@@ -1,4 +1,4 @@
-package com.storix.storix_api.common.config;
+package com.storix.storix_api.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

@@ -1,4 +1,4 @@
-package com.storix.storix_api.common.model;
+package com.storix.storix_api.global.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

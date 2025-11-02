@@ -1,4 +1,4 @@
-package com.storix.storix_api.common.config;
+package com.storix.storix_api.global.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
