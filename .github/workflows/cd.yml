@@ -3,7 +3,7 @@ name: STORIX CD - Deploy to EC2
 on:
   workflow_run:
     workflows:
-      - ["STORIX CI - Build & Push to ECR"]
+      - "STORIX CI - Build & Push to ECR"
     types:
       - completed
 
@@ -24,19 +24,16 @@ jobs:
           port: 22
 
           script: |
-          # Change directory
             cd ~/storix
             test -f docker-compose.yml || { echo "ERORR: docker-compose.yml not found"; exit 1; }
             test -f .env || { echo "ERROR: .env not found"; exit 1; }
-
-          # ECR에서 이미지 pull
+            
             echo ">>> Pulling latest image from ECR..."
             sudo docker compose pull app
             
             echo ">>> Starting new container..."
             sudo docker compose up -d --no-deps app
             
-          # 구버전 이미지 정리
             echo ">>> Pruning old images..."
             sudo docker image prune -af
             
