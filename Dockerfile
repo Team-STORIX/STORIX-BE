@@ -1,5 +1,5 @@
-# 1. build stage
-FROM public.ecr.aws/amazoncorretto/amazoncorretto:17-jdk-alpine AS builder
+# 1. Build Stage
+FROM amazoncorretto:17-alpine-jdk AS builder
 
 ENV TZ=Asia/Seoul
 WORKDIR /app
@@ -15,8 +15,9 @@ COPY . .
 
 RUN ./gradlew build -x test --no-daemon
 
-# 2. run stage
-FROM public.ecr.aws/amazoncorretto/amazoncorretto:17-jre-alpine
+
+# 2. Run Stage
+FROM amazoncorretto:17-alpine-jdk
 
 ENV TZ=Asia/Seoul
 WORKDIR /app
