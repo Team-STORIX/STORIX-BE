@@ -16,15 +16,16 @@ public class User {
     private Long id;
 
     // 계정 정보
-    private Boolean isAdultVerified = false;
+    private String nickName;
     @Embedded private Profile profile;
+    private Boolean isAdultVerified = false;
 
     // 계정 상태
     private AccountState accountState = AccountState.NORMAL;
 
     // 계정 권한
     private LocalDateTime lastLoginAt = LocalDateTime.now();
-    private Role role = Role.READER;
+    private Role role = Role.ROLE_READER;
 
     // 독자용 소셜 로그인
     private String name;
@@ -38,18 +39,19 @@ public class User {
     protected User() {}
 
     @Builder // 독자
-    public User(OAuthInfo oauthInfo, String name, Profile profile) {
+    public User(OAuthInfo oauthInfo, String name, String nickName, Profile profile) {
         this.oauthInfo = oauthInfo;
         this.name = name;
+        this.nickName = nickName;
         this.profile = profile;
     }
 
     @Builder // 작가
-    public User(String name, String loginId, String password) {
-        this.name = name;
+    public User(String nickName, String loginId, String password) {
+        this.nickName = nickName;
         this.loginId = loginId;
         this.password = password;
-        this.role = Role.ARTIST;
+        this.role = Role.ROLE_ARTIST;
     }
 
     /** 비즈니스 로직 **/

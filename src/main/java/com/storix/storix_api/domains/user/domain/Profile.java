@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Profile {
 
-    private String nickName;
-
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
