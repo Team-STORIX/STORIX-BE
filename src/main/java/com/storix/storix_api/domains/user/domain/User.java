@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.user.domain;
 
+import com.storix.storix_api.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Table(name = "users")
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -25,7 +26,7 @@ public class User {
 
     // 계정 권한
     private LocalDateTime lastLoginAt = LocalDateTime.now();
-    private Role role = Role.ROLE_READER;
+    private Role role = Role.READER;
 
     // 독자용 소셜 로그인
     private String name;
@@ -51,7 +52,7 @@ public class User {
         this.nickName = nickName;
         this.loginId = loginId;
         this.password = password;
-        this.role = Role.ROLE_ARTIST;
+        this.role = Role.ARTIST;
     }
 
     /** 비즈니스 로직 **/
