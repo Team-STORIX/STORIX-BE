@@ -18,7 +18,7 @@ public enum ErrorCode {
     // Token error
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_001", "잘못된 토큰입니다"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_401_001", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요"),
-    REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "AUTH_403_001", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요");
+    REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "AUTH_403_001", "토큰이 만료되었습니다. 재로그인 해주세요");
 
 
     private final HttpStatus httpStatus;
