@@ -1,32 +1,29 @@
 package com.storix.storix_api.global.security;
 
-import com.storix.storix_api.domains.user.domain.RefreshToken;
-import com.storix.storix_api.domains.user.repository.RefreshTokenRepository;
+import com.storix.storix_api.domains.user.adaptor.RefreshTokenAdaptor;
+import com.storix.storix_api.global.apiPayload.exception.ExpiredRefreshTokenException;
+import com.storix.storix_api.global.apiPayload.exception.ExpiredTokenException;
+import com.storix.storix_api.global.apiPayload.exception.InvalidTokenException;
+import com.storix.storix_api.global.security.dto.AccessTokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.stream.Collectors;
+
+import static com.storix.storix_api.global.apiPayload.STORIXStatic.*;
+
 
 @Component
 @RequiredArgsConstructor
 public class TokenProvider implements InitializingBean {
 
-    private final UserDetailsService userDetailsService;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenAdaptor refreshTokenAdaptor;
 
     @Value("${JWT_SECRET_KEY}") private String secretKey;
     @Value("${JWT_ACCESS_TOKEN_VALIDITY_MS}") private long accessTokenValidityMs;
@@ -41,113 +38,79 @@ public class TokenProvider implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes); // HMAC-SHA
     }
 
-    /** 요청 헤더에서 Bearer 토큰만 추출 */
-    public String getAccessToken(HttpServletRequest request) {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
+    private Jws<Claims> getJws(String token) {
+        try {
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        } catch (ExpiredJwtException e) {
+            throw ExpiredTokenException.EXCEPTION;
+        } catch (Exception e) {
+            throw InvalidTokenException.EXCEPTION;
         }
-        return null;
     }
 
-    /** 액세스 토큰 생성: subject = userId, roles = 권한 CSV */
-    public String createAccessToken(Long id, Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+    public String createAccessToken(String userId, String role) {
 
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + accessTokenValidityMs);
+        final Date issuedAt = new Date();
+        final Date expiredAt = new Date(issuedAt.getTime() + accessTokenValidityMs);
 
         return Jwts.builder()
-                .setSubject(String.valueOf(id))      // user 식별자
-                .claim("roles", authorities)          // 권한
-                .setIssuedAt(now)
-                .setExpiration(expiry)
+                .setIssuer(TOKEN_ISSUR)
+                .setSubject(userId)
+                .claim(TOKEN_TYPE, ACCESS_TOKEN)
+                .claim(TOKEN_ROLE, role)
+                .setIssuedAt(issuedAt)
+                .setExpiration(expiredAt)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String createRefreshToken(Long userId) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + refreshTokenValidityMs);
+    public String createRefreshToken(String userId) {
 
-        String token = Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .claim("type", "refresh")
-                .setIssuedAt(now)
-                .setExpiration(expiry)
+        final Date issuedAt = new Date();
+        final Date expiredAt = new Date(issuedAt.getTime() + refreshTokenValidityMs);
+
+        return Jwts.builder()
+                .setIssuer(TOKEN_ISSUR)
+                .setSubject(userId)
+                .claim(TOKEN_TYPE, REFRESH_TOKEN)
+                .setIssuedAt(issuedAt)
+                .setExpiration(expiredAt)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-
-        // @TimeToLive 단위 변환
-        long ttlSeconds = refreshTokenValidityMs / 1000L;
-
-        RefreshToken refreshToken = RefreshToken.builder()
-                .id(String.valueOf(userId))   // key: userId 기준
-                .refreshToken(token)
-                .ttl(ttlSeconds)
-                .build();
-
-        refreshTokenRepository.save(refreshToken);
-
-        return token;
     }
 
-    /** 토큰에서 사용자 ID(subject) 추출 */
-    public String getTokenUserId(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token)
-                .getBody().getSubject();
+    public boolean isAccessToken(String token) {
+        return getJws(token).getBody().get(TOKEN_TYPE).equals(ACCESS_TOKEN);
     }
 
-    /** 토큰을 기반으로 Authentication 생성 (SecurityContext에 넣을 용도) */
-    public Authentication getAuthentication(String token) {
-        String userId = getTokenUserId(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-        return new UsernamePasswordAuthenticationToken(
-                userDetails, token, userDetails.getAuthorities());
+    public boolean isRefreshToken(String token) {
+        return getJws(token).getBody().get(TOKEN_TYPE).equals(REFRESH_TOKEN);
     }
 
-    /** 유효성 검증 (서명/만료/포맷) */
-    public boolean validateAccessToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            return false; // 만료
-        } catch (JwtException | IllegalArgumentException e) {
-            return false; // 서명 불일치/변조/형식 오류
+    public AccessTokenInfo parseAccessToken(String token) {
+        if (isAccessToken(token)) {
+            Claims claims = getJws(token).getBody();
+            return AccessTokenInfo.builder()
+                    .userId(Long.parseLong(claims.getSubject()))
+                    .role((String) claims.get(TOKEN_ROLE))
+                    .build();
         }
+        throw InvalidTokenException.EXCEPTION;
     }
 
-    /** 리프레시 토큰 유효성 검증 + Redis에 존재 여부 검증 */
-    public boolean validateRefreshToken(String token) {
+    public Long parseRefreshToken(String token) {
         try {
-            // 1) JWT 형식/서명/만료 검증
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            // type 이 refresh인지 체크
-            Object type = claims.get("type");
-            if (type == null || !"refresh".equals(type.toString())) {
-                return false;
+            if (isRefreshToken(token)) {
+                Claims claims = getJws(token).getBody();
+                return Long.parseLong(claims.getSubject());
             }
-
-            String userId = claims.getSubject();
-
-            // 2) Redis 에서 해당 사용자 id로 저장된 refresh token 가져오기
-            return refreshTokenRepository.findById(userId)
-                    .map(saved -> saved.getRefreshToken().equals(token))
-                    .orElse(false);
-
-        } catch (ExpiredJwtException e) {
-            return false; // 만료
-        } catch (JwtException | IllegalArgumentException e) {
-            return false; // 서명 불일치/변조/형식 오류
+        } catch (ExpiredTokenException e) {
+            throw ExpiredRefreshTokenException.EXCEPTION;
         }
+        throw InvalidTokenException.EXCEPTION;
+    }
+
+    public Long getRefreshTokenValidityMs() {
+        return refreshTokenValidityMs;
     }
 }
