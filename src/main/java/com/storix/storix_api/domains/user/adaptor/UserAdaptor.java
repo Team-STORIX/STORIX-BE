@@ -4,6 +4,7 @@ import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.domains.user.repository.UserRepository;
 import com.storix.storix_api.domains.user.service.CreateArtistUserCommand;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
+import com.storix.storix_api.global.apiPayload.exception.UnknownUserException;
 import com.storix.storix_api.global.apiPayload.exception.ErrorResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -12,26 +13,27 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserAdaptor {
 
     private final UserRepository userRepository;
 
+    // TODO: 인덱싱
+
     // 작가
+    // loginId -> userId (회원가입 api 응답, 작품-작가 매칭 용)
     public Long findArtistUserIdByLoginId(String loginId){
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
         if(artistUser.isPresent()){
             return artistUser.get().getId();
         }
-        return null;
+        throw UnknownUserException.EXCEPTION;
     }
 
-    public User findArtistUserByLoginId(String loginId){
-        Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
-        if(artistUser.isPresent()){
-            return artistUser.get();
-        }
-        return null;
+    // loginId -> Optional<User> (로그인 시, loginId가 DB에 존재하는가? 존재한다면 password까지)
+    public Optional<User> findArtistUserByLoginId(String loginId){
+        return userRepository.findArtistUserByLoginId(loginId);
     }
 
     public AuthUserDetails findArtistUserIdAndRoleByLoginId(String loginId){
@@ -39,7 +41,7 @@ public class UserAdaptor {
         if(artistUser.isPresent()){
             return new AuthUserDetails(String.valueOf(artistUser.get().getId()), String.valueOf(artistUser.get().getRole()));
         }
-        return null;
+        throw UnknownUserException.EXCEPTION;
     }
 
     public ErrorResponse isLoginIdDuplicate(String loginId) {
@@ -50,7 +52,6 @@ public class UserAdaptor {
         return null;
     }
 
-    @Transactional
     public User saveArtistUser(CreateArtistUserCommand cmd) {
         User user = userRepository.save(cmd.toEntity());
         return userRepository.save(user);

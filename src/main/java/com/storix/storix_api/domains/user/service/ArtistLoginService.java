@@ -3,11 +3,14 @@ package com.storix.storix_api.domains.user.service;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.User;
+import com.storix.storix_api.global.apiPayload.exception.ArtistLoginException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +24,11 @@ public class ArtistLoginService implements UserDetailsService {
         return userAdaptor.findArtistUserIdAndRoleByLoginId(username);
     }
 
-    public boolean artistLogin(String loginId, String password) {
-        User artistUser = userAdaptor.findArtistUserByLoginId(loginId);
+    public boolean isArtistLoginValidate(String loginId, String password) {
+        Optional<User> artistUser = userAdaptor.findArtistUserByLoginId(loginId);
 
-        if (!passwordEncoder.matches(password, artistUser.getPassword())) {
-            throw new IllegalArgumentException("비밀번호 불일치");
+        if (!artistUser.isPresent() | !passwordEncoder.matches(password, artistUser.get().getPassword())) {
+            throw ArtistLoginException.EXCEPTION;
         }
 
         return true;
