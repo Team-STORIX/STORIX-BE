@@ -21,7 +21,7 @@ public class LoginUseCase {
 
     /**
      * 독자용
-     * username = String.valueOf(id)
+     * username =
      *
      * id: User PK
      * */
@@ -29,16 +29,12 @@ public class LoginUseCase {
 
     /**
      * 작가용
-     * username = loginId // TODO: String.valueOf(id)로 바꿀 것
-     *
-     * @param req
+     * username = loginId
      * */
     public CustomResponse<LoginWithTokenResponse> artistLoginWithLoginId(ArtistLoginRequest req) {
-        if (artistLoginService.artistLogin(req.loginId(), req.password())){
-            AuthUserDetails userDetails = artistLoginService.loadUserByUsername(req.loginId());
-            LoginWithTokenResponse loginWithTokenResponse = tokenGenerateHelper.generateLoginWithToken(userDetails);
-            return CustomResponse.onSuccess(SuccessCode.SUCCESS, loginWithTokenResponse);
-        }
-        return null; // TODO: Exception 핸들링
+        artistLoginService.isArtistLoginValidate(req.loginId(), req.password());
+        AuthUserDetails userDetails = artistLoginService.loadUserByUsername(req.loginId());
+        LoginWithTokenResponse loginWithTokenResponse = tokenGenerateHelper.generateLoginWithToken(userDetails);
+        return CustomResponse.onSuccess(SuccessCode.SUCCESS, loginWithTokenResponse);
     }
 }

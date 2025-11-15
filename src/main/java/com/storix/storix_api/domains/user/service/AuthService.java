@@ -26,6 +26,7 @@ public class AuthService {
 
         userAdaptor.saveArtistUser(m);
         Long artistUserId = userAdaptor.findArtistUserIdByLoginId(req.loginId());
+        // TODO: 이때 WorksAndArtistMatcher 만들어두고 artistUserId 바로 넘기면 될듯요 (회원가입과 동시에 Works에 작가 회원id 정보 넣어주기)
 
         return artistUserId;
     }
