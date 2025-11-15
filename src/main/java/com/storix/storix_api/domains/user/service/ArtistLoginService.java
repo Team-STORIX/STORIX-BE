@@ -27,7 +27,11 @@ public class ArtistLoginService implements UserDetailsService {
     public boolean isArtistLoginValidate(String loginId, String password) {
         Optional<User> artistUser = userAdaptor.findArtistUserByLoginId(loginId);
 
-        if (!artistUser.isPresent() | !passwordEncoder.matches(password, artistUser.get().getPassword())) {
+        if (!artistUser.isPresent()) {
+            throw ArtistLoginException.EXCEPTION;
+        }
+
+        if (!passwordEncoder.matches(password, artistUser.get().getPassword())) {
             throw ArtistLoginException.EXCEPTION;
         }
 
