@@ -9,7 +9,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "users")
+@Table(
+        name = "users",
+        indexes = {
+                @Index(name = "idx_loginId_password", columnList = "loginId, password")
+        }
+)
 public class User extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +22,7 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     // 계정 정보
+    @Column(nullable = false)
     private String nickName;
     @Embedded private Profile profile;
     private Boolean isAdultVerified = false;
