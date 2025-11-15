@@ -8,6 +8,7 @@ import com.storix.storix_api.domains.user.service.AuthService;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,10 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    private AuthService authService;
-    private LoginUseCase loginUseCase;
+    private final AuthService authService;
+    private final LoginUseCase loginUseCase;
 
     @PostMapping("/users/artist/login")
     public ResponseEntity artistUserLogin(@RequestBody ArtistLoginRequest req){
