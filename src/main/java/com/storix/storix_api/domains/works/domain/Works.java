@@ -25,11 +25,11 @@ public class Works {
     private Platform platform;
 
     // 작품명
-    @Column(name = "works_name")
+    @Column(name = "works_name", nullable = false)
     private String worksName;
 
     // 전체 작가
-    @Column(name = "artist_name")
+    @Column(name = "artist_name", nullable = false)
     private String artistName;
 
     @Column(length = 100)
