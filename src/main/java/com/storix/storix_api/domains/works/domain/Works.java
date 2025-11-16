@@ -18,7 +18,7 @@ public class Works {
     private Long id;
 
     @Column(name = "user_id")
-    private Long userId;
+    private Long userId = null;
 
     // 작품 플랫폼
     @Column(nullable = false)
@@ -76,13 +76,12 @@ public class Works {
     private Set<Hashtag> hashtags = new HashSet<>();
 
     @Builder
-    private Works(Long userId, Platform platform, String worksName,
+    private Works(Platform platform, String worksName,
                   String artistName, String author, String illustrator,
                   String originalAuthor, AgeClassification ageClassification,
                   String description, Genre genre, String thumbnailUrl,
                   WorksType worksType) {
 
-        this.userId = userId;
         this.platform = platform;
         this.worksName = worksName;
         this.artistName = artistName;
