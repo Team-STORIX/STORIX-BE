@@ -24,7 +24,7 @@ public class ArtistLoginService implements UserDetailsService {
         return userAdaptor.findArtistUserIdAndRoleByLoginId(username);
     }
 
-    public boolean isArtistLoginValidate(String loginId, String password) {
+    public void validateArtistLogin (String loginId, String password) {
         Optional<User> artistUser = userAdaptor.findArtistUserByLoginId(loginId);
 
         if (!artistUser.isPresent()) {
@@ -35,6 +35,5 @@ public class ArtistLoginService implements UserDetailsService {
             throw ArtistLoginException.EXCEPTION;
         }
 
-        return true;
     }
 }

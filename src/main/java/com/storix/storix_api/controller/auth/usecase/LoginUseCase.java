@@ -32,7 +32,7 @@ public class LoginUseCase {
      * username = loginId
      * */
     public CustomResponse<LoginWithTokenResponse> artistLoginWithLoginId(ArtistLoginRequest req) {
-        artistLoginService.isArtistLoginValidate(req.loginId(), req.password());
+        artistLoginService.validateArtistLogin(req.loginId(), req.password());
         AuthUserDetails userDetails = artistLoginService.loadUserByUsername(req.loginId());
         LoginWithTokenResponse loginWithTokenResponse = tokenGenerateHelper.generateLoginWithToken(userDetails);
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, loginWithTokenResponse);
