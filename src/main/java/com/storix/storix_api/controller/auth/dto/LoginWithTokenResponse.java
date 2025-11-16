@@ -1,6 +1,5 @@
-package com.storix.storix_api.controller.dto;
+package com.storix.storix_api.controller.auth.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder

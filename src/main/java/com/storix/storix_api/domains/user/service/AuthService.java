@@ -1,6 +1,6 @@
 package com.storix.storix_api.domains.user.service;
 
-import com.storix.storix_api.controller.dto.ArtistSignupRequest;
+import com.storix.storix_api.controller.auth.dto.ArtistSignupRequest;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,9 @@
-package com.storix.storix_api.controller;
+package com.storix.storix_api.controller.auth;
 
-import com.storix.storix_api.controller.auth.LoginUseCase;
-import com.storix.storix_api.controller.dto.ArtistLoginRequest;
-import com.storix.storix_api.controller.dto.ArtistSignupRequest;
-import com.storix.storix_api.controller.dto.ArtistSignupResponse;
+import com.storix.storix_api.controller.auth.dto.ArtistLoginRequest;
+import com.storix.storix_api.controller.auth.dto.ArtistSignupRequest;
+import com.storix.storix_api.controller.auth.dto.ArtistSignupResponse;
+import com.storix.storix_api.controller.auth.usecase.LoginUseCase;
 import com.storix.storix_api.domains.user.service.AuthService;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;

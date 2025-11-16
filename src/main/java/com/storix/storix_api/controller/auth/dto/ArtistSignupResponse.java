@@ -1,4 +1,4 @@
-package com.storix.storix_api.controller.dto;
+package com.storix.storix_api.controller.auth.dto;
 
 public record ArtistSignupResponse(
         Long userId,

@@ -1,6 +1,6 @@
 package com.storix.storix_api.domains.user.adaptor;
 
-import com.storix.storix_api.controller.dto.LoginWithTokenResponse;
+import com.storix.storix_api.controller.auth.dto.LoginWithTokenResponse;
 import com.storix.storix_api.domains.user.domain.RefreshToken;
 import com.storix.storix_api.global.security.TokenProvider;
 import jakarta.transaction.Transactional;
