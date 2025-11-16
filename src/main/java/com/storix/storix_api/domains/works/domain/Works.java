@@ -58,10 +58,10 @@ public class Works {
     private String thumbnailUrl;
 
     @Column(name = "reviews_count")
-    private Integer reviewsCount;
+    private int reviewsCount;
 
     @Column(name = "avg_rating")
-    private Float avgRating;
+    private double avgRating;
 
     @Column(name = "works_type", nullable = false)
     private WorksType worksType;
@@ -94,7 +94,7 @@ public class Works {
         this.thumbnailUrl = thumbnailUrl;
         this.worksType = worksType;
         this.reviewsCount = 0;
-        this.avgRating = 0.0f;
+        this.avgRating = 0.0;
         this.hashtags = new HashSet<>();
     }
 
