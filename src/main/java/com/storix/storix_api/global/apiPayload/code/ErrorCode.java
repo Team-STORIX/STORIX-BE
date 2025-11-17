@@ -21,7 +21,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "AUTH_403_001", "토큰이 만료되었습니다. 재로그인 해주세요"),
 
     // Login error
-    FAILED_ARTIST_LOGIN(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_002", "인증되지 않은 계정 정보입니다. 다시 로그인 해주세요.");
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_002", "아이디 또는 비밀번호가 일치하지 않습니다");
 
 
     private final HttpStatus httpStatus;

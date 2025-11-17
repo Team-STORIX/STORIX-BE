@@ -6,5 +6,5 @@ public class ArtistLoginException extends STORIXCodeException {
 
     public static final STORIXCodeException EXCEPTION = new ArtistLoginException();
 
-    private ArtistLoginException() { super(ErrorCode.FAILED_ARTIST_LOGIN); }
+    private ArtistLoginException() { super(ErrorCode.INVALID_CREDENTIALS); }
 }
