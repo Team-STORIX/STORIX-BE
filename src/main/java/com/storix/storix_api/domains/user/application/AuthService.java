@@ -1,7 +1,8 @@
-package com.storix.storix_api.domains.user.service;
+package com.storix.storix_api.domains.user.application;
 
 import com.storix.storix_api.controller.auth.dto.ArtistSignupRequest;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
+import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

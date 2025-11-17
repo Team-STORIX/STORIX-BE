@@ -2,7 +2,7 @@ package com.storix.storix_api.domains.user.adaptor;
 
 import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.domains.user.repository.UserRepository;
-import com.storix.storix_api.domains.user.service.CreateArtistUserCommand;
+import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import com.storix.storix_api.global.apiPayload.exception.UnknownUserException;
 import com.storix.storix_api.global.apiPayload.exception.ErrorResponse;

@@ -1,4 +1,4 @@
-package com.storix.storix_api.domains.user.service;
+package com.storix.storix_api.domains.user.dto;
 
 import com.storix.storix_api.domains.user.domain.User;
 
