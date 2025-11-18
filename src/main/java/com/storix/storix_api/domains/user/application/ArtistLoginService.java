@@ -2,15 +2,13 @@ package com.storix.storix_api.domains.user.application;
 
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
-import com.storix.storix_api.domains.user.domain.User;
+import com.storix.storix_api.domains.user.dto.LoginInfo;
 import com.storix.storix_api.global.apiPayload.exception.ArtistLoginException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,13 +23,9 @@ public class ArtistLoginService implements UserDetailsService {
     }
 
     public void validateArtistLogin (String loginId, String password) {
-        Optional<User> artistUser = userAdaptor.findArtistUserByLoginId(loginId);
+        LoginInfo artistUserLoginInfo = userAdaptor.findArtistUserLoginInfoByLoginId(loginId);
 
-        if (!artistUser.isPresent()) {
-            throw ArtistLoginException.EXCEPTION;
-        }
-
-        if (!passwordEncoder.matches(password, artistUser.get().getPassword())) {
+        if (!passwordEncoder.matches(password, artistUserLoginInfo.password())) {
             throw ArtistLoginException.EXCEPTION;
         }
 

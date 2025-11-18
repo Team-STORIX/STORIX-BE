@@ -1,9 +1,11 @@
 package com.storix.storix_api.domains.user.adaptor;
 
 import com.storix.storix_api.domains.user.domain.User;
+import com.storix.storix_api.domains.user.dto.LoginInfo;
 import com.storix.storix_api.domains.user.repository.UserRepository;
 import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
+import com.storix.storix_api.global.apiPayload.exception.ArtistLoginException;
 import com.storix.storix_api.global.apiPayload.exception.UnknownUserException;
 import com.storix.storix_api.global.apiPayload.exception.ErrorResponse;
 import jakarta.transaction.Transactional;
@@ -32,8 +34,16 @@ public class UserAdaptor {
     }
 
     // loginId -> Optional<User> (로그인 시, loginId가 DB에 존재하는가? 존재한다면 password까지)
-    public Optional<User> findArtistUserByLoginId(String loginId){
-        return userRepository.findArtistUserByLoginId(loginId);
+    public LoginInfo findArtistUserLoginInfoByLoginId(String loginId){
+
+        Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
+
+        if(!artistUser.isPresent()) { throw ArtistLoginException.EXCEPTION; }
+
+        LoginInfo loginInfo = new LoginInfo(artistUser.get().getLoginId(), artistUser.get().getPassword());
+
+        return loginInfo;
+
     }
 
     public AuthUserDetails findArtistUserIdAndRoleByLoginId(String loginId){
