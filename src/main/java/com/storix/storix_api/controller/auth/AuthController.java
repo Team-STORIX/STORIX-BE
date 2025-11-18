@@ -3,6 +3,7 @@ package com.storix.storix_api.controller.auth;
 import com.storix.storix_api.controller.auth.dto.ArtistLoginRequest;
 import com.storix.storix_api.controller.auth.dto.ArtistSignupRequest;
 import com.storix.storix_api.controller.auth.dto.ArtistSignupResponse;
+import com.storix.storix_api.domains.user.application.AuthUseCase;
 import com.storix.storix_api.domains.user.application.LoginUseCase;
 import com.storix.storix_api.domains.user.application.AuthService;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthUseCase authUseCase;
     private final LoginUseCase loginUseCase;
 
     @PostMapping("/users/artist/login")
@@ -31,9 +32,9 @@ public class AuthController {
 
     @Operation(summary = "백엔드용 작가 계정 생성 api 입니다.")
     @PostMapping("/developer/users/artist/signup")
-    public CustomResponse<ArtistSignupResponse> developerArtistUserSignup(@RequestBody ArtistSignupRequest req){
-        Long artistUserId = authService.signUpArtistUser(req);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, new ArtistSignupResponse(artistUserId, req.loginId(), req.nickName()));
+    public ResponseEntity developerArtistUserSignup(@RequestBody ArtistSignupRequest req){
+        return ResponseEntity.ok()
+                .body(authUseCase.artistSignup(req));
     }
 
 }
