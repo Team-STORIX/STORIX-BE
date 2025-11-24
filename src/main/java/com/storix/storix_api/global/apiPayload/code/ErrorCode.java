@@ -17,12 +17,15 @@ public enum ErrorCode {
 
     // Token error
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_001", "잘못된 토큰입니다"),
-    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_401_001", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요"),
-    REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "AUTH_403_001", "토큰이 만료되었습니다. 재로그인 해주세요"),
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_401_001", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요"),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "AUTH_ERROR_403_001", "토큰이 만료되었습니다. 재로그인 해주세요"),
 
     // Login error
-    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_002", "아이디 또는 비밀번호가 일치하지 않습니다");
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_002", "아이디 또는 비밀번호가 일치하지 않습니다"),
 
+    // Notification error
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_ERROR_001", "알림을 찾을 수 없습니다"),
+    NOTIFICATION_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "NOTIFICATION_ERROR_002", "인가되지 않은 접근입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
