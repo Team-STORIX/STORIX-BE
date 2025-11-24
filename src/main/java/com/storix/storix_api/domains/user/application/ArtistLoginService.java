@@ -3,7 +3,7 @@ package com.storix.storix_api.domains.user.application;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.dto.LoginInfo;
-import com.storix.storix_api.global.apiPayload.exception.ArtistLoginException;
+import com.storix.storix_api.global.apiPayload.exception.user.ArtistLoginException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
