@@ -32,8 +32,7 @@ public class NotificationController {
             @Parameter(description = "한 번에 가져올 개수 (기본 10)")
             @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        // AuthUserDetails : String -> Long 변환
-        Long userId = Long.valueOf(authUser.getUserId());
+        Long userId = authUser.getUserId();
 
         Slice<NotificationResponseDto> result = notificationService.getNotifications(userId, cursorId, PageRequest.of(0, size));
 
@@ -46,7 +45,7 @@ public class NotificationController {
     public CustomResponse<Long> getUnreadCount(
             @AuthenticationPrincipal AuthUserDetails authUser
     ) {
-        Long userId = Long.valueOf(authUser.getUserId());
+        Long userId = authUser.getUserId();
 
         long count = notificationService.getUnreadCount(userId);
         return CustomResponse.onSuccess(SuccessCode.NOTIFICATION_COUNT_SUCCESS, count);
@@ -59,7 +58,7 @@ public class NotificationController {
             @AuthenticationPrincipal AuthUserDetails authUser,
             @PathVariable("id") Long notificationId
     ) {
-        Long userId = Long.valueOf(authUser.getUserId());
+        Long userId = authUser.getUserId();
 
         notificationService.readNotification(userId, notificationId);
         return CustomResponse.onSuccess(SuccessCode.NOTIFICATION_READ_SUCCESS);
@@ -71,7 +70,7 @@ public class NotificationController {
     public CustomResponse<Void> readAllNotifications(
             @AuthenticationPrincipal AuthUserDetails authUser
     ) {
-        Long userId = Long.valueOf(authUser.getUserId());
+        Long userId = authUser.getUserId();
 
         notificationService.readAllNotifications(userId);
         return CustomResponse.onSuccess(SuccessCode.NOTIFICATION_READ_ALL_SUCCESS);
