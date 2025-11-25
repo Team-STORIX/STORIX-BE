@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @Getter
 public class RefreshToken {
     @Id
-    private String id;
+    private Long id;
 
     @Indexed
     private String refreshToken;
@@ -20,7 +20,7 @@ public class RefreshToken {
     private Long ttl;
 
     @Builder
-    public RefreshToken(String id, String refreshToken, Long ttl) {
+    public RefreshToken(Long id, String refreshToken, Long ttl) {
         this.id = id;
         this.refreshToken = refreshToken;
         this.ttl = ttl;
