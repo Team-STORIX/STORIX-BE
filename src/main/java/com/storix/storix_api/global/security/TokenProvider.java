@@ -1,9 +1,9 @@
 package com.storix.storix_api.global.security;
 
 import com.storix.storix_api.domains.user.adaptor.RefreshTokenAdaptor;
-import com.storix.storix_api.global.apiPayload.exception.ExpiredRefreshTokenException;
-import com.storix.storix_api.global.apiPayload.exception.ExpiredTokenException;
-import com.storix.storix_api.global.apiPayload.exception.InvalidTokenException;
+import com.storix.storix_api.global.apiPayload.exception.user.ExpiredRefreshTokenException;
+import com.storix.storix_api.global.apiPayload.exception.user.ExpiredTokenException;
+import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
 import com.storix.storix_api.global.security.dto.AccessTokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
