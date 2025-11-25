@@ -49,7 +49,7 @@ public class UserAdaptor {
     public AuthUserDetails findArtistUserIdAndRoleByLoginId(String loginId){
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
         if(artistUser.isPresent()){
-            return new AuthUserDetails(String.valueOf(artistUser.get().getId()), String.valueOf(artistUser.get().getRole()));
+            return new AuthUserDetails(artistUser.get().getId(), String.valueOf(artistUser.get().getRole()));
         }
         throw UnknownUserException.EXCEPTION;
     }

@@ -13,7 +13,7 @@ import java.util.Collections;
 @AllArgsConstructor
 public class AuthUserDetails implements UserDetails {
 
-    private String userId;
+    private Long userId;
 
     private String role;
 
@@ -28,7 +28,7 @@ public class AuthUserDetails implements UserDetails {
     public String getPassword() { return null; }
 
     @Override
-    public String getUsername() { return userId; }
+    public String getUsername() { return userId.toString(); }
 
     // AccountState 분기
     @Override

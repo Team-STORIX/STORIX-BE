@@ -19,7 +19,7 @@ public class TokenGenerateHelper {
     @Transactional
     public LoginWithTokenResponse generateLoginWithToken(AuthUserDetails userDetails) {
 
-        String userId = userDetails.getUserId();
+        Long userId = userDetails.getUserId();
         String role = userDetails.getRole();
 
         String accessToken = tokenProvider.createAccessToken(userId, role);

@@ -11,7 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -52,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         AccessTokenInfo accessTokenInfo = tokenProvider.parseAccessToken(token);
 
         AuthUserDetails userDetails = new AuthUserDetails(
-                accessTokenInfo.getUserId().toString(), accessTokenInfo.getRole());
+                accessTokenInfo.userId(), accessTokenInfo.role());
         return new UsernamePasswordAuthenticationToken(
                 userDetails, "user", userDetails.getAuthorities());
     }
