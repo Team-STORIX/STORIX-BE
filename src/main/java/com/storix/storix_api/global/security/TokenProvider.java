@@ -48,14 +48,14 @@ public class TokenProvider implements InitializingBean {
         }
     }
 
-    public String createAccessToken(String userId, String role) {
+    public String createAccessToken(Long userId, String role) {
 
         final Date issuedAt = new Date();
         final Date expiredAt = new Date(issuedAt.getTime() + accessTokenValidityMs);
 
         return Jwts.builder()
                 .setIssuer(TOKEN_ISSUR)
-                .setSubject(userId)
+                .setSubject(userId.toString())
                 .claim(TOKEN_TYPE, ACCESS_TOKEN)
                 .claim(TOKEN_ROLE, role)
                 .setIssuedAt(issuedAt)
@@ -64,14 +64,14 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
-    public String createRefreshToken(String userId) {
+    public String createRefreshToken(Long userId) {
 
         final Date issuedAt = new Date();
         final Date expiredAt = new Date(issuedAt.getTime() + refreshTokenValidityMs);
 
         return Jwts.builder()
                 .setIssuer(TOKEN_ISSUR)
-                .setSubject(userId)
+                .setSubject(userId.toString())
                 .claim(TOKEN_TYPE, REFRESH_TOKEN)
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiredAt)
