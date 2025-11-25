@@ -15,7 +15,7 @@ public class NotificationResponseDto {
     private NotificationType notificationType;
     private String content;
     private Long targetId;
-    private Boolean isRead;
+    private boolean isRead;
     private LocalDateTime createdAt;
 
     // Entity -> DTO 변환 정적 팩토리 메서드
@@ -25,7 +25,7 @@ public class NotificationResponseDto {
                 .notificationType(notification.getNotificationType())
                 .content(notification.getContent())
                 .targetId(notification.getTargetId())
-                .isRead(notification.getIsRead())
+                .isRead(notification.isRead())
                 .createdAt(notification.getCreatedAt()) // BaseEntity의 getter
                 .build();
     }
