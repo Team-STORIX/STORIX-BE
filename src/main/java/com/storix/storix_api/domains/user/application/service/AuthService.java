@@ -1,4 +1,4 @@
-package com.storix.storix_api.domains.user.application;
+package com.storix.storix_api.domains.user.application.service;
 
 import com.storix.storix_api.controller.auth.dto.ArtistSignupRequest;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
@@ -15,6 +15,10 @@ public class AuthService {
     private final UserAdaptor userAdaptor;
     private final PasswordEncoder passwordEncoder;
 
+    // 독자 회원 가입 (소셜 로그인)
+
+
+    // 작가 회원 가입 (일반 로그인)
     @Transactional
     public Long signUpArtistUser(ArtistSignupRequest req) {
         userAdaptor.isLoginIdDuplicate(req.loginId());

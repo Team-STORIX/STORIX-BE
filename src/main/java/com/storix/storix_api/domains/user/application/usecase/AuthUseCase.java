@@ -1,8 +1,9 @@
-package com.storix.storix_api.domains.user.application;
+package com.storix.storix_api.domains.user.application.usecase;
 
 import com.storix.storix_api.UseCase;
 import com.storix.storix_api.controller.auth.dto.ArtistSignupRequest;
 import com.storix.storix_api.controller.auth.dto.ArtistSignupResponse;
+import com.storix.storix_api.domains.user.application.service.AuthService;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import lombok.RequiredArgsConstructor;
