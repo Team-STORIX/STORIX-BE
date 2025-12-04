@@ -18,7 +18,7 @@ import java.time.Duration;
 public class RedisCacheConfig {
 
     @Bean
-    public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+    public CacheManager oidcCacheManager(RedisConnectionFactory redisConnectionFactory) {
 
         RedisCacheConfiguration redisCacheConfiguration
                 = RedisCacheConfiguration.defaultCacheConfig()
@@ -28,7 +28,7 @@ public class RedisCacheConfig {
                     .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
                                 new GenericJackson2JsonRedisSerializer()))
-                    .entryTtl(Duration.ofHours(3));
+                    .entryTtl(Duration.ofDays(7L));
 
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
