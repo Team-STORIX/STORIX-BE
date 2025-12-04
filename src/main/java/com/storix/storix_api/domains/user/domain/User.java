@@ -12,7 +12,13 @@ import java.time.LocalDateTime;
 @Table(
         name = "users",
         indexes = {
-                @Index(name = "idx_loginId_password", columnList = "loginId, password")
+                @Index(name = "idx_loginId", columnList = "loginId")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_oauth_provider_oid",
+                        columnNames = {"oauth_provider", "oauth_oid"}
+                )
         }
 )
 public class User extends BaseTimeEntity {
@@ -36,7 +42,12 @@ public class User extends BaseTimeEntity {
 
     // 독자용 소셜 로그인
     private String name;
-    @Embedded private OAuthInfo oauthInfo;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "provider", column = @Column(name = "oauth_provider")),
+            @AttributeOverride(name = "oid", column = @Column(name = "oauth_oid"))
+    })
+    private OAuthInfo oauthInfo;
 
     // 작가용 아이디/비번
     private String loginId = null;
