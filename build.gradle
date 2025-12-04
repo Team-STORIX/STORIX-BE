@@ -47,6 +47,8 @@ dependencies {
 
     // OAuth 2.0
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation platform("org.springframework.cloud:spring-cloud-dependencies:2025.0.0")
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
