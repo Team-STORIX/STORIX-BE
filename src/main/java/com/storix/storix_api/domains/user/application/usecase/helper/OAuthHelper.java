@@ -1,5 +1,6 @@
-package com.storix.storix_api.domains.user.adaptor;
+package com.storix.storix_api.domains.user.application.usecase.helper;
 
+import com.storix.storix_api.domains.user.adaptor.JwtOIDCProvider;
 import com.storix.storix_api.domains.user.application.client.KakaoInfoClient;
 import com.storix.storix_api.domains.user.application.client.KakaoOAuthClient;
 import com.storix.storix_api.domains.user.application.client.OAuthProperties;

@@ -3,7 +3,7 @@ package com.storix.storix_api.domains.user.application.usecase;
 import com.storix.storix_api.UseCase;
 import com.storix.storix_api.controller.auth.dto.*;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
-import com.storix.storix_api.domains.user.adaptor.TokenGenerateHelper;
+import com.storix.storix_api.domains.user.application.usecase.helper.TokenGenerateHelper;
 import com.storix.storix_api.domains.user.application.service.AuthService;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.global.apiPayload.CustomResponse;

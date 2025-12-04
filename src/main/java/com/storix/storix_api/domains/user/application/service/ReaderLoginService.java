@@ -1,7 +1,7 @@
 package com.storix.storix_api.domains.user.application.service;
 
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
-import com.storix.storix_api.domains.user.adaptor.OAuthHelper;
+import com.storix.storix_api.domains.user.application.usecase.helper.OAuthHelper;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
