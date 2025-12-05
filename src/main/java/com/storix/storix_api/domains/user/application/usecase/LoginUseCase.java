@@ -3,6 +3,7 @@ package com.storix.storix_api.domains.user.application.usecase;
 import com.storix.storix_api.UseCase;
 import com.storix.storix_api.controller.auth.dto.*;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
+import com.storix.storix_api.domains.user.application.service.LogoutService;
 import com.storix.storix_api.domains.user.application.usecase.helper.TokenGenerateHelper;
 import com.storix.storix_api.domains.user.application.service.ArtistLoginService;
 import com.storix.storix_api.domains.user.application.service.ReaderLoginService;
@@ -18,6 +19,7 @@ public class LoginUseCase {
 
     private final ReaderLoginService readerLoginService;
     private final ArtistLoginService artistLoginService;
+    private final LogoutService logoutService;
     private final TokenGenerateHelper tokenGenerateHelper;
 
     /**UserDetails -> AuthUserDetails: (String)userId, (String)role */
@@ -59,5 +61,11 @@ public class LoginUseCase {
         AuthUserDetails userDetails = artistLoginService.loadUserByUsername(req.loginId());
         LoginWithTokenResponse loginWithTokenResponse = tokenGenerateHelper.generateLoginWithToken(userDetails);
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, loginWithTokenResponse);
+    }
+
+    // 로그아웃
+    public CustomResponse userLogoutWithRefreshToken(LogoutRequest req) {
+        logoutService.logoutByRefreshToken(req.refreshToken());
+        return CustomResponse.onSuccess(SuccessCode.VALID_LOGOUT);
     }
 }
