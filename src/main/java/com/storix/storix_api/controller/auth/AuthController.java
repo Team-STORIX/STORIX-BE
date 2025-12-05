@@ -53,4 +53,12 @@ public class AuthController {
                 .body(authUseCase.artistSignup(req));
     }
 
+    // 로그아웃
+    @Operation(summary = "로그아웃", description = "로그아웃 용 api 입니다. refreshToken을 보내주세요")
+    @PostMapping("/user/logout")
+    public ResponseEntity logout(@RequestBody LogoutRequest req) {
+        return ResponseEntity.ok()
+                .body(loginUseCase.userLogoutWithRefreshToken(req));
+    }
+
 }
