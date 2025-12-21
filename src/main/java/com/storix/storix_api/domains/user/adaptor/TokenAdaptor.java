@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.user.adaptor;
 
 import com.storix.storix_api.domains.user.domain.OnboardingToken;
 import com.storix.storix_api.domains.user.domain.RefreshToken;
+import com.storix.storix_api.domains.user.dto.OnboardingPrincipal;
 import com.storix.storix_api.domains.user.repository.OnboardingTokenRepository;
 import com.storix.storix_api.domains.user.repository.RefreshTokenRepository;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
@@ -38,6 +39,15 @@ public class TokenAdaptor {
     // OnboardingToken
     public void saveOnboardingToken(OnboardingToken onboardingToken) {
         onboardingTokenRepository.save(onboardingToken);
+    }
+
+    public OnboardingPrincipal findOnboardingPrincipalByJti(String jti) {
+        Optional<OnboardingToken> onboardingToken = onboardingTokenRepository.findById(jti);
+        if (onboardingToken.isEmpty()) {
+            throw InvalidTokenException.EXCEPTION;
+        }
+
+        return new OnboardingPrincipal(onboardingToken.get().getProvider(), onboardingToken.get().getOid());
     }
 
     public void deleteOnboardingTokenByJti(String jti) { onboardingTokenRepository.deleteById(jti);}

@@ -3,6 +3,7 @@ package com.storix.storix_api.global.security;
 import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.domains.user.dto.OnboardingTokenInfo;
+import com.storix.storix_api.global.apiPayload.exception.user.ExpiredOnboardingTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.ExpiredRefreshTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.ExpiredTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
@@ -106,9 +107,9 @@ public class TokenProvider implements InitializingBean {
         return getJws(token).getBody().get(TOKEN_TYPE).equals(ACCESS_TOKEN);
     }
 
-    public boolean isRefreshToken(String token) {
-        return getJws(token).getBody().get(TOKEN_TYPE).equals(REFRESH_TOKEN);
-    }
+    public boolean isRefreshToken(String token) { return getJws(token).getBody().get(TOKEN_TYPE).equals(REFRESH_TOKEN); }
+
+    public boolean isOnboardingToken(String token) { return getJws(token).getBody().get(TOKEN_TYPE).equals(ONBOARDING_TOKEN); }
 
     public AccessTokenInfo parseAccessToken(String token) {
         if (isAccessToken(token)) {
@@ -129,6 +130,18 @@ public class TokenProvider implements InitializingBean {
             }
         } catch (ExpiredTokenException e) {
             throw ExpiredRefreshTokenException.EXCEPTION;
+        }
+        throw InvalidTokenException.EXCEPTION;
+    }
+
+    public String parseOnboardingToken(String token) {
+        try {
+            if (isOnboardingToken(token)) {
+                Claims claims = getJws(token).getBody();
+                return claims.getSubject();
+            }
+        } catch (ExpiredTokenException e) {
+            throw ExpiredOnboardingTokenException.EXCEPTION;
         }
         throw InvalidTokenException.EXCEPTION;
     }

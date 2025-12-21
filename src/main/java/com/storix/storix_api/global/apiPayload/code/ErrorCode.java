@@ -19,6 +19,7 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_001", "잘못된 토큰입니다"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_401_001", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요"),
     REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "AUTH_ERROR_403_001", "토큰이 만료되었습니다. 재로그인 해주세요"),
+    ONBOARDING_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_401_002", "온보딩 토큰이 만료되었습니다. 소셜 로그인 재시도 해주세요"),
 
     // Login error
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_002", "아이디 또는 비밀번호가 일치하지 않습니다"),

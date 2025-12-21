@@ -5,6 +5,7 @@ import com.storix.storix_api.controller.auth.dto.OAuthAuthorizationRequest;
 import com.storix.storix_api.controller.auth.dto.ReaderSignupRequest;
 import com.storix.storix_api.controller.auth.dto.ValidAuthDTO;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
+import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.application.usecase.helper.OAuthHelper;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserAdaptor userAdaptor;
+    private final TokenAdaptor tokenAdaptor;
     private final OAuthHelper oauthHelper;
     private final PasswordEncoder passwordEncoder;
 
@@ -46,19 +48,26 @@ public class AuthService {
 
     // 독자 회원 가입 (소셜 로그인)
     @Transactional
-    public AuthUserDetails signUpReaderUser(ReaderSignupRequest req) {
-        boolean isUserPresent = userAdaptor.isUserPresentWithProviderAndOid(req.oauthProvider(), req.oid());
+    public AuthUserDetails signUpReaderUser(ReaderSignupRequest req, String jti) {
+
+        OnboardingPrincipal principal = tokenAdaptor.findOnboardingPrincipalByJti(jti);
+        OAuthProvider provider = principal.provider(); String oid = principal.oid();
+
+        boolean isUserPresent = userAdaptor.isUserPresentWithProviderAndOid(provider, oid);
         if (isUserPresent) throw DuplicateUserException.EXCEPTION;
 
         CreateReaderUserCommand m = new CreateReaderUserCommand(
-                req.oauthProvider(),
-                req.oid(),
+                provider,
+                oid,
                 req.nickName(),
                 req.gender(),
                 req.favoriteGenre()
         );
 
-        return userAdaptor.saveReaderUser(m);
+        AuthUserDetails authUserDetails = userAdaptor.saveReaderUser(m);
+        tokenAdaptor.deleteOnboardingTokenByJti(jti);
+
+        return authUserDetails;
     }
 
 

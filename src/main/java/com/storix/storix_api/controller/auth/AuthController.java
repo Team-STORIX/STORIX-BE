@@ -1,6 +1,7 @@
 package com.storix.storix_api.controller.auth;
 
 import com.storix.storix_api.controller.auth.dto.*;
+import com.storix.storix_api.domains.user.adaptor.OnboardingUserDetails;
 import com.storix.storix_api.domains.user.application.usecase.AuthUseCase;
 import com.storix.storix_api.domains.user.application.usecase.AuthorizationUseCase;
 import com.storix.storix_api.domains.user.application.usecase.LoginUseCase;
@@ -9,6 +10,7 @@ import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,9 +38,11 @@ public class AuthController {
 
     @Operation(summary = "독자 계정 회원가입", description = "유저 정보를 최종적으로 등록하는 api 입니다.")
     @PostMapping("/users/reader/signup")
-    public ResponseEntity readerUserSignup(@RequestBody ReaderSignupRequest req){
+    public ResponseEntity readerUserSignup(
+            @AuthenticationPrincipal OnboardingUserDetails onboardingUser,
+            @RequestBody ReaderSignupRequest req){
         return ResponseEntity.ok()
-                .body(authUseCase.readerSignup(req));
+                .body(authUseCase.readerSignup(req, onboardingUser.getJti()));
     }
 
     @Operation(summary = "작가 계정 일반 로그인", description = "작가 계정에 로그인 하는 api 입니다.")

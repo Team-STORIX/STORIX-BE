@@ -30,8 +30,8 @@ public class AuthUseCase {
     }
 
     // 독자 유저 정보 등록
-    public CustomResponse<LoginWithTokenResponse> readerSignup(ReaderSignupRequest req) {
-        AuthUserDetails userDetails = authService.signUpReaderUser(req);
+    public CustomResponse<LoginWithTokenResponse> readerSignup(ReaderSignupRequest req, String jti) {
+        AuthUserDetails userDetails = authService.signUpReaderUser(req, jti);
         LoginWithTokenResponse loginWithTokenResponse = tokenGenerateHelper.generateLoginWithToken(userDetails);
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, loginWithTokenResponse);
     }
