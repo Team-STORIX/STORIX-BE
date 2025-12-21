@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.user.adaptor;
 
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
+import com.storix.storix_api.domains.user.domain.Role;
 import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.domains.user.dto.CreateReaderUserCommand;
 import com.storix.storix_api.domains.user.dto.LoginInfo;
@@ -25,6 +26,14 @@ public class UserAdaptor {
     private final UserRepository userRepository;
 
     // TODO: 인덱싱
+
+    public Role findUserRoleByUserId(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            return user.get().getRole();
+        }
+        throw UnknownUserException.EXCEPTION;
+    }
 
     /**
      * 독자

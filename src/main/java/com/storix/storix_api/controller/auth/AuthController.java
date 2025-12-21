@@ -2,6 +2,7 @@ package com.storix.storix_api.controller.auth;
 
 import com.storix.storix_api.controller.auth.dto.*;
 import com.storix.storix_api.domains.user.application.usecase.AuthUseCase;
+import com.storix.storix_api.domains.user.application.usecase.AuthorizationUseCase;
 import com.storix.storix_api.domains.user.application.usecase.LoginUseCase;
 import com.storix.storix_api.domains.user.application.usecase.OAuthLoginUseCase;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
@@ -18,6 +19,7 @@ public class AuthController {
     private final AuthUseCase authUseCase;
     private final LoginUseCase loginUseCase;
     private final OAuthLoginUseCase oauthLoginUseCase;
+    private final AuthorizationUseCase authorizationUseCase;
 
     @Operation(summary = "카카오 로그인", description = "카카오로 로그인 하는 api 입니다. 회원가입한 유저의 경우 JWT를, 아닌 경우 유저 정보 등록에 필요한 OAuthInfo를 반환합니다.")
     @GetMapping("/oauth/kakao/login")
@@ -46,11 +48,18 @@ public class AuthController {
                         .body(loginUseCase.artistLoginWithLoginId(req));
     }
 
-    @Operation(summary = "백엔드용 작가 계정 생성 api 입니다.")
+    @Operation(summary = "[백엔드용] 작가 계정 회원가입", description = "백엔드용 작가 계정 생성 api 입니다.")
     @PostMapping("/developer/users/artist/signup")
     public ResponseEntity developerArtistUserSignup(@RequestBody ArtistSignupRequest req){
         return ResponseEntity.ok()
                 .body(authUseCase.artistSignup(req));
+    }
+
+    @Operation(summary = "액세스 토큰 재발급", description = "만료된 AccessToken을 재발급해주기 위해서 RefreshToken을 받는 api 입니다.")
+    @PostMapping("/refresh_token")
+    public ResponseEntity reissueAccessToken(@RequestBody RefreshTokenRequest req){
+        return ResponseEntity.ok()
+                .body(authorizationUseCase.getAccessTokenWithRefreshToken(req));
     }
 
     // 로그아웃
