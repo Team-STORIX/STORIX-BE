@@ -10,9 +10,11 @@ import com.storix.storix_api.domains.user.repository.UserRepository;
 import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import com.storix.storix_api.global.apiPayload.exception.user.ArtistLoginException;
+import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
 import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
 import com.storix.storix_api.global.apiPayload.exception.ErrorResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,8 +62,12 @@ public class UserAdaptor {
 
     // 독자 회원 가입
     public AuthUserDetails saveReaderUser(CreateReaderUserCommand cmd) {
-        User user = userRepository.save(cmd.toEntity());
-        return new AuthUserDetails(user.getId(), user.getRole().toString());
+        try {
+            User user = userRepository.save(cmd.toEntity());
+            return new AuthUserDetails(user.getId(), user.getRole().toString());
+        } catch (DataIntegrityViolationException e) {
+            throw DuplicateUserException.EXCEPTION;
+        }
     }
 
     /**
