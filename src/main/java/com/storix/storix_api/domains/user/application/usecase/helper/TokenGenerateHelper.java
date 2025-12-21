@@ -28,7 +28,7 @@ public class TokenGenerateHelper {
         String refreshToken = tokenProvider.createRefreshToken(userId);
 
         // redis 저장
-        long ttlSeconds = tokenProvider.getRefreshTokenValidityMs() * MILLI_TO_SECOND;
+        long ttlSeconds = tokenProvider.getRefreshTokenValidityMs() / MILLI_TO_SECOND;
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .id(userId)
                 .refreshToken(refreshToken)
