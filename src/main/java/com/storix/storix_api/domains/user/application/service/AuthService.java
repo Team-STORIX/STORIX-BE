@@ -12,10 +12,10 @@ import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.domains.user.dto.*;
 import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
 import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

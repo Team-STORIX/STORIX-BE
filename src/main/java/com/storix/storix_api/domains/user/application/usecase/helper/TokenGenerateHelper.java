@@ -5,9 +5,9 @@ import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.RefreshTokenAdaptor;
 import com.storix.storix_api.domains.user.domain.RefreshToken;
 import com.storix.storix_api.global.security.TokenProvider;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.storix.storix_api.global.apiPayload.STORIXStatic.MILLI_TO_SECOND;
 

@@ -11,9 +11,9 @@ import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import com.storix.storix_api.global.apiPayload.exception.user.ArtistLoginException;
 import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
 import com.storix.storix_api.global.apiPayload.exception.ErrorResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
