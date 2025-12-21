@@ -1,6 +1,6 @@
 package com.storix.storix_api.domains.user.application.service;
 
-import com.storix.storix_api.domains.user.adaptor.RefreshTokenAdaptor;
+import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,12 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LogoutService {
 
-    private final RefreshTokenAdaptor refreshTokenAdaptor;
+    private final TokenAdaptor tokenAdaptor;
 
     @Transactional
     public void logoutByRefreshToken(String refreshToken) {
-        Long userId = refreshTokenAdaptor.findUserIdByRefreshToken(refreshToken);
-        refreshTokenAdaptor.deleteByUserId(userId);
+        Long userId = tokenAdaptor.findUserIdByRefreshToken(refreshToken);
+        tokenAdaptor.deleteRefreshTokenByUserId(userId);
     }
 
 }
