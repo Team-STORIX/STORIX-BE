@@ -44,9 +44,10 @@ public class LoginUseCase {
     public CustomResponse<ReaderPreLoginResponse> readerPreLoginWithIdToken(String idToken, OAuthProvider provider) {
         OAuthInfo oauthInfo = readerLoginService.getOauthInfoByIdToken(idToken, provider);
 
+        OAuthLoginWithTokenResponse onboardingToken = tokenGenerateHelper.generateOAuthLoginWithToken(oauthInfo);
+
         ReaderPreLoginResponse readerPreLoginResponse = ReaderPreLoginResponse.of(
-                oauthInfo.getProvider(),
-                oauthInfo.getOid()
+                onboardingToken.onboardingToken()
         );
 
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, readerPreLoginResponse);

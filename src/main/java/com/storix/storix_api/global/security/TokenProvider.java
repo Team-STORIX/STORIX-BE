@@ -1,6 +1,8 @@
 package com.storix.storix_api.global.security;
 
-import com.storix.storix_api.domains.user.adaptor.RefreshTokenAdaptor;
+import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
+import com.storix.storix_api.domains.user.domain.OAuthProvider;
+import com.storix.storix_api.domains.user.dto.OnboardingTokenInfo;
 import com.storix.storix_api.global.apiPayload.exception.user.ExpiredRefreshTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.ExpiredTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 import static com.storix.storix_api.global.apiPayload.STORIXStatic.*;
 
@@ -23,11 +26,12 @@ import static com.storix.storix_api.global.apiPayload.STORIXStatic.*;
 @RequiredArgsConstructor
 public class TokenProvider implements InitializingBean {
 
-    private final RefreshTokenAdaptor refreshTokenAdaptor;
+    private final TokenAdaptor tokenAdaptor;
 
     @Value("${JWT_SECRET_KEY}") private String secretKey;
     @Value("${JWT_ACCESS_TOKEN_VALIDITY_MS}") private long accessTokenValidityMs;
     @Value(("${JWT_REFRESH_TOKEN_VALIDITY_MS}")) private long refreshTokenValidityMs;
+    @Value(("${JWT_ONBOARDING_TOKEN_VALIDITY_MS}")) private long onboardingTokenValidityMs;
 
 
     private Key key;
@@ -79,6 +83,25 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
+    public OnboardingTokenInfo createOnboardingToken() {
+
+        String jti = UUID.randomUUID().toString();
+
+        final Date issuedAt = new Date();
+        final Date expiredAt = new Date(issuedAt.getTime() + onboardingTokenValidityMs);
+
+        String onboardingToken = Jwts.builder()
+                .setIssuer(TOKEN_ISSUR)
+                .setSubject(jti)
+                .claim(TOKEN_TYPE, ONBOARDING_TOKEN)
+                .setIssuedAt(issuedAt)
+                .setExpiration(expiredAt)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return new OnboardingTokenInfo(onboardingToken, jti);
+    }
+
     public boolean isAccessToken(String token) {
         return getJws(token).getBody().get(TOKEN_TYPE).equals(ACCESS_TOKEN);
     }
@@ -110,7 +133,8 @@ public class TokenProvider implements InitializingBean {
         throw InvalidTokenException.EXCEPTION;
     }
 
-    public Long getRefreshTokenValidityMs() {
-        return refreshTokenValidityMs;
-    }
+    public Long getRefreshTokenValidityMs() { return refreshTokenValidityMs; }
+
+    public Long getOnboardingTokenValidityMs() { return onboardingTokenValidityMs; }
+
 }

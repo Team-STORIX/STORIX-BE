@@ -27,8 +27,8 @@ public class OAuthLoginUseCase {
         }
 
         /**
-         * (2) isRegistered = false (계정 정보 없음) -> 회원가입에 필요한 유저 정보 반환 (OAuthInfo 반환)
-         *     return 1)isRegistered 2)OAuthProvider 3)oid
+         * (2) isRegistered = false (계정 정보 없음) -> 회원가입에 필요한 유저 정보를 담은 온보딩 토큰 반환 (OAuthInfo)
+         *     return 1)isRegistered 2)OnboardingToken
          * */
         else {
             return loginUseCase.readerPreLoginWithIdToken(valid.idToken(), provider);

@@ -1,11 +1,12 @@
 package com.storix.storix_api.domains.user.application.usecase.helper;
 
 import com.storix.storix_api.controller.auth.dto.LoginWithTokenResponse;
+import com.storix.storix_api.controller.auth.dto.OAuthLoginWithTokenResponse;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
-import com.storix.storix_api.domains.user.adaptor.RefreshTokenAdaptor;
+import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
-import com.storix.storix_api.domains.user.domain.RefreshToken;
-import com.storix.storix_api.domains.user.domain.Role;
+import com.storix.storix_api.domains.user.domain.*;
+import com.storix.storix_api.domains.user.dto.OnboardingTokenInfo;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
 import com.storix.storix_api.global.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import static com.storix.storix_api.global.apiPayload.STORIXStatic.MILLI_TO_SECO
 public class TokenGenerateHelper {
 
     private final TokenProvider tokenProvider;
-    private final RefreshTokenAdaptor refreshTokenAdaptor;
+    private final TokenAdaptor tokenAdaptor;
     private final UserAdaptor userAdaptor;
 
     @Transactional
@@ -38,7 +39,7 @@ public class TokenGenerateHelper {
                 .refreshToken(refreshToken)
                 .ttl(ttlSeconds)
                 .build();
-        refreshTokenAdaptor.save(newRefreshToken);
+        tokenAdaptor.saveRefreshToken(newRefreshToken);
 
         return LoginWithTokenResponse.builder()
                 .accessToken(accessToken)
@@ -58,4 +59,27 @@ public class TokenGenerateHelper {
 
         return tokenProvider.createAccessToken(userId, String.valueOf(role));
     }
+
+    @Transactional
+    public OAuthLoginWithTokenResponse generateOAuthLoginWithToken(OAuthInfo oAuthInfo) {
+
+        OAuthProvider provider = oAuthInfo.getProvider();
+        String oid = oAuthInfo.getOid();
+
+        OnboardingTokenInfo oti = tokenProvider.createOnboardingToken();
+
+        long ttlSeconds = tokenProvider.getOnboardingTokenValidityMs() / MILLI_TO_SECOND;
+        OnboardingToken newOnboardingToken = OnboardingToken.builder()
+                .jti(oti.jti())
+                .provider(provider)
+                .oid(oid)
+                .ttl(ttlSeconds)
+                .build();
+        tokenAdaptor.saveOnboardingToken(newOnboardingToken);
+
+        return OAuthLoginWithTokenResponse.builder()
+                .onboardingToken(oti.onboardingToken())
+                .build();
+    }
+
 }

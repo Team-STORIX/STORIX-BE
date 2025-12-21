@@ -4,10 +4,9 @@ import com.storix.storix_api.domains.user.domain.OAuthProvider;
 
 public record ReaderPreLoginResponse(
         boolean isRegistered,
-        OAuthProvider provider,
-        String oid
+        String onboardingToken
 ) {
-    public static ReaderPreLoginResponse of(OAuthProvider provider, String oid) {
-        return new ReaderPreLoginResponse(false, provider, oid);
+    public static ReaderPreLoginResponse of(String onboardingToken) {
+        return new ReaderPreLoginResponse(false, onboardingToken);
     }
 }
