@@ -24,7 +24,19 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_002", "아이디 또는 비밀번호가 일치하지 않습니다"),
 
     // SignUp error
-    DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "AUTH_ERROR_400_001", "중복 가입 요청입니다.");
+    DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "AUTH_ERROR_400_001", "중복 가입 요청입니다."),
+
+    // Other Server error
+    OTHER_SERVER_BAD_REQUEST(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_1", "Other server bad request"),
+    OTHER_SERVER_UNAUTHORIZED(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_2", "Other server unauthorized"),
+    OTHER_SERVER_FORBIDDEN(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_3", "Other server forbidden"),
+    OTHER_SERVER_EXPIRED_TOKEN(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_4", "Other server expired token"),
+    OTHER_SERVER_NOT_FOUND(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_5", "Other server not found error"),
+    OTHER_SERVER_INTERNAL_SERVER_ERROR(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_6", "Other server internal server error"),
+
+    // OIDC error
+    OIDC_OLD_PUBLIC_KEY_ERROR(HttpStatus.BAD_REQUEST, "OIDC_ERORR_1", "OIDC 공개키 갱신이 필요합니다.")
+    ;
 
 
     private final HttpStatus httpStatus;

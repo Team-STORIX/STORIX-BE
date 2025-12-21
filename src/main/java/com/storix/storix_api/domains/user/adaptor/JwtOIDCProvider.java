@@ -5,6 +5,7 @@ import com.storix.storix_api.domains.user.dto.OIDCPublicKeyDTO;
 import com.storix.storix_api.domains.user.dto.OIDCPublicKeysResponse;
 import com.storix.storix_api.global.apiPayload.exception.user.ExpiredTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
+import com.storix.storix_api.global.apiPayload.exception.user.OidcJwksRefreshRequiredException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -94,7 +95,7 @@ public class JwtOIDCProvider {
                 oidcPublicKeysResponse.getKeys().stream()
                         .filter(o -> o.getKid().equals(kid))
                         .findFirst()
-                        .orElseThrow();
+                        .orElseThrow(OidcJwksRefreshRequiredException::new);
 
         return getOIDCTokenBody(
                 idToken, oidcPublicKeyDto.getN(), oidcPublicKeyDto.getE());

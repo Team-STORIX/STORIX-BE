@@ -7,7 +7,10 @@ import com.storix.storix_api.domains.user.application.client.OAuthProperties;
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.domains.user.dto.*;
+import com.storix.storix_api.global.apiPayload.exception.user.OidcJwksRefreshRequiredException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import static com.storix.storix_api.global.apiPayload.STORIXStatic.BEARER;
@@ -18,6 +21,7 @@ public class OAuthHelper {
 
     private final OAuthProperties oauthProperties;
     private final JwtOIDCProvider jwtOIDCProvider;
+    private final CacheManager oidcCacheManager;
 
     // 카카오
     private final KakaoOAuthClient kakaoOauthClient;
@@ -45,17 +49,23 @@ public class OAuthHelper {
 
     // OIDC 스펙: OIDC 공개키 목록 조회
     public OIDCPublicKeysResponse getOIDCPublicKeys(OAuthProvider provider) {
+        return switch (provider) {
+            case KAKAO -> kakaoOauthClient.getKakaoOIDCOpenKeys();
+            // case NAVER -> naverOauthClient.getNaverOIDCOpenKeys();
+            default -> null;
+        };
+    }
+
+    // OIDC 스펙: OIDC 공개키 캐시 무효화
+    public void clearOidcCacheKeys(OAuthProvider provider) {
+        Cache cache;
         switch (provider) {
-            case KAKAO -> {
-                return kakaoOauthClient.getKakaoOIDCOpenKeys();
-            }
-            // case NAVER -> {
-            //      return naverOauthClient.getNaverOIDCOpenKeys();
-            // }
-            default -> {
-                return null;
-            }
+            case KAKAO -> cache = oidcCacheManager.getCache("KakaoOIDC");
+            // case NAVER -> cache = oidcCacheManager.getCache("NaverOIDC")
+            default -> cache = null;
         }
+
+        if (cache != null) cache.clear();
     }
 
     // OIDC 스펙: OIDC Config 정보 조회 (baseUrl, clientId)
@@ -81,11 +91,13 @@ public class OAuthHelper {
         OIDCConfigDTO oidcConfig = getOIDCConfig(provider);
         OIDCPublicKeysResponse oidcPublicKeysResponse = getOIDCPublicKeys(provider);
 
-        return jwtOIDCProvider.getPayloadFromIdToken(
-                idToken,
-                oidcConfig.baseUri(),
-                oidcConfig.clientId(),
-                oidcPublicKeysResponse);
+        try {
+            return jwtOIDCProvider.getPayloadFromIdToken(idToken, oidcConfig.baseUri(), oidcConfig.clientId(), oidcPublicKeysResponse);
+        } catch (OidcJwksRefreshRequiredException e) {
+            clearOidcCacheKeys(provider);
+            OIDCPublicKeysResponse newOidcPublicKeysResponse = getOIDCPublicKeys(provider);
+            return jwtOIDCProvider.getPayloadFromIdToken(idToken, oidcConfig.baseUri(), oidcConfig.clientId(), newOidcPublicKeysResponse);
+        }
     }
 
     // OIDC 스펙: 검증된 idToken으로 OAuthInfo 반환 (provider, oid)

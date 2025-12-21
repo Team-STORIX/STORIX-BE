@@ -27,7 +27,7 @@ public interface KakaoOAuthClient {
     );
 
     // OIDC 공개키 목록 조회 (인증용)
-    @Cacheable(cacheNames = "KakaoOICD", cacheManager = "oidcCacheManager")
+    @Cacheable(cacheNames = "KakaoOIDC", cacheManager = "oidcCacheManager")
     @GetMapping("/.well-known/jwks.json")
     OIDCPublicKeysResponse getKakaoOIDCOpenKeys();
 }
