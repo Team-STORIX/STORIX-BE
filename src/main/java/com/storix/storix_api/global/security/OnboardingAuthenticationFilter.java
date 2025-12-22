@@ -1,9 +1,9 @@
 package com.storix.storix_api.global.security;
 
-import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.OnboardingUserDetails;
 import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.dto.OnboardingPrincipal;
+import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,10 +41,12 @@ public class OnboardingAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = resolveToken(request);
 
-        if (StringUtils.hasText(token)) {
-            Authentication authentication = getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (!StringUtils.hasText(token)) {
+            throw InvalidTokenException.EXCEPTION;
         }
+
+        Authentication authentication = getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }

@@ -1,5 +1,6 @@
 package com.storix.storix_api.global.config;
 
+import com.storix.storix_api.global.security.ErrorHandlingFilter;
 import com.storix.storix_api.global.security.JwtAuthenticationFilter;
 import com.storix.storix_api.global.security.OnboardingAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final OnboardingAuthenticationFilter onboardingFilter;
+    private final ErrorHandlingFilter errorHandlingFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception {
@@ -47,6 +49,7 @@ public class SecurityConfig {
                                 .anyRequest().permitAll()
                 )
 
+                .addFilterBefore(errorHandlingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(onboardingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
