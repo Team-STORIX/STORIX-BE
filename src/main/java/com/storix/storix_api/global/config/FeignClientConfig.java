@@ -1,11 +1,10 @@
 package com.storix.storix_api.global.config;
 
-//import com.storix.storix_api.global.apiPayload.exception.KakaoInfoErrorDecoder;
-//import com.storix.storix_api.global.apiPayload.exception.KakaoOIDCErrorDecoder;
+import com.storix.storix_api.global.apiPayload.exception.web.KakaoInfoErrorDecoder;
+import com.storix.storix_api.global.apiPayload.exception.web.KakaoOauthErrorDecoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import feign.form.FormEncoder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,27 +16,24 @@ public class FeignClientConfig {
     @Bean
     public Encoder formEncoder() { return new FormEncoder(); }
 
-    // TODO: ErrorDecoder 관리
-
     // 카카오 OAuth
-    @Configuration
-    public static class KakaoInfoConfig {
-
-//        @Bean
-//        @ConditionalOnMissingBean(value = ErrorDecoder.class)
-//        public ErrorDecoder kakaoInfoErrorDecoder() {
-//            return new KakaoInfoErrorDecoder();
-//        }
-    }
-
     @Configuration
     public static class KakaoOauthConfig {
 
-//        @Bean
-//        @ConditionalOnMissingBean(value = ErrorDecoder.class)
-//        public ErrorDecoder kakaoOauthErrorDecoder() {
-//            return new KakaoOIDCErrorDecoder();
-//        }
+        @Bean
+        public ErrorDecoder kakaoOauthErrorDecoder() {
+            return new KakaoOauthErrorDecoder();
+        }
+
+    }
+
+    @Configuration
+    public static class KakaoInfoConfig {
+
+        @Bean
+        public ErrorDecoder kakaoInfoErrorDecoder() {
+            return new KakaoInfoErrorDecoder();
+        }
 
     }
 
