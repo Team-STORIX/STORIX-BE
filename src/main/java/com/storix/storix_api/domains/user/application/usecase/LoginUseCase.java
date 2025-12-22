@@ -37,7 +37,7 @@ public class LoginUseCase {
                 loginToken.refreshToken()
         );
 
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, readerLoginResponse);
+        return CustomResponse.onSuccess(SuccessCode.VALID_LOGIN, readerLoginResponse);
     }
 
     // 회원가입하지 않은 경우 로그인 처리
@@ -50,7 +50,7 @@ public class LoginUseCase {
                 onboardingToken.onboardingToken()
         );
 
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, readerPreLoginResponse);
+        return CustomResponse.onSuccess(SuccessCode.VALID_SOCIAL_LOGIN, readerPreLoginResponse);
     }
 
     /**
