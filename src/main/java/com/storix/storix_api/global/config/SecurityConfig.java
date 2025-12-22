@@ -1,6 +1,8 @@
 package com.storix.storix_api.global.config;
 
+import com.storix.storix_api.global.security.ErrorHandlingFilter;
 import com.storix.storix_api.global.security.JwtAuthenticationFilter;
+import com.storix.storix_api.global.security.OnboardingAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +28,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
+    private final OnboardingAuthenticationFilter onboardingFilter;
+    private final ErrorHandlingFilter errorHandlingFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception {
@@ -45,7 +49,8 @@ public class SecurityConfig {
                                 .anyRequest().permitAll()
                 )
 
-                // JWT 설정
+                .addFilterBefore(errorHandlingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(onboardingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

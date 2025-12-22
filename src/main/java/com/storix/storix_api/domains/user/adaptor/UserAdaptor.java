@@ -1,16 +1,22 @@
 package com.storix.storix_api.domains.user.adaptor;
 
+import com.storix.storix_api.domains.user.domain.OAuthInfo;
+import com.storix.storix_api.domains.user.domain.OAuthProvider;
+import com.storix.storix_api.domains.user.domain.Role;
 import com.storix.storix_api.domains.user.domain.User;
+import com.storix.storix_api.domains.user.dto.CreateReaderUserCommand;
 import com.storix.storix_api.domains.user.dto.LoginInfo;
 import com.storix.storix_api.domains.user.repository.UserRepository;
 import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import com.storix.storix_api.global.apiPayload.exception.user.ArtistLoginException;
+import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
 import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
 import com.storix.storix_api.global.apiPayload.exception.ErrorResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -23,7 +29,50 @@ public class UserAdaptor {
 
     // TODO: 인덱싱
 
-    // 작가
+    public Role findUserRoleByUserId(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            return user.get().getRole();
+        }
+        throw UnknownUserException.EXCEPTION;
+    }
+
+    /**
+     * 독자
+     * */
+    // 독자
+    // OAuthInfo(oid, provider) -> userId(PK), role (토큰 서명용)
+    public AuthUserDetails findReaderUserByOAuthInfo(OAuthInfo oauthInfo) {
+        Optional<User> readerUser = userRepository.findByOauthInfoProviderAndOauthInfoOid(oauthInfo.getProvider(), oauthInfo.getOid());
+        if (readerUser.isPresent()) {
+            return new AuthUserDetails(readerUser.get().getId(), readerUser.get().getRole().toString());
+        } else {
+            throw UnknownUserException.EXCEPTION;
+        }
+    }
+
+    public boolean isUserPresentWithProviderAndOid(OAuthProvider provider, String oid) {
+        Optional<User> readerUser = userRepository.findByOauthInfoProviderAndOauthInfoOid(provider, oid);
+        if (readerUser.isPresent()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 독자 회원 가입
+    public AuthUserDetails saveReaderUser(CreateReaderUserCommand cmd) {
+        try {
+            User user = userRepository.save(cmd.toEntity());
+            return new AuthUserDetails(user.getId(), user.getRole().toString());
+        } catch (DataIntegrityViolationException e) {
+            throw DuplicateUserException.EXCEPTION;
+        }
+    }
+
+    /**
+     * 작가
+     * */
     // loginId -> userId (회원가입 api 응답, 작품-작가 매칭 용)
     public Long findArtistUserIdByLoginId(String loginId){
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
@@ -62,8 +111,5 @@ public class UserAdaptor {
         return null;
     }
 
-    public User saveArtistUser(CreateArtistUserCommand cmd) {
-        User user = userRepository.save(cmd.toEntity());
-        return userRepository.save(user);
-    }
+    public void saveArtistUser(CreateArtistUserCommand cmd) { userRepository.save(cmd.toEntity()); }
 }

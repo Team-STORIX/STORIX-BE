@@ -1,4 +1,4 @@
-package com.storix.storix_api.domains.user.application;
+package com.storix.storix_api.domains.user.application.service;
 
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
