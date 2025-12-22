@@ -9,7 +9,7 @@ public class WorksSearchResponseDto {
     private Long worksId;
     private String worksName;
     private String artistName;
-    private int reviewsCount;
-    private double avgRating;
+    private Long reviewsCount;  // DTO에서 Long으로
+    private Double avgRating;   // DTO에서 Double로
     private String thumbnailUrl;
 }
