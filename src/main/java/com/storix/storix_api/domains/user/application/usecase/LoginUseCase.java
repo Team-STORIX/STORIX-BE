@@ -28,29 +28,29 @@ public class LoginUseCase {
      * 독자용
      * */
     // 회원가입한 경우 로그인 처리
-    public CustomResponse<ReaderLoginResponse> readerLoginWithIdToken(String idToken, OAuthProvider provider) {
+    public CustomResponse<ReaderSocialLoginResponse> readerLoginWithIdToken(String idToken, OAuthProvider provider) {
         AuthUserDetails userDetails = readerLoginService.execute(idToken, provider);
         LoginWithTokenResponse loginToken = tokenGenerateHelper.generateLoginWithToken(userDetails);
 
-        ReaderLoginResponse readerLoginResponse = ReaderLoginResponse.of(
+        ReaderLoginResponse readerLoginResponse = new ReaderLoginResponse(
                 loginToken.accessToken(),
                 loginToken.refreshToken()
         );
 
-        return CustomResponse.onSuccess(SuccessCode.VALID_LOGIN, readerLoginResponse);
+        return CustomResponse.onSuccess(SuccessCode.VALID_LOGIN, new ReaderSocialLoginResponse(true, readerLoginResponse, null));
     }
 
     // 회원가입하지 않은 경우 로그인 처리
-    public CustomResponse<ReaderPreLoginResponse> readerPreLoginWithIdToken(String idToken, OAuthProvider provider) {
+    public CustomResponse<ReaderSocialLoginResponse> readerPreLoginWithIdToken(String idToken, OAuthProvider provider) {
         OAuthInfo oauthInfo = readerLoginService.getOauthInfoByIdToken(idToken, provider);
 
         OAuthLoginWithTokenResponse onboardingToken = tokenGenerateHelper.generateOAuthLoginWithToken(oauthInfo);
 
-        ReaderPreLoginResponse readerPreLoginResponse = ReaderPreLoginResponse.of(
+        ReaderPreLoginResponse readerPreLoginResponse = new ReaderPreLoginResponse(
                 onboardingToken.onboardingToken()
         );
 
-        return CustomResponse.onSuccess(SuccessCode.VALID_SOCIAL_LOGIN, readerPreLoginResponse);
+        return CustomResponse.onSuccess(SuccessCode.VALID_SOCIAL_LOGIN, new ReaderSocialLoginResponse(false, null, readerPreLoginResponse));
     }
 
     /**
