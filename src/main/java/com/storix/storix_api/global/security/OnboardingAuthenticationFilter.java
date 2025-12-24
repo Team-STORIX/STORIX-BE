@@ -3,7 +3,6 @@ package com.storix.storix_api.global.security;
 import com.storix.storix_api.domains.user.adaptor.OnboardingUserDetails;
 import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.dto.OnboardingPrincipal;
-import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.NullTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

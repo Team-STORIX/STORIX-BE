@@ -1,5 +1,7 @@
 package com.storix.storix_api.global.apiPayload;
 
+import java.util.List;
+
 public class STORIXStatic {
     public static final String AUTH_HEADER = "Authorization";
     public static final String BEARER = "Bearer ";
@@ -13,4 +15,7 @@ public class STORIXStatic {
 
     public static final int MILLI_TO_SECOND = 1000;
 
+    public static final List<String> SWAGGER_URI= List.of(
+            new String[]{"/swagger-resources/", "/swagger-ui/", "/v3/api-docs"}
+    );
 }

@@ -1,7 +1,6 @@
 package com.storix.storix_api.global.security;
 
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
-import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.NullTokenException;
 import com.storix.storix_api.global.security.dto.AccessTokenInfo;
 import jakarta.servlet.FilterChain;
@@ -20,12 +19,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 import static com.storix.storix_api.global.apiPayload.STORIXStatic.BEARER;
+import static com.storix.storix_api.global.apiPayload.STORIXStatic.SWAGGER_URI;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return SWAGGER_URI.stream().anyMatch(uri::startsWith);
+    }
 
     @Override
     protected void doFilterInternal(

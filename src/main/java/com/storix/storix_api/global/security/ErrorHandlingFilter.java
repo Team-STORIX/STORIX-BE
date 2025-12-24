@@ -15,6 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.storix.storix_api.global.apiPayload.STORIXStatic.SWAGGER_URI;
+
 @Component
 @RequiredArgsConstructor
 public class ErrorHandlingFilter extends OncePerRequestFilter {
@@ -22,15 +24,17 @@ public class ErrorHandlingFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return SWAGGER_URI.stream().anyMatch(uri::startsWith);
+    }
 
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
+    ) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-
         } catch (STORIXCodeException ex) {
             if (response.isCommitted()) throw ex;
 
