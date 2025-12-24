@@ -16,6 +16,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_ERROR_005", "서버 내부 오류가 발생했습니다"),
 
     // Token error
+    NULL_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_000", "인가가 필요한 경로로 토큰이 전달되지 않았습니다"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_001", "잘못된 토큰입니다"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_401_001", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요"),
     REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "AUTH_ERROR_403_001", "토큰이 만료되었습니다. 재로그인 해주세요"),

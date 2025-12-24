@@ -4,6 +4,7 @@ import com.storix.storix_api.domains.user.adaptor.OnboardingUserDetails;
 import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.dto.OnboardingPrincipal;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
+import com.storix.storix_api.global.apiPayload.exception.user.NullTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,12 +42,10 @@ public class OnboardingAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = resolveToken(request);
 
-        if (!StringUtils.hasText(token)) {
-            throw InvalidTokenException.EXCEPTION;
+        if (StringUtils.hasText(token)) {
+            Authentication authentication = getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
-        Authentication authentication = getAuthentication(token);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }
@@ -55,13 +54,13 @@ public class OnboardingAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(7);
+        } else {
+            throw NullTokenException.EXCEPTION;
         }
-        return null;
     }
 
     public Authentication getAuthentication(String token) {
         String jti = tokenProvider.parseOnboardingToken(token);
-
         OnboardingPrincipal principal = tokenAdaptor.findOnboardingPrincipalByJti(jti);
 
         OnboardingUserDetails userDetails = new OnboardingUserDetails(
