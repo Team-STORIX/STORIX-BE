@@ -73,6 +73,7 @@ public class TokenGenerateHelper {
                 .jti(oti.jti())
                 .provider(provider)
                 .oid(oid)
+                .onboardingToken(oti.onboardingToken())
                 .ttl(ttlSeconds)
                 .build();
         tokenAdaptor.saveOnboardingToken(newOnboardingToken);
