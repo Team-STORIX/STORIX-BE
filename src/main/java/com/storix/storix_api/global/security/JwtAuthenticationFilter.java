@@ -1,7 +1,6 @@
 package com.storix.storix_api.global.security;
 
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
-import com.storix.storix_api.global.apiPayload.exception.user.NullTokenException;
 import com.storix.storix_api.global.security.dto.AccessTokenInfo;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,7 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 import static com.storix.storix_api.global.apiPayload.STORIXStatic.BEARER;
-import static com.storix.storix_api.global.apiPayload.STORIXStatic.SWAGGER_URI;
 
 @Component
 @RequiredArgsConstructor
@@ -29,8 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return SWAGGER_URI.stream().anyMatch(uri::startsWith);
+        return ("/api/v1/auth/users/reader/signup".equals(request.getRequestURI()));
     }
 
     @Override
@@ -51,9 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(7);
-        } else {
-            throw NullTokenException.EXCEPTION;
         }
+        return null;
     }
 
     public Authentication getAuthentication(String token) {

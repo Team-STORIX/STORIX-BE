@@ -7,5 +7,5 @@ public class NullTokenException extends STORIXCodeException {
 
     public static final STORIXCodeException EXCEPTION = new NullTokenException();
 
-    private NullTokenException() { super(ErrorCode.NULL_TOKEN); }
+    private NullTokenException() { super(ErrorCode.TOKEN_NOT_EXIST); }
 }

@@ -14,20 +14,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
-import static com.storix.storix_api.global.apiPayload.STORIXStatic.SWAGGER_URI;
+import java.nio.file.AccessDeniedException;
 
 @Component
 @RequiredArgsConstructor
 public class ErrorHandlingFilter extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper;
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return SWAGGER_URI.stream().anyMatch(uri::startsWith);
-    }
 
     @Override
     protected void doFilterInternal(
@@ -37,14 +30,16 @@ public class ErrorHandlingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (STORIXCodeException ex) {
             if (response.isCommitted()) throw ex;
-
-            ErrorCode errorCode = ex.getErrorCode();
-            ErrorResponse body = new ErrorResponse(errorCode);
-
-            response.setStatus(errorCode.getHttpStatus().value());
-            response.setContentType("application/json;charset=UTF-8");
-            objectMapper.writeValue(response.getWriter(), body);
-
+            responseToClient(response, ex.getErrorCode(), new ErrorResponse(ex.getErrorCode()));
+        } catch (AccessDeniedException e) {
+            responseToClient(response, ErrorCode.TOKEN_NOT_EXIST, new ErrorResponse(ErrorCode.TOKEN_NOT_EXIST));
         }
+    }
+
+    private void responseToClient(HttpServletResponse response, ErrorCode errorCode, ErrorResponse body)
+            throws IOException {
+        response.setStatus(errorCode.getHttpStatus().value());
+        response.setContentType("application/json;charset=UTF-8");
+        objectMapper.writeValue(response.getWriter(), body);
     }
 }

@@ -1,8 +1,6 @@
 package com.storix.storix_api.global.config;
 
-import com.storix.storix_api.global.security.ErrorHandlingFilter;
-import com.storix.storix_api.global.security.JwtAuthenticationFilter;
-import com.storix.storix_api.global.security.OnboardingAuthenticationFilter;
+import com.storix.storix_api.global.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +29,9 @@ public class SecurityConfig {
     private final OnboardingAuthenticationFilter onboardingFilter;
     private final ErrorHandlingFilter errorHandlingFilter;
 
+    private final SecurityEntryPoint securityEntryPoint;
+    private final SecurityDeniedHandler securityDeniedHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception {
 
@@ -45,13 +46,22 @@ public class SecurityConfig {
                         (requests) -> requests
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                // TODO: endpoint 결정 시 기본 api 추가 (일단 전부 허용)
-                                .anyRequest().permitAll()
+                                .requestMatchers("/api/v1/auth/oauth/**").permitAll()
+                                .requestMatchers("/api/v1/auth/users/artist/login").permitAll()
+                                .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
+                                .anyRequest().authenticated()
                 )
 
+                // jwt filter
                 .addFilterBefore(errorHandlingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(onboardingFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // spring security exception handler
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(securityEntryPoint) // 401 error
+                        .accessDeniedHandler(securityDeniedHandler) // 403 error
+                );
 
         return http.build();
     }

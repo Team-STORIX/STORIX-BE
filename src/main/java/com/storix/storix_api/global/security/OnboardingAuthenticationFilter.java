@@ -3,7 +3,6 @@ package com.storix.storix_api.global.security;
 import com.storix.storix_api.domains.user.adaptor.OnboardingUserDetails;
 import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.dto.OnboardingPrincipal;
-import com.storix.storix_api.global.apiPayload.exception.user.NullTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +30,6 @@ public class OnboardingAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        // 엔드포인트 일치하는 경우만 onboardingFilter.doFilterInternal() 탐
         return !("/api/v1/auth/users/reader/signup".equals(request.getRequestURI()));
     }
 
@@ -53,9 +51,8 @@ public class OnboardingAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(7);
-        } else {
-            throw NullTokenException.EXCEPTION;
         }
+        return null;
     }
 
     public Authentication getAuthentication(String token) {
