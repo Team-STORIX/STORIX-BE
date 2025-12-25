@@ -17,6 +17,6 @@ public class AuthorizationUseCase {
     public CustomResponse<AuthorizationResponse> getAccessTokenWithRefreshToken(RefreshTokenRequest req) {
         String accessToken = tokenGenerateHelper.reissueAccessTokenWithRefreshToken(req.refreshToken());
         AuthorizationResponse result = new AuthorizationResponse(accessToken);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS_REISSUE_ACCESSTOKEN, result);
+        return CustomResponse.onSuccess(SuccessCode.AUTH_REISSUE_ACCESSTOKEN_SUCCESS, result);
     }
 }
