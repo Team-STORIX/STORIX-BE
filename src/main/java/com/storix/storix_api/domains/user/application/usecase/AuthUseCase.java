@@ -23,8 +23,9 @@ public class AuthUseCase {
             case KAKAO -> {
                 return authService.validKakaoSignup(req);
             }
-            // case NAVER
-            // return authService.validNaverSignup(req);
+            case NAVER -> {
+                return authService.validNaverSignup(req);
+            }
             default -> {return null;}
         }
     }

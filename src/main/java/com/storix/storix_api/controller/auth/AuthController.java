@@ -32,12 +32,21 @@ public class AuthController {
             @RequestParam("code") String code,
             @RequestParam("redirectUri") String redirectUri
     ) {
-        OAuthAuthorizationRequest req = new OAuthAuthorizationRequest(code, redirectUri);
+        OAuthAuthorizationRequest req = OAuthAuthorizationRequest.forKakao(code, redirectUri);
         return ResponseEntity.ok()
                 .body(oauthLoginUseCase.readerOAuthLogin(req, OAuthProvider.KAKAO));
     }
 
-    // TODO: 네이버 로그인
+    @Operation(summary = "네이버 로그인", description = "네이버로 로그인 하는 api 입니다. 회원가입한 유저의 경우 액세스 토큰 & 리프레쉬 토큰을, 아닌 경우 유저 정보 등록에 필요한 온보딩 토큰을 반환합니다.")
+    @GetMapping("/oauth/naver/login")
+    public ResponseEntity<CustomResponse<ReaderSocialLoginResponse>> naverLogin(
+            @RequestParam("code") String code,
+            @RequestParam("state") String state
+    ) {
+        OAuthAuthorizationRequest req = OAuthAuthorizationRequest.forNaver(code, state);
+        return ResponseEntity.ok()
+                .body(oauthLoginUseCase.readerOAuthLogin(req, OAuthProvider.NAVER));
+    }
 
     @Operation(summary = "독자 계정 회원가입", description = "유저 정보를 최종적으로 등록하는 api 입니다.")
     @PostMapping("/users/reader/signup")

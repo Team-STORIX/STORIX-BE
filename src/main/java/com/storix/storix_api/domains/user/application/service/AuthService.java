@@ -44,6 +44,22 @@ public class AuthService {
     }
 
     // - 네이버
+    @Transactional
+    public ValidAuthDTO validNaverSignup(OAuthAuthorizationRequest req) {
+
+        NaverTokenResponse naverToken = oauthHelper.getNaverOAuthToken(req.authCode(), req.state());
+        NaverUserResponse naverUser = oauthHelper.getNaverInformation(naverToken.accessToken());
+
+        // 네이버 OIDC token 요청 시 Internal Server Error 반환 중 -> 지원 종료 관련 공지는 없으나, 더이상 지원하지 않는다 판단
+        // 기존 로직에서 idToken 값에 oid 값 반환
+//        OAuthInfo oauthInfo = oauthHelper.getOauthInfoByIdToken(naverToken.idToken(), OAuthProvider.NAVER);
+//        if (!oauthInfo.getOid().equals(naverUser.id())) { throw UnknownUserException.EXCEPTION; }
+
+        boolean isRegistered = userAdaptor.isUserPresentWithProviderAndOid(OAuthProvider.NAVER, naverUser.id());
+
+//        return new ValidAuthDTO(isRegistered, naverToken.idToken());
+        return new ValidAuthDTO(isRegistered, naverUser.id());
+    }
 
 
     // 독자 회원 가입 (소셜 로그인)
