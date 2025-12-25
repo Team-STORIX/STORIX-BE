@@ -60,8 +60,8 @@ public class AuthController {
 
     @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 여부를 체크하는 api 입니다.")
     @GetMapping("/nickname/valid")
-    public ResponseEntity<CustomResponse<?>> nickNameCheck(
-            @RequestParam("nickName") String nickName
+    public ResponseEntity<CustomResponse<Void>> nickNameCheck(
+            @RequestParam("nickname") String nickName
     ) {
         return ResponseEntity.ok()
                 .body(authUseCase.checkAvailableNickname(nickName));
