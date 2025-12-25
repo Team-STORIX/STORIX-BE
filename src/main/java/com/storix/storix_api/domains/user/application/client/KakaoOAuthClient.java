@@ -2,7 +2,7 @@ package com.storix.storix_api.domains.user.application.client;
 
 import com.storix.storix_api.domains.user.dto.OIDCPublicKeysResponse;
 import com.storix.storix_api.domains.user.dto.KakaoTokenResponse;
-import com.storix.storix_api.global.config.FeignClientConfig;
+import com.storix.storix_api.global.config.web.KakaoOauthConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(
         name = "KakaoOAuthClient",
         url = "https://kauth.kakao.com",
-        configuration = FeignClientConfig.KakaoOauthConfig.class
+        configuration = KakaoOauthConfig.class
 )
 public interface KakaoOAuthClient {
 
