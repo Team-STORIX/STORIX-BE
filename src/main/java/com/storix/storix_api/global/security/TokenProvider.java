@@ -1,7 +1,5 @@
 package com.storix.storix_api.global.security;
 
-import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
-import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.domains.user.dto.OnboardingTokenInfo;
 import com.storix.storix_api.global.apiPayload.exception.user.ExpiredOnboardingTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.ExpiredRefreshTokenException;
@@ -22,12 +20,9 @@ import java.util.UUID;
 
 import static com.storix.storix_api.global.apiPayload.STORIXStatic.*;
 
-
 @Component
 @RequiredArgsConstructor
 public class TokenProvider implements InitializingBean {
-
-    private final TokenAdaptor tokenAdaptor;
 
     @Value("${JWT_SECRET_KEY}") private String secretKey;
     @Value("${JWT_ACCESS_TOKEN_VALIDITY_MS}") private long accessTokenValidityMs;
