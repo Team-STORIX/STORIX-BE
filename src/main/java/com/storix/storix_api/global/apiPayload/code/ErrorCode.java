@@ -23,10 +23,13 @@ public enum ErrorCode {
     ONBOARDING_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_005", "온보딩 토큰이 만료되었습니다. 소셜 로그인 재시도 해주세요"),
 
     // Login error
-    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "LOGIN_ERROR_002", "아이디 또는 비밀번호가 일치하지 않습니다"),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "LOGIN_ERROR_001", "아이디 또는 비밀번호가 일치하지 않습니다"),
 
     // SignUp error
-    DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "SIGNUP_ERROR_400_001", "중복 가입 요청입니다."),
+    DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "SIGNUP_ERROR_001", "중복 가입 요청입니다."),
+
+    // Onboarding error
+    ONBOARDING_DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_001", "이미 사용 중인 닉네임입니다."),
 
     // Other Server error
     OTHER_SERVER_BAD_REQUEST(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_1", "Other server bad request"),

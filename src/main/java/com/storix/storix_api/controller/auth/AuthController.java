@@ -58,13 +58,22 @@ public class AuthController {
                 .body(authUseCase.readerSignup(req, onboardingUser.getJti()));
     }
 
+    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 여부를 체크하는 api 입니다.")
+    @GetMapping("/nickname/valid")
+    public ResponseEntity<CustomResponse<?>> nickNameCheck(
+            @RequestParam("nickName") String nickName
+    ) {
+        return ResponseEntity.ok()
+                .body(authUseCase.checkAvailableNickname(nickName));
+    }
+
     @Operation(summary = "작가 계정 일반 로그인", description = "작가 계정에 로그인 하는 api 입니다.")
     @PostMapping("/users/artist/login")
     public ResponseEntity<CustomResponse<LoginWithTokenResponse>> artistUserLogin(
             @RequestBody ArtistLoginRequest req
     ) {
         return ResponseEntity.ok()
-                        .body(loginUseCase.artistLoginWithLoginId(req));
+                .body(loginUseCase.artistLoginWithLoginId(req));
     }
 
     @Operation(summary = "[백엔드용] 작가 계정 회원가입", description = "백엔드용 작가 계정 생성 api 입니다.")

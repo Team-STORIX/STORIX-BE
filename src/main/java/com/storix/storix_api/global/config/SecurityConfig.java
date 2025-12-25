@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/api/v1/auth/oauth/**").permitAll()
+                                .requestMatchers("/api/v1/auth/nickname/valid").permitAll()
                                 .requestMatchers("/api/v1/auth/users/artist/login").permitAll()
                                 .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
                                 .anyRequest().authenticated()

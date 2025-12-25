@@ -11,6 +11,7 @@ import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.domains.user.dto.*;
+import com.storix.storix_api.global.apiPayload.exception.user.DuplicateNicknameException;
 import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
 import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
 import lombok.RequiredArgsConstructor;
@@ -86,6 +87,13 @@ public class AuthService {
         return authUserDetails;
     }
 
+    // 독자 닉네임 중복 체크
+    public void validNickname(String nickName) {
+        // TODO: [Domain_works] 작가 닉네임 중복 체크
+        if (userAdaptor.isNicknameDuplicate(nickName)) {
+            throw DuplicateNicknameException.EXCEPTION;
+        }
+    }
 
     // 작가 회원 가입 (일반 로그인)
     @Transactional

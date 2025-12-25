@@ -37,6 +37,12 @@ public class AuthUseCase {
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, loginWithTokenResponse);
     }
 
+    // 닉네임 중복 체크
+    public CustomResponse<Void> checkAvailableNickname(String nickName) {
+        authService.validNickname(nickName);
+        return CustomResponse.onSuccess(SuccessCode.VALID_NICKNAME);
+    }
+
     // 작가 회원 가입
     public CustomResponse<ArtistSignupResponse> artistSignup(ArtistSignupRequest req) {
         Long artistUserId = authService.signUpArtistUser(req);

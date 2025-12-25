@@ -22,6 +22,9 @@ public enum SuccessCode {
     VALID_LOGOUT(HttpStatus.OK, "AUTH_SUCCESS_002", "로그아웃에 성공했습니다."),
     VALID_SOCIAL_LOGIN(HttpStatus.OK, "AUTH_SUCCESS_003", "회원가입이 필요합니다."),
 
+    // onboarding success
+    VALID_NICKNAME(HttpStatus.OK, "ONBOARDING_SUCCESS_001", "사용 가능한 닉네임입니다."),
+
     // authorization success
     SUCCESS_REISSUE_ACCESSTOKEN(HttpStatus.CREATED, "AUTHORIZATION_SUCCESS_001", "엑세스 토큰 재발급에 성공했습니다.");
 
