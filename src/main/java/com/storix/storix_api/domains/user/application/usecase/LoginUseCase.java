@@ -65,7 +65,7 @@ public class LoginUseCase {
     }
 
     // 로그아웃
-    public CustomResponse userLogoutWithRefreshToken(LogoutRequest req) {
+    public CustomResponse<Void> userLogoutWithRefreshToken(LogoutRequest req) {
         logoutService.logoutByRefreshToken(req.refreshToken());
         return CustomResponse.onSuccess(SuccessCode.VALID_LOGOUT);
     }

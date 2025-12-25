@@ -52,7 +52,8 @@ public class AuthController {
     @PostMapping("/users/reader/signup")
     public ResponseEntity<CustomResponse<LoginWithTokenResponse>> readerUserSignup(
             @AuthenticationPrincipal OnboardingUserDetails onboardingUser,
-            @RequestBody ReaderSignupRequest req){
+            @RequestBody ReaderSignupRequest req
+    ) {
         return ResponseEntity.ok()
                 .body(authUseCase.readerSignup(req, onboardingUser.getJti()));
     }
@@ -60,7 +61,8 @@ public class AuthController {
     @Operation(summary = "작가 계정 일반 로그인", description = "작가 계정에 로그인 하는 api 입니다.")
     @PostMapping("/users/artist/login")
     public ResponseEntity<CustomResponse<LoginWithTokenResponse>> artistUserLogin(
-            @RequestBody ArtistLoginRequest req){
+            @RequestBody ArtistLoginRequest req
+    ) {
         return ResponseEntity.ok()
                         .body(loginUseCase.artistLoginWithLoginId(req));
     }
@@ -68,7 +70,8 @@ public class AuthController {
     @Operation(summary = "[백엔드용] 작가 계정 회원가입", description = "백엔드용 작가 계정 생성 api 입니다.")
     @PostMapping("/developer/users/artist/signup")
     public ResponseEntity<CustomResponse<ArtistSignupResponse>> developerArtistUserSignup(
-            @RequestBody ArtistSignupRequest req){
+            @RequestBody ArtistSignupRequest req
+    ) {
         return ResponseEntity.ok()
                 .body(authUseCase.artistSignup(req));
     }
@@ -76,15 +79,17 @@ public class AuthController {
     @Operation(summary = "액세스 토큰 재발급", description = "만료된 AccessToken을 재발급해주기 위해서 RefreshToken을 받는 api 입니다.")
     @PostMapping("/refresh_token")
     public ResponseEntity<CustomResponse<AuthorizationResponse>> reissueAccessToken(
-            @RequestBody RefreshTokenRequest req){
+            @RequestBody RefreshTokenRequest req
+    ) {
         return ResponseEntity.ok()
                 .body(authorizationUseCase.getAccessTokenWithRefreshToken(req));
     }
 
     @Operation(summary = "로그아웃", description = "로그아웃 용 api 입니다. refreshToken을 보내주세요")
     @PostMapping("/user/logout")
-    public ResponseEntity<CustomResponse> logout(
-            @RequestBody LogoutRequest req) {
+    public ResponseEntity<CustomResponse<Void>> logout(
+            @RequestBody LogoutRequest req
+    ) {
         return ResponseEntity.ok()
                 .body(loginUseCase.userLogoutWithRefreshToken(req));
     }
