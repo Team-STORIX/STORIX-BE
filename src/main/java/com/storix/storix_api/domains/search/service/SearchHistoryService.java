@@ -39,7 +39,7 @@ public class SearchHistoryService {
     private static final long TRENDING_KEY_TTL_DAYS = 3;
 
     /** 1. 검색어 저장 (인기 + 최근 검색어) */
-    @Async
+    @Async("logThreadPool")
     public void addSearchLog(Long userId, String keyword) {
 
         if (keyword == null || keyword.isBlank()) return;
