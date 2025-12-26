@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class SearchHistoryService {
     private static final String TRENDING_KEY = "search:trending";
     private static final String RECENT_KEY_PREFIX = "search:recent:";
     private static final int MAX_RECENT_SIZE = 10;
-
+    private static final long RECENT_KEY_TTL_DAYS = 14;
 
     /** 1. 검색어 저장 (인기 + 최근 검색어) */
     public void addSearchLog(Long userId, String keyword) {
@@ -31,11 +32,12 @@ public class SearchHistoryService {
 
             String key = RECENT_KEY_PREFIX + userId;
 
-            // 중복 제거 (이미 있으면 삭제 후 맨 앞으로 이동)
             redisTemplate.opsForList().remove(key, 1, keyword);
             redisTemplate.opsForList().leftPush(key, keyword);
-
             redisTemplate.opsForList().trim(key, 0, MAX_RECENT_SIZE - 1);
+
+            // 최근 검색어 TTL 설정
+            redisTemplate.expire(key, RECENT_KEY_TTL_DAYS, TimeUnit.DAYS);
         }
     }
 
