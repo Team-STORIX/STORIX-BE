@@ -4,9 +4,12 @@ import com.storix.storix_api.domains.search.dto.TrendingItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,19 +22,35 @@ public class SearchHistoryService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private static final String TRENDING_KEY = "search:trending";
+    // 날짜별 키 접두사
+    private static final String TRENDING_KEY_PREFIX = "search:trending:";
     private static final String RECENT_KEY_PREFIX = "search:recent:";
+
+    // 랭킹 변동 계산용
     private static final String SNAPSHOT_KEY = "search:trending:snapshot";
+
+    // 최근 검색어 개수 (10)
     private static final int MAX_RECENT_SIZE = 10;
+
+    // 최근 검색어 TTL (14일)
     private static final long RECENT_KEY_TTL_DAYS = 14;
 
+    // Redis 키 유효 기간 (랭킹 리셋)
+    private static final long TRENDING_KEY_TTL_DAYS = 3;
+
     /** 1. 검색어 저장 (인기 + 최근 검색어) */
+    @Async
     public void addSearchLog(Long userId, String keyword) {
 
         if (keyword == null || keyword.isBlank()) return;
 
+        String today = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        String todayKey = TRENDING_KEY_PREFIX + today;
+
         // 인기 검색어 점수 추가
-        redisTemplate.opsForZSet().incrementScore(TRENDING_KEY, keyword, 1.0);
+        redisTemplate.opsForZSet().incrementScore(todayKey, keyword, 1.0);
+
+        redisTemplate.expire(todayKey, TRENDING_KEY_TTL_DAYS, TimeUnit.DAYS);
 
         // 로그인한 유저: 최근 검색어 저장
         if (userId != null) {
@@ -47,19 +66,15 @@ public class SearchHistoryService {
         }
     }
 
-    @Scheduled(fixedRate = 10 * 60 * 1000) // 10분 주기
-    public void updateTrendingSnapshot() {
-        // search:trending 내용 -> search:trending:snapshot에 덮어씀
-        redisTemplate.opsForZSet().unionAndStore(TRENDING_KEY, List.of(TRENDING_KEY), SNAPSHOT_KEY);
-
-        log.info("급상승 검색어 스냅샷 갱신 완료");
-    }
-
     /** 2. 급상승 검색어 조회 (Top 10) */
     public List<TrendingItem> getTrendingKeywords() {
 
-        // 현재 top 10
-        Set<String> currentKeywords = redisTemplate.opsForZSet().reverseRange(TRENDING_KEY, 0, 9);
+        LocalDate now = LocalDate.now();
+        String todayKey = TRENDING_KEY_PREFIX + now.format(DateTimeFormatter.BASIC_ISO_DATE);
+        String yesterdayKey = TRENDING_KEY_PREFIX + now.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
+
+        // 오늘 Top 10
+        Set<String> currentKeywords = redisTemplate.opsForZSet().reverseRange(todayKey, 0, 9);
 
         if (currentKeywords == null || currentKeywords.isEmpty()) {
             return List.of();
@@ -69,8 +84,9 @@ public class SearchHistoryService {
         int currentRank = 1;
 
         for (String keyword : currentKeywords) {
-            // 과거 랭킹
-            Long prevRankIndex = redisTemplate.opsForZSet().reverseRank(SNAPSHOT_KEY, keyword);
+
+            // 어제 랭킹 (비교용)
+            Long prevRankIndex = redisTemplate.opsForZSet().reverseRank(yesterdayKey, keyword);
 
             String status = "SAME";
 
