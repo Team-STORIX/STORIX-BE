@@ -40,7 +40,7 @@ public class SearchController {
     }
 
     @GetMapping("/trending")
-    @Operation(summary = "급상승 검색어 조회")
+    @Operation(summary = "급상승 검색어 조회", description = "인기 검색어 1~10위와 순위 변동을 조회합니다.")
     public CustomResponse<TrendingResponseDto> getTrending() {
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,

@@ -9,5 +9,5 @@ import java.util.List;
 @Builder
 public class TrendingResponseDto {
 
-    private List<String> trendingKeywords;
+    private List<TrendingItem> trendingKeywords;
 }
