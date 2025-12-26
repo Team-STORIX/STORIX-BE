@@ -62,6 +62,7 @@ public class WorksSearchService implements SearchWorksUseCase {
                 .thumbnailUrl(works.getThumbnailUrl())
                 .reviewsCount((long) works.getReviewsCount())
                 .avgRating(works.getAvgRating())
+                .worksType(works.getWorksType().name())
                 .build();
     }
 
