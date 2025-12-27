@@ -26,7 +26,7 @@ public class AuthController {
     private final OAuthLoginUseCase oauthLoginUseCase;
     private final AuthorizationUseCase authorizationUseCase;
 
-    @Operation(summary = "카카오 로그인", description = "카카오로 로그인 하는 api 입니다. 회원가입한 유저의 경우 액세스 토큰 & 리프레쉬 토큰을, 아닌 경우 유저 정보 등록에 필요한 온보딩 토큰을 반환합니다.")
+    @Operation(summary = "카카오 로그인", description = "카카오로 로그인 하는 api 입니다.   \n회원가입한 유저의 경우 readerLoginResponse로 엑세스 토큰과 리프레쉬 토큰을 반환합니다.   \n회원가입이 필요한 유저의 경우 readerPreLoginResponse로 온보딩 토큰을 반환합니다.")
     @GetMapping("/oauth/kakao/login")
     public ResponseEntity<CustomResponse<ReaderSocialLoginResponse>> kakaoLogin(
             @RequestParam("code") String code,
@@ -94,7 +94,7 @@ public class AuthController {
                 .body(authorizationUseCase.getAccessTokenWithRefreshToken(req));
     }
 
-    @Operation(summary = "로그아웃", description = "로그아웃 용 api 입니다. refreshToken을 보내주세요")
+    @Operation(summary = "로그아웃", description = "로그아웃용 api 입니다.   \nrefreshToken을 보내주세요")
     @PostMapping("/user/logout")
     public ResponseEntity<CustomResponse<Void>> logout(
             @RequestBody LogoutRequest req
