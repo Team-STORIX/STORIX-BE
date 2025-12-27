@@ -27,7 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return ("/api/v1/auth/users/reader/signup".equals(request.getRequestURI()));
+        String uri = request.getRequestURI();
+
+        return uri.startsWith("/api/v1/auth/oauth/")
+                || uri.equals("/api/v1/auth/nickname/valid")
+                || uri.equals("/api/v1/auth/users/artist/login")
+                || uri.startsWith("/api/v1/auth/developer/")
+                || uri.equals("/api/v1/auth/users/reader/signup");
     }
 
     @Override
