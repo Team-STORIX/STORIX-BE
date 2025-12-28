@@ -4,6 +4,7 @@ import com.storix.storix_api.domains.search.dto.TrendingItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,9 @@ public class SearchHistoryService {
 
     // Redis 키 유효 기간 (랭킹 리셋)
     private static final long TRENDING_KEY_TTL_DAYS = 3;
+
+    // 최소 검색 횟수 지정
+    private static final double MIN_TRENDING_SCORE = 5.0;
 
     /** 1. 검색어 저장 (인기 + 최근 검색어) */
     @Async("logThreadPool")
@@ -74,16 +78,25 @@ public class SearchHistoryService {
         String yesterdayKey = TRENDING_KEY_PREFIX + now.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
 
         // 오늘 Top 10
-        Set<String> currentKeywords = redisTemplate.opsForZSet().reverseRange(todayKey, 0, 9);
+        Set<ZSetOperations.TypedTuple<String>> currentKeywordsWithScores =
+                redisTemplate.opsForZSet().reverseRangeWithScores(todayKey, 0, 9);
 
-        if (currentKeywords == null || currentKeywords.isEmpty()) {
+        if (currentKeywordsWithScores == null || currentKeywordsWithScores.isEmpty()) {
             return List.of();
         }
 
         List<TrendingItem> result = new ArrayList<>();
         int currentRank = 1;
 
-        for (String keyword : currentKeywords) {
+        for (ZSetOperations.TypedTuple<String> tuple : currentKeywordsWithScores) {
+
+            String keyword = tuple.getValue();
+            Double score = tuple.getScore();
+
+            // 최소 점수 미만이면 결과에서 제외
+            if (score == null || score < MIN_TRENDING_SCORE) {
+                break;
+            }
 
             // 어제 랭킹 (비교용)
             Long prevRankIndex = redisTemplate.opsForZSet().reverseRank(yesterdayKey, keyword);
