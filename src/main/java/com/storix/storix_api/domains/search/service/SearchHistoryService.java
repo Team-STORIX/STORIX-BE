@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,9 +28,6 @@ public class SearchHistoryService {
     // 날짜별 키 접두사
     private static final String TRENDING_KEY_PREFIX = "search:trending:";
     private static final String RECENT_KEY_PREFIX = "search:recent:";
-
-    // 랭킹 변동 계산용
-    private static final String SNAPSHOT_KEY = "search:trending:snapshot";
 
     // 최근 검색어 개수 (10)
     private static final int MAX_RECENT_SIZE = 10;
@@ -76,7 +72,7 @@ public class SearchHistoryService {
 
                 String key = RECENT_KEY_PREFIX + userId;
 
-                // Lua Script 실행
+                // Lua Script
                 // KEYS[1]: 키 이름
                 // ARGV[1]: 검색어, ARGV[2]: 리스트 크기 제한(인덱스), ARGV[3]: TTL(초 단위)
                 RedisScript<Long> script = new DefaultRedisScript<>(ADD_RECENT_SEARCH_SCRIPT, Long.class);
