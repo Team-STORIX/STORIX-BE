@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
 @RestController
 @RequestMapping("/api/v1/search")
 @RequiredArgsConstructor
@@ -55,7 +57,16 @@ public class SearchController {
     public CustomResponse<RecentResponseDto> getRecent(
             @AuthenticationPrincipal AuthUserDetails authUser
     ) {
-        // authUser null 체크 필요시 추가
+
+        if (authUser == null) {
+            return CustomResponse.onSuccess(
+                    SuccessCode.SUCCESS,
+                    RecentResponseDto.builder()
+                            .recentKeywords(Collections.emptyList())
+                            .build()
+            );
+        }
+
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
                 RecentResponseDto.builder()
@@ -70,7 +81,11 @@ public class SearchController {
             @RequestParam String keyword,
             @AuthenticationPrincipal AuthUserDetails authUser
     ) {
-        searchHistoryService.deleteRecentKeyword(authUser.getUserId(), keyword);
+
+        if (authUser != null) {
+            searchHistoryService.deleteRecentKeyword(authUser.getUserId(), keyword);
+        }
+
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, null);
     }
 }
