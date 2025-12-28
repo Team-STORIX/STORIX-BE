@@ -60,8 +60,8 @@ public class WorksSearchService implements SearchWorksUseCase {
                 .worksName(works.getWorksName())
                 .artistName(works.getArtistName())
                 .thumbnailUrl(works.getThumbnailUrl())
-                .reviewsCount((long) works.getReviewsCount())
-                .avgRating(works.getAvgRating())
+                .reviewsCount(works.getReviewsCount() != null ? works.getReviewsCount().longValue() : 0L)
+                .avgRating(works.getAvgRating() != null ? works.getAvgRating() : 0.0)
                 .worksType(works.getWorksType().name())
                 .build();
     }
