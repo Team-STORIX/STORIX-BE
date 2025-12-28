@@ -31,7 +31,7 @@ jobs:
           docker compose pull app
 
           echo ">>> Starting new container..."
-          docker compose up -d --no-deps app
+          docker compose up -d
 
           echo ">>> Pruning old images..."
           docker image prune -af
