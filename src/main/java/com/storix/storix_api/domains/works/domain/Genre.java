@@ -16,7 +16,10 @@ public enum Genre {
     GAG("개그"),
     THRILLER("스릴러"),
     ACTION("액션"),
-    SPORTS("스포츠");
+    SPORTS("스포츠"),
+    SENTIMENTAL("감성"),
+    BL("BL"),
+    MODERN_FANTASY("현판");
 
     private final String dbValue;
 }

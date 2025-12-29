@@ -58,10 +58,10 @@ public class Works {
     private String thumbnailUrl;
 
     @Column(name = "reviews_count")
-    private int reviewsCount;
+    private Integer reviewsCount;
 
     @Column(name = "avg_rating")
-    private double avgRating;
+    private Double avgRating;
 
     @Column(name = "works_type", nullable = false)
     private WorksType worksType;
