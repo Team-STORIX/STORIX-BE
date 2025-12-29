@@ -1,12 +1,12 @@
 package com.storix.storix_api.domains.user.application.usecase;
 
 import com.storix.storix_api.UseCase;
-import com.storix.storix_api.controller.auth.dto.*;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.application.service.LogoutService;
 import com.storix.storix_api.domains.user.application.usecase.helper.TokenGenerateHelper;
 import com.storix.storix_api.domains.user.application.service.ArtistLoginService;
 import com.storix.storix_api.domains.user.application.service.ReaderLoginService;
+import com.storix.storix_api.domains.user.controller.dto.*;
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.global.apiPayload.CustomResponse;

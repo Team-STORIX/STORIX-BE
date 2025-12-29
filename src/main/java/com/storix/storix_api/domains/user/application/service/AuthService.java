@@ -1,9 +1,9 @@
 package com.storix.storix_api.domains.user.application.service;
 
-import com.storix.storix_api.controller.auth.dto.ArtistSignupRequest;
-import com.storix.storix_api.controller.auth.dto.OAuthAuthorizationRequest;
-import com.storix.storix_api.controller.auth.dto.ReaderSignupRequest;
-import com.storix.storix_api.controller.auth.dto.ValidAuthDTO;
+import com.storix.storix_api.domains.user.controller.dto.ArtistSignupRequest;
+import com.storix.storix_api.domains.user.controller.dto.OAuthAuthorizationRequest;
+import com.storix.storix_api.domains.user.controller.dto.ReaderSignupRequest;
+import com.storix.storix_api.domains.user.controller.dto.ValidAuthDTO;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.application.usecase.helper.OAuthHelper;

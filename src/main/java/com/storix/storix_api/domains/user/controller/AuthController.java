@@ -1,11 +1,11 @@
-package com.storix.storix_api.controller.auth;
+package com.storix.storix_api.domains.user.controller;
 
-import com.storix.storix_api.controller.auth.dto.*;
 import com.storix.storix_api.domains.user.adaptor.OnboardingUserDetails;
 import com.storix.storix_api.domains.user.application.usecase.AuthUseCase;
 import com.storix.storix_api.domains.user.application.usecase.AuthorizationUseCase;
 import com.storix.storix_api.domains.user.application.usecase.LoginUseCase;
 import com.storix.storix_api.domains.user.application.usecase.OAuthLoginUseCase;
+import com.storix.storix_api.domains.user.controller.dto.*;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;

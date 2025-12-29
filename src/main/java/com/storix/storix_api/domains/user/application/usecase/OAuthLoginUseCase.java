@@ -1,9 +1,9 @@
 package com.storix.storix_api.domains.user.application.usecase;
 
 import com.storix.storix_api.UseCase;
-import com.storix.storix_api.controller.auth.dto.OAuthAuthorizationRequest;
-import com.storix.storix_api.controller.auth.dto.ReaderSocialLoginResponse;
-import com.storix.storix_api.controller.auth.dto.ValidAuthDTO;
+import com.storix.storix_api.domains.user.controller.dto.OAuthAuthorizationRequest;
+import com.storix.storix_api.domains.user.controller.dto.ReaderSocialLoginResponse;
+import com.storix.storix_api.domains.user.controller.dto.ValidAuthDTO;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import lombok.RequiredArgsConstructor;
