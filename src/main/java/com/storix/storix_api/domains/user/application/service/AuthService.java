@@ -14,6 +14,7 @@ import com.storix.storix_api.domains.user.dto.*;
 import com.storix.storix_api.global.apiPayload.exception.user.DuplicateNicknameException;
 import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
 import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
+import com.storix.storix_api.global.apiPayload.exception.web.FeignClientServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,8 @@ public class AuthService {
         // 기존 로직에서 idToken 값에 oid 값 반환
 //        OAuthInfo oauthInfo = oauthHelper.getOauthInfoByIdToken(naverToken.idToken(), OAuthProvider.NAVER);
 //        if (!oauthInfo.getOid().equals(naverUser.id())) { throw UnknownUserException.EXCEPTION; }
+
+        if (naverUser.id() == null) throw FeignClientServerErrorException.EXCEPTION;
 
         boolean isRegistered = userAdaptor.isUserPresentWithProviderAndOid(OAuthProvider.NAVER, naverUser.id());
 
