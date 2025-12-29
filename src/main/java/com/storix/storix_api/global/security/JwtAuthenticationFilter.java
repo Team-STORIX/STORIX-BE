@@ -26,12 +26,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        return uri.startsWith("/api/v1/auth/oauth/")
+                || uri.equals("/api/v1/auth/nickname/valid")
+                || uri.equals("/api/v1/auth/users/artist/login")
+                || uri.startsWith("/api/v1/auth/developer/")
+                || uri.equals("/api/v1/auth/users/reader/signup");
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = resolveToken(request);
 
-        if (StringUtils.hasText(token) && tokenProvider.isAccessToken(token)) {
+        if (StringUtils.hasText(token)) {
             Authentication authentication = getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

@@ -1,10 +1,10 @@
 package com.storix.storix_api.domains.user.application.usecase;
 
 import com.storix.storix_api.UseCase;
-import com.storix.storix_api.controller.auth.dto.*;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.application.usecase.helper.TokenGenerateHelper;
 import com.storix.storix_api.domains.user.application.service.AuthService;
+import com.storix.storix_api.domains.user.controller.dto.*;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
@@ -23,8 +23,9 @@ public class AuthUseCase {
             case KAKAO -> {
                 return authService.validKakaoSignup(req);
             }
-            // case NAVER
-            // return authService.validNaverSignup(req);
+            case NAVER -> {
+                return authService.validNaverSignup(req);
+            }
             default -> {return null;}
         }
     }
@@ -33,13 +34,19 @@ public class AuthUseCase {
     public CustomResponse<LoginWithTokenResponse> readerSignup(ReaderSignupRequest req, String jti) {
         AuthUserDetails userDetails = authService.signUpReaderUser(req, jti);
         LoginWithTokenResponse loginWithTokenResponse = tokenGenerateHelper.generateLoginWithToken(userDetails);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, loginWithTokenResponse);
+        return CustomResponse.onSuccess(SuccessCode.AUTH_SIGNUP_SUCCESS, loginWithTokenResponse);
+    }
+
+    // 닉네임 중복 체크
+    public CustomResponse<Void> checkAvailableNickname(String nickName) {
+        authService.validNickname(nickName);
+        return CustomResponse.onSuccess(SuccessCode.AUTH_NICKNAME_SUCCESS);
     }
 
     // 작가 회원 가입
     public CustomResponse<ArtistSignupResponse> artistSignup(ArtistSignupRequest req) {
         Long artistUserId = authService.signUpArtistUser(req);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS,
+        return CustomResponse.onSuccess(SuccessCode.AUTH_ARTIST_SIGNUP_SUCCESS,
                 new ArtistSignupResponse(artistUserId, req.loginId(), req.nickName()));
     }
 }

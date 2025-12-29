@@ -60,6 +60,11 @@ public class UserAdaptor {
         }
     }
 
+    public boolean isNicknameDuplicate(String nickName) {
+        Optional<User> readerUser = userRepository.findByNickName(nickName);
+        return readerUser.isPresent();
+    }
+
     // 독자 회원 가입
     public AuthUserDetails saveReaderUser(CreateReaderUserCommand cmd) {
         try {

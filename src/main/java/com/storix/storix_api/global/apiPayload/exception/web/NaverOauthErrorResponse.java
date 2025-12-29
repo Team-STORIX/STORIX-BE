@@ -1,20 +1,21 @@
 package com.storix.storix_api.global.apiPayload.exception.web;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import java.io.IOException;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record KakaoOauthErrorResponse(
+public record NaverOauthErrorResponse(
         String error,
-        String errorDescription,
-        String errorCode
+        String errorMessage
 ) {
-    public static KakaoOauthErrorResponse from(feign.Response response) {
+    public static NaverOauthErrorResponse from(feign.Response response) {
         try (var is = response.body().asInputStream()) {
-            return new ObjectMapper().readValue(is, KakaoOauthErrorResponse.class);
+            return new ObjectMapper().readValue(is, NaverOauthErrorResponse.class);
         } catch (IOException e) {
             throw UnHandleException.EXCEPTION;
         }
