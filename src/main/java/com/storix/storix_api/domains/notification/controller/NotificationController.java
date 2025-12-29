@@ -35,19 +35,7 @@ public class NotificationController {
             @Parameter(description = "한 번에 가져올 개수 (기본 10)")
             @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-
-        // 비로그인 유저 -> 빈 객체 반환
-        if (authUser == null) {
-            return CustomResponse.onSuccess(
-                    SuccessCode.NOTIFICATION_LOAD_SUCCESS,
-                    new SliceImpl<>(Collections.emptyList())
-            );
-        }
-
-        Long userId = authUser.getUserId();
-
-        Slice<NotificationResponseDto> result = notificationService.getNotifications(userId, cursorId, PageRequest.of(0, size));
-
+        Slice<NotificationResponseDto> result = notificationService.getNotifications(authUser.getUserId(), cursorId, PageRequest.of(0, size));
         return CustomResponse.onSuccess(SuccessCode.NOTIFICATION_LOAD_SUCCESS, result);
     }
 
@@ -57,14 +45,7 @@ public class NotificationController {
     public CustomResponse<Long> getUnreadCount(
             @AuthenticationPrincipal AuthUserDetails authUser
     ) {
-
-        if (authUser == null) {
-            return CustomResponse.onSuccess(SuccessCode.NOTIFICATION_COUNT_SUCCESS, 0L);
-        }
-
-        Long userId = authUser.getUserId();
-
-        long count = notificationService.getUnreadCount(userId);
+        long count = notificationService.getUnreadCount(authUser.getUserId());
         return CustomResponse.onSuccess(SuccessCode.NOTIFICATION_COUNT_SUCCESS, count);
     }
 
@@ -75,11 +56,7 @@ public class NotificationController {
             @AuthenticationPrincipal AuthUserDetails authUser,
             @PathVariable("id") Long notificationId
     ) {
-
-        if (authUser != null) {
-            notificationService.readNotification(authUser.getUserId(), notificationId);
-        }
-
+        notificationService.readNotification(authUser.getUserId(), notificationId);
         return CustomResponse.onSuccess(SuccessCode.NOTIFICATION_READ_SUCCESS);
     }
 
@@ -89,11 +66,7 @@ public class NotificationController {
     public CustomResponse<Void> readAllNotifications(
             @AuthenticationPrincipal AuthUserDetails authUser
     ) {
-
-        if (authUser != null) {
-            notificationService.readAllNotifications(authUser.getUserId());
-        }
-
+        notificationService.readAllNotifications(authUser.getUserId());
         return CustomResponse.onSuccess(SuccessCode.NOTIFICATION_READ_ALL_SUCCESS);
     }
 }
