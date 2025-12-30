@@ -8,8 +8,6 @@ import org.springframework.data.domain.Slice;
 @Builder
 public class SearchResponseWrapperDto<T> {
 
-    private Slice<T> result;
-
-    // 검색 결과가 없을 때 추천될 검색어
-    private String fallbackRecommendation;
+    private Slice<T> result;    // 무한 스크롤 데이터
+    private String fallbackRecommendation;      // 검색 결과 없는 경우 추천 검색어
 }
