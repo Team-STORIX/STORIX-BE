@@ -42,10 +42,10 @@ public class UserAdaptor {
      * */
     // 독자
     // OAuthInfo(oid, provider) -> userId(PK), role (토큰 서명용)
-    public AuthUserDetails findReaderUserByOAuthInfo(OAuthInfo oauthInfo) {
+    public User findReaderUserByOAuthInfo(OAuthInfo oauthInfo) {
         Optional<User> readerUser = userRepository.findByOauthInfoProviderAndOauthInfoOid(oauthInfo.getProvider(), oauthInfo.getOid());
         if (readerUser.isPresent()) {
-            return new AuthUserDetails(readerUser.get().getId(), readerUser.get().getRole().toString());
+            return readerUser.get();
         } else {
             throw UnknownUserException.EXCEPTION;
         }
@@ -117,4 +117,12 @@ public class UserAdaptor {
     }
 
     public void saveArtistUser(CreateArtistUserCommand cmd) { userRepository.save(cmd.toEntity()); }
+
+    public User findUserById(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw UnknownUserException.EXCEPTION;
+        }
+        return user.get();
+    }
 }
