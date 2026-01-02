@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.user.application.service;
 
+import com.storix.storix_api.domains.favorite.adaptor.FavoriteWorksAdaptor;
 import com.storix.storix_api.domains.user.controller.dto.ArtistSignupRequest;
 import com.storix.storix_api.domains.user.controller.dto.OAuthAuthorizationRequest;
 import com.storix.storix_api.domains.user.controller.dto.ReaderSignupRequest;
@@ -26,6 +27,7 @@ public class AuthService {
 
     private final UserAdaptor userAdaptor;
     private final TokenAdaptor tokenAdaptor;
+    private final FavoriteWorksAdaptor favoriteWorksAdaptor;
     private final OAuthHelper oauthHelper;
     private final PasswordEncoder passwordEncoder;
 
@@ -65,7 +67,6 @@ public class AuthService {
         return new ValidAuthDTO(isRegistered, naverUser.id());
     }
 
-
     // 독자 회원 가입 (소셜 로그인)
     @Transactional
     public AuthUserDetails signUpReaderUser(ReaderSignupRequest req, String jti) {
@@ -81,11 +82,13 @@ public class AuthService {
                 oid,
                 req.nickName(),
                 req.gender(),
-                req.favoriteGenre()
+                req.favoriteGenreList()
         );
 
         AuthUserDetails authUserDetails = userAdaptor.saveReaderUser(m);
         tokenAdaptor.deleteOnboardingTokenByJti(jti);
+
+        favoriteWorksAdaptor.saveFavoriteWorks(authUserDetails.getUserId(), req.favoriteWorksIdList());
 
         return authUserDetails;
     }
