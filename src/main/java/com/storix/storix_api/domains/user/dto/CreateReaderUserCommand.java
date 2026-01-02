@@ -23,7 +23,7 @@ public record CreateReaderUserCommand(
                 oauthInfo,
                 nickName,
                 gender,
-                favoriteGenreList
+                genres
         );
     }
 }
