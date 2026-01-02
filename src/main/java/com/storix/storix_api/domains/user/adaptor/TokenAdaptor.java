@@ -5,6 +5,7 @@ import com.storix.storix_api.domains.user.domain.RefreshToken;
 import com.storix.storix_api.domains.user.dto.OnboardingPrincipal;
 import com.storix.storix_api.domains.user.repository.OnboardingTokenRepository;
 import com.storix.storix_api.domains.user.repository.RefreshTokenRepository;
+import com.storix.storix_api.global.apiPayload.exception.user.InvalidLogoutException;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,17 +24,16 @@ public class TokenAdaptor {
         refreshTokenRepository.save(refreshToken);
     }
 
-    public Long findUserIdByRefreshToken(String refreshToken) {
-        Optional<RefreshToken> refreshTokenInfo = refreshTokenRepository.findByRefreshToken(refreshToken);
+    public void deleteRefreshTokenByUserId(Long userId) {
+        Optional<RefreshToken> refreshTokenInfo = refreshTokenRepository.findById(userId);
         if (refreshTokenInfo.isEmpty()) {
-            throw InvalidTokenException.EXCEPTION;
+            throw InvalidLogoutException.EXCEPTION;
         }
-
-        return refreshTokenInfo.get().getId();
+        refreshTokenRepository.deleteById(userId);
     }
 
-    public void deleteRefreshTokenByUserId(Long userId) {
-        refreshTokenRepository.deleteById(userId);
+    public void deleteRefreshToken(String refreshToken) {
+        refreshTokenRepository.deleteByRefreshToken(refreshToken);
     }
 
     // OnboardingToken
