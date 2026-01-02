@@ -96,5 +96,20 @@ public class User extends BaseTimeEntity {
     // 계정 정보 수정
 
     // 계정 탈퇴
+    public void withdraw() {
+        if (accountState.equals(AccountState.DELETED)) {
+            throw AlreadyWithDrawUserException.EXCEPTION;
+        }
+        accountState = AccountState.DELETED;
+        nickName = "탈퇴한 유저";
+        gender = null;
+        favoriteGenreList = null;
+        if (role.equals(Role.READER)) {
+            oauthInfo = oauthInfo.withDrawOauthInfo();
+        } else {
+            loginId = null;
+            password = null;
+        }
+    }
 
 }
