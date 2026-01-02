@@ -12,9 +12,7 @@ import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.domains.user.dto.*;
-import com.storix.storix_api.global.apiPayload.exception.user.DuplicateNicknameException;
-import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
-import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
+import com.storix.storix_api.global.apiPayload.exception.user.*;
 import com.storix.storix_api.global.apiPayload.exception.web.FeignClientServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,6 +68,16 @@ public class AuthService {
     // 독자 회원 가입 (소셜 로그인)
     @Transactional
     public AuthUserDetails signUpReaderUser(ReaderSignupRequest req, String jti) {
+
+        int genreSize = (req.favoriteGenreList() == null) ? 0 : req.favoriteGenreList().size();
+        if (genreSize < 1 || genreSize > 3) {
+            throw InsufficientFavoriteGenreException.EXCEPTION;
+        }
+
+        int worksSize = (req.favoriteWorksIdList() == null) ? 0 : req.favoriteWorksIdList().size();
+        if (worksSize > 18) {
+            throw InsufficientFavoriteWorksException.EXCEPTION;
+        }
 
         OnboardingPrincipal principal = tokenAdaptor.findOnboardingPrincipalByJti(jti);
         OAuthProvider provider = principal.provider(); String oid = principal.oid();
