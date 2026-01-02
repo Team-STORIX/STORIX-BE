@@ -48,7 +48,7 @@ public class TokenGenerateHelper {
     }
 
     @Transactional
-    public String reissueAccessTokenWithRefreshToken(String refreshToken) {
+    public LoginWithTokenResponse reissueTokens(String refreshToken) {
 
         if (!tokenProvider.isRefreshToken(refreshToken)) {
             throw InvalidTokenException.EXCEPTION;
@@ -57,7 +57,10 @@ public class TokenGenerateHelper {
         Long userId = tokenProvider.parseRefreshToken(refreshToken);
         Role role = userAdaptor.findUserRoleByUserId(userId);
 
-        return tokenProvider.createAccessToken(userId, String.valueOf(role));
+        tokenAdaptor.deleteRefreshToken(refreshToken);
+
+        // AccessToken, RefreshToken 재발급
+        return generateLoginWithToken(new AuthUserDetails(userId, String.valueOf(role)));
     }
 
     @Transactional
