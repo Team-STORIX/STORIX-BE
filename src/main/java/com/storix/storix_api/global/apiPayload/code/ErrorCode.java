@@ -26,6 +26,7 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "LOGIN_ERROR_001", "아이디 또는 비밀번호가 일치하지 않습니다"),
     DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "SIGNUP_ERROR_001", "중복 가입 요청입니다."),
     INVALID_USER_LOGOUT(HttpStatus.BAD_REQUEST, "LOGOUT_ERROR_001", "이미 로그아웃 처리가 되었거나, 다른 소셜 계정에 대한 로그아웃 요청입니다."),
+    INVALID_USER_WITHDRAW(HttpStatus.BAD_REQUEST, "WITHDRAW_ERROR_001", "이미 탈퇴 처리된 사용자입니다."),
     ONBOARDING_DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_001", "이미 사용 중인 닉네임입니다."),
     ONBOARDING_INSUFFICIENT_FAVORITE_GENRE(HttpStatus.BAD_REQUEST, "FAV_GENRE_ERROR_001", "관심 장르 개수는 최소 1개에서 최대 3개여야 합니다."),
     ONBOARDING_INSUFFICIENT_FAVORITE_WORKS(HttpStatus.BAD_REQUEST, "FAV_WORKS_ERROR_001", "관심 작품 개수는 최대 18개 입니다."),
