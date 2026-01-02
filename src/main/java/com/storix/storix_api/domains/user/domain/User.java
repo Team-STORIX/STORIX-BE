@@ -1,11 +1,15 @@
 package com.storix.storix_api.domains.user.domain;
 
+import com.storix.storix_api.domains.works.domain.Genre;
+import com.storix.storix_api.global.apiPayload.exception.user.AlreadyWithDrawUserException;
 import com.storix.storix_api.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -28,9 +32,21 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     // 계정 정보
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String nickName;
-    @Embedded private Profile profile;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @ElementCollection(targetClass = Genre.class)
+    @CollectionTable(
+            name = "user_favorite_genre",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "genre", nullable = false)
+    private Set<Genre> favoriteGenreList = new HashSet<>();
+
     private Boolean isAdultVerified = false;
 
     // 계정 상태
@@ -41,7 +57,6 @@ public class User extends BaseTimeEntity {
     private Role role = Role.READER;
 
     // 독자용 소셜 로그인
-    private String name;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "provider", column = @Column(name = "oauth_provider")),
@@ -57,11 +72,11 @@ public class User extends BaseTimeEntity {
     protected User() {}
 
     @Builder // 독자
-    public User(OAuthInfo oauthInfo, String name, String nickName, Profile profile) {
+    public User(OAuthInfo oauthInfo, String nickName, Gender gender, Set<Genre> favoriteGenreList) {
         this.oauthInfo = oauthInfo;
-        this.name = name;
         this.nickName = nickName;
-        this.profile = profile;
+        this.gender = gender;
+        this.favoriteGenreList = favoriteGenreList;
     }
 
     @Builder // 작가
