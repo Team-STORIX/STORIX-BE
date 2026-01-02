@@ -1,22 +1,29 @@
 package com.storix.storix_api.domains.user.dto;
 
 import com.storix.storix_api.domains.user.domain.*;
+import com.storix.storix_api.domains.works.domain.Genre;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public record CreateReaderUserCommand(
         OAuthProvider provider,
         String oid,
         String nickName,
         Gender gender,
-        FavoriteGenre favoriteGenre
+        Set<Genre> favoriteGenreList
 ) {
     public User toEntity() {
         OAuthInfo oauthInfo = new OAuthInfo(provider, oid);
-        Profile profile = new Profile(gender, favoriteGenre);
+        Set<Genre> genres = (favoriteGenreList == null) ?
+                        Collections.emptySet() : new LinkedHashSet<>(favoriteGenreList);
 
-        return User.builder()
-                .oauthInfo(oauthInfo)
-                .nickName(nickName)
-                .profile(profile)
-                .build();
+        return new User(
+                oauthInfo,
+                nickName,
+                gender,
+                favoriteGenreList
+        );
     }
 }
