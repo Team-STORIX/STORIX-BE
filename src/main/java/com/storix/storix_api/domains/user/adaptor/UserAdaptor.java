@@ -53,11 +53,7 @@ public class UserAdaptor {
 
     public boolean isUserPresentWithProviderAndOid(OAuthProvider provider, String oid) {
         Optional<User> readerUser = userRepository.findByOauthInfoProviderAndOauthInfoOid(provider, oid);
-        if (readerUser.isPresent()) {
-            return true;
-        } else {
-            return false;
-        }
+        return readerUser.isPresent();
     }
 
     public boolean isNicknameDuplicate(String nickName) {
@@ -92,12 +88,9 @@ public class UserAdaptor {
 
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
 
-        if(!artistUser.isPresent()) { throw ArtistLoginException.EXCEPTION; }
+        if(artistUser.isEmpty()) { throw ArtistLoginException.EXCEPTION; }
 
-        LoginInfo loginInfo = new LoginInfo(artistUser.get().getLoginId(), artistUser.get().getPassword());
-
-        return loginInfo;
-
+        return new LoginInfo(artistUser.get().getLoginId(), artistUser.get().getPassword());
     }
 
     public AuthUserDetails findArtistUserIdAndRoleByLoginId(String loginId){
@@ -108,12 +101,11 @@ public class UserAdaptor {
         throw UnknownUserException.EXCEPTION;
     }
 
-    public ErrorResponse isLoginIdDuplicate(String loginId) {
+    public void isLoginIdDuplicate(String loginId) {
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
         if (artistUser.isPresent()) {
-            return new ErrorResponse(ErrorCode.BAD_REQUEST);
+            new ErrorResponse(ErrorCode.BAD_REQUEST);
         }
-        return null;
     }
 
     public void saveArtistUser(CreateArtistUserCommand cmd) { userRepository.save(cmd.toEntity()); }
