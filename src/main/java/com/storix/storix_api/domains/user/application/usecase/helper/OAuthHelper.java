@@ -46,6 +46,17 @@ public class OAuthHelper {
         return kakaoInfoClient.getUserInfo(BEARER + accessToken);
     }
 
+    // 카카오: 사용자 연결 해제
+    public void unlinkKakaoUser(String oid) {
+        var kakao = oauthProperties.getKakao();
+        String header = "KakaoAK " + kakao.getAdminKey();
+        kakaoInfoClient.unlinkUser(
+                header,
+                "user_id",
+                Long.valueOf(oid)
+        );
+    }
+
     // 네이버: 인가 코드로 토큰 발급 요청 -> accessToken
     public NaverTokenResponse getNaverOAuthToken(String code, String state) {
         var naver = oauthProperties.getNaver();
@@ -61,6 +72,12 @@ public class OAuthHelper {
     // 네이버: 사용자 정보 요청 (accessToken)
     public NaverUserResponse getNaverInformation(String accessToken) {
         return naverInfoClient.getUserInfo(BEARER + accessToken).response();
+    }
+
+    // 네이버: 사용자 연결 해제
+    public void unlinkNaverUser(String oid) {
+        var naver = oauthProperties.getNaver();
+        // 네이버는 토큰 캐싱 및 주기적 갱신 필요
     }
 
 
