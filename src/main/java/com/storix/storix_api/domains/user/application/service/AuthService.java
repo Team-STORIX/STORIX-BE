@@ -11,6 +11,8 @@ import com.storix.storix_api.domains.user.application.usecase.helper.OAuthHelper
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
+import com.storix.storix_api.domains.user.domain.Role;
+import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.domains.user.dto.*;
 import com.storix.storix_api.global.apiPayload.exception.user.*;
 import com.storix.storix_api.global.apiPayload.exception.web.FeignClientServerErrorException;
@@ -125,5 +127,21 @@ public class AuthService {
         // TODO: 이때 WorksAndArtistMatcher 만들어두고 artistUserId 바로 넘기면 될듯요 (회원가입과 동시에 Works에 작가 회원id 정보 넣어주기)
 
         return artistUserId;
+    }
+
+    // 유저 회원 탈퇴
+    @Transactional
+    public void withDrawUser(Long userId) {
+        User user = userAdaptor.findUserById(userId);
+        // 소셜 서비스 unlink
+        if (user.getRole() == Role.READER) {
+            switch (user.getOauthInfo().getProvider()) {
+                case KAKAO -> oauthHelper.unlinkKakaoUser(user.getOauthInfo().getOid());
+                case NAVER -> oauthHelper.unlinkNaverUser(user.getOauthInfo().getOid());
+            }
+        }
+        user.withdraw();
+        tokenAdaptor.deleteRefreshTokenByUserId(userId);
+        favoriteWorksAdaptor.deleteFavoriteWorks(userId);
     }
 }
