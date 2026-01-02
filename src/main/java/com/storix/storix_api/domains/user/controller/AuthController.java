@@ -25,6 +25,7 @@ public class AuthController {
     private final LogoutUseCase logoutUseCase;
     private final OAuthLoginUseCase oauthLoginUseCase;
     private final AuthorizationUseCase authorizationUseCase;
+    private final WithDrawUseCase withDrawUseCase;
 
     @Operation(summary = "카카오 로그인", description = "카카오로 로그인 하는 api 입니다.   \n회원가입한 유저의 경우 readerLoginResponse로 액세스 토큰을 리프레쉬 토큰 쿠키와 함께 반환합니다.   \n회원가입이 필요한 유저의 경우 readerPreLoginResponse로 온보딩 토큰을 반환합니다.")
     @GetMapping("/oauth/kakao/login")
@@ -96,6 +97,14 @@ public class AuthController {
             @AuthenticationPrincipal AuthUserDetails authUserDetails
     ) {
         return logoutUseCase.execute(authUserDetails.getUserId());
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴용 api 입니다.   \n액세스 토큰을 보내주세요.")
+    @DeleteMapping("/user/withdraw")
+    public ResponseEntity<CustomResponse<Void>> withdraw(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails
+    ) {
+        return withDrawUseCase.execute(authUserDetails.getUserId());
     }
 
 }
