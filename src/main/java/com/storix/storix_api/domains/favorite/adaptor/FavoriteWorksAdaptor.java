@@ -16,6 +16,11 @@ public class FavoriteWorksAdaptor {
 
     // 온보딩 관심 작품 리스트 저장
     public void saveFavoriteWorks(Long userId, Set<Long> worksIds) {
+
+        if (worksIds == null || worksIds.isEmpty()) {
+            return;
+        }
+
         List<FavoriteWorks> entities = worksIds.stream()
                 .map(worksId -> new FavoriteWorks(userId, worksId))
                 .toList();
