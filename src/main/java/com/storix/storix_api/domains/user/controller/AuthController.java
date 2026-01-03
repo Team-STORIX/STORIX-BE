@@ -9,6 +9,7 @@ import com.storix.storix_api.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -51,7 +52,7 @@ public class AuthController {
     @PostMapping("/users/reader/signup")
     public ResponseEntity<CustomResponse<AuthorizationResponse>> readerUserSignup(
             @AuthenticationPrincipal OnboardingUserDetails onboardingUser,
-            @RequestBody ReaderSignupRequest req
+            @Valid @RequestBody ReaderSignupRequest req
     ) {
         return authUseCase.readerSignup(req, onboardingUser.getJti());
     }
