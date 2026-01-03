@@ -71,16 +71,6 @@ public class AuthService {
     @Transactional
     public AuthUserDetails signUpReaderUser(ReaderSignupRequest req, String jti) {
 
-        int genreSize = (req.favoriteGenreList() == null) ? 0 : req.favoriteGenreList().size();
-        if (genreSize < 1 || genreSize > 3) {
-            throw InsufficientFavoriteGenreException.EXCEPTION;
-        }
-
-        int worksSize = (req.favoriteWorksIdList() == null) ? 0 : req.favoriteWorksIdList().size();
-        if (worksSize < 2 || worksSize > 18) {
-            throw InsufficientFavoriteWorksException.EXCEPTION;
-        }
-
         OnboardingPrincipal principal = tokenAdaptor.findOnboardingPrincipalByJti(jti);
         OAuthProvider provider = principal.provider(); String oid = principal.oid();
 
