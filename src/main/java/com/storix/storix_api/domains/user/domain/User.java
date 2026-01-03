@@ -111,13 +111,14 @@ public class User extends BaseTimeEntity {
             throw AlreadyWithDrawUserException.EXCEPTION;
         }
         accountState = AccountState.DELETED;
-        nickName = "탈퇴한 유저";
         gender = null;
         favoriteGenreList = null;
         profileImageUrl = null;
         if (role.equals(Role.READER)) {
+            nickName = "탈퇴한 유저";
             oauthInfo = oauthInfo.withDrawOauthInfo();
         } else {
+            nickName = "탈퇴한 작가";
             loginId = null;
             password = null;
         }
