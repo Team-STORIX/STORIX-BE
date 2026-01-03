@@ -60,16 +60,16 @@ public class AuthController {
     @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 여부를 체크하는 api 입니다.")
     @GetMapping("/nickname/valid")
     public ResponseEntity<CustomResponse<Void>> nickNameCheck(
-            @RequestParam("nickname") String nickName
+            @Valid @RequestBody NickNameCheckRequest req
     ) {
         return ResponseEntity.ok()
-                .body(authUseCase.checkAvailableNickname(nickName));
+                .body(authUseCase.checkAvailableNickname(req.nickName()));
     }
 
     @Operation(summary = "작가 계정 일반 로그인", description = "작가 계정에 로그인 하는 api 입니다.")
     @PostMapping("/users/artist/login")
     public ResponseEntity<CustomResponse<AuthorizationResponse>> artistUserLogin(
-            @RequestBody ArtistLoginRequest req
+            @Valid @RequestBody ArtistLoginRequest req
     ) {
         return loginUseCase.artistLoginWithLoginId(req);
     }
