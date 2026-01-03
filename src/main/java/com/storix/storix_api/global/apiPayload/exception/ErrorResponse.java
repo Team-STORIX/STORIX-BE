@@ -4,17 +4,23 @@ import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 public record ErrorResponse (
         Boolean isSuccess,
         String code,
         String message,
-        LocalDateTime timestamp
+        LocalDateTime timestamp,
+        List<FieldErrorResponse> fieldErrors
 ) {
 
     public ErrorResponse(ErrorCode errorCode) {
-        this(false, errorCode.getCode(), errorCode.getMessage(), LocalDateTime.now());
+        this(false, errorCode.getCode(), errorCode.getMessage(), LocalDateTime.now(), null);
+    }
+
+    public ErrorResponse(ErrorCode errorCode, List<FieldErrorResponse> fieldErrors) {
+        this(false, errorCode.getCode(), errorCode.getMessage(), LocalDateTime.now(), fieldErrors);
     }
 
 }
