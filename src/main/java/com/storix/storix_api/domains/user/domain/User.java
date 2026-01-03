@@ -47,6 +47,9 @@ public class User extends BaseTimeEntity {
     @Column(name = "genre", nullable = false)
     private Set<Genre> favoriteGenreList = new HashSet<>();
 
+    @Column(name = "profile_image_url")
+    private String profileImageUrl = null;
+
     private Boolean isAdultVerified = false;
 
     // 계정 상태
@@ -104,6 +107,7 @@ public class User extends BaseTimeEntity {
         nickName = "탈퇴한 유저";
         gender = null;
         favoriteGenreList = null;
+        profileImageUrl = null;
         if (role.equals(Role.READER)) {
             oauthInfo = oauthInfo.withDrawOauthInfo();
         } else {
