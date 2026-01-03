@@ -32,10 +32,11 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     // 계정 정보
-    @Column(nullable = false, length = 10)
+    @Column(name = "nick_name", nullable = false, length = 10)
     private String nickName;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Gender gender;
 
     @ElementCollection(targetClass = Genre.class)
@@ -50,12 +51,15 @@ public class User extends BaseTimeEntity {
     @Column(name = "profile_image_url")
     private String profileImageUrl = null;
 
+    @Column(name = "is_adult_verified")
     private Boolean isAdultVerified = false;
 
     // 계정 상태
+    @Column(name = "account_state")
     private AccountState accountState = AccountState.NORMAL;
 
     // 계정 권한
+    @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt = LocalDateTime.now();
     private Role role = Role.READER;
 
@@ -68,7 +72,10 @@ public class User extends BaseTimeEntity {
     private OAuthInfo oauthInfo;
 
     // 작가용 아이디/비번
+    @Column(name = "login_id")
     private String loginId = null;
+
+    @Column(name = "password")
     private String password = null;
 
     /** 생성자 로직 **/
