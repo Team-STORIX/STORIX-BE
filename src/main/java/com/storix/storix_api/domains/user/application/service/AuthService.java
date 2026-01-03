@@ -77,7 +77,7 @@ public class AuthService {
         }
 
         int worksSize = (req.favoriteWorksIdList() == null) ? 0 : req.favoriteWorksIdList().size();
-        if (worksSize > 18) {
+        if (worksSize < 2 || worksSize > 18) {
             throw InsufficientFavoriteWorksException.EXCEPTION;
         }
 
