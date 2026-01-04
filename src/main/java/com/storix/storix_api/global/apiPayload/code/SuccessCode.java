@@ -17,13 +17,15 @@ public enum SuccessCode {
     NOTIFICATION_READ_SUCCESS(HttpStatus.OK, "NOTI2003", "알림을 읽음 처리했습니다."),
     NOTIFICATION_READ_ALL_SUCCESS(HttpStatus.OK, "NOTI2004", "모든 알림을 읽음 처리했습니다."),
 
-    // login success
-    VALID_LOGIN(HttpStatus.OK, "AUTH_SUCCESS_001", "로그인에 성공했습니다."),
-    VALID_LOGOUT(HttpStatus.OK, "AUTH_SUCCESS_002", "로그아웃에 성공했습니다."),
-    VALID_SOCIAL_LOGIN(HttpStatus.OK, "AUTH_SUCCESS_003", "회원가입이 필요합니다."),
-
-    // authorization success
-    SUCCESS_REISSUE_ACCESSTOKEN(HttpStatus.CREATED, "AUTHORIZATION_SUCCESS_001", "엑세스 토큰 재발급에 성공했습니다.");
+    // Auth success
+    OAUTH_LOGIN_SUCCESS(HttpStatus.OK, "OAUTH_SUCCESS_001", "소셜 로그인에 성공했습니다."),
+    OAUTH_PRE_LOGIN_SUCCESS(HttpStatus.OK, "OAUTH_SUCCESS_002", "소셜 로그인에 성공했습니다. 회원가입이 필요합니다."),
+    AUTH_NICKNAME_SUCCESS(HttpStatus.OK, "NICKNAME_SUCCESS_001", "사용 가능한 닉네임입니다."),
+    AUTH_SIGNUP_SUCCESS(HttpStatus.CREATED, "AUTH_SUCCESS_001", "유저 정보 등록이 완료되었습니다."),
+    AUTH_LOGOUT_SUCCESS(HttpStatus.OK, "AUTH_SUCCESS_002", "로그아웃에 성공했습니다."),
+    AUTH_REISSUE_ACCESSTOKEN_SUCCESS(HttpStatus.CREATED, "AUTH_SUCCESS_003", "엑세스 토큰 재발급에 성공했습니다."),
+    AUTH_ARTIST_SIGNUP_SUCCESS(HttpStatus.CREATED, "AUTH_SUCCESS_004", "작가 계정 생성이 완료되었습니다."),
+    AUTH_ARTIST_LOGIN_SUCCESS(HttpStatus.OK, "AUTH_SUCCESS_005", "작가 계정 로그인에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

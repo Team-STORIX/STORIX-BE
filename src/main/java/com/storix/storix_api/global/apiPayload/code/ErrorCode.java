@@ -16,16 +16,20 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_ERROR_005", "서버 내부 오류가 발생했습니다"),
 
     // Token error
-    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_001", "잘못된 토큰입니다"),
-    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_401_001", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요"),
-    REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "AUTH_ERROR_403_001", "토큰이 만료되었습니다. 재로그인 해주세요"),
-    ONBOARDING_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_401_002", "온보딩 토큰이 만료되었습니다. 소셜 로그인 재시도 해주세요"),
+    TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_001", "인가가 필요한 경로로 토큰이 전달되지 않았습니다"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_002", "잘못된 토큰입니다"),
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_003", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요"),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "TOKEN_ERROR_004", "토큰이 만료되었습니다. 재로그인 해주세요"),
+    ONBOARDING_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_005", "온보딩 토큰이 만료되었습니다. 소셜 로그인 재시도 해주세요"),
 
     // Login error
-    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_002", "아이디 또는 비밀번호가 일치하지 않습니다"),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "LOGIN_ERROR_001", "아이디 또는 비밀번호가 일치하지 않습니다"),
 
     // SignUp error
-    DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "AUTH_ERROR_400_001", "중복 가입 요청입니다."),
+    DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "SIGNUP_ERROR_001", "중복 가입 요청입니다."),
+
+    // Onboarding error
+    ONBOARDING_DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_001", "이미 사용 중인 닉네임입니다."),
 
     // Other Server error
     OTHER_SERVER_BAD_REQUEST(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_1", "Other server bad request"),
@@ -41,6 +45,17 @@ public enum ErrorCode {
     KOE303(HttpStatus.BAD_REQUEST, "KAKAO_KOE303", "인가 코드 요청 시 사용한 redirect_uri와 액세스 토큰 요청 시 사용한 redirect_uri가 다릅니다"),
     KOE320(HttpStatus.BAD_REQUEST, "KAKAO_KOE320", "동일한 인가 코드를 두 번 이상 사용하거나, 이미 만료된 인가 코드를 사용한 경우, 혹은 인가 코드를 찾을 수 없는 경우입니다."),
     KOE_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "KAKAO_KOE_INVALID_REQUEST","잘못된 요청인 경우"),
+
+    // Naver OAuth error
+    NOE024(HttpStatus.UNAUTHORIZED, "NAVER_NOE024", "OAuth 인증에 실패했습니다."),
+    NOE028(HttpStatus.UNAUTHORIZED, "NAVER_NOE028", "OAuth 인증 헤더가 없습니다."),
+    NOE403(HttpStatus.FORBIDDEN, "NAVER_NOE403", "OAuth 호출 권한이 없습니다."),
+    NOE404(HttpStatus.NOT_FOUND, "NAVER_NOE404", "OAuth 검색 결과가 없습니다."),
+    NOE500(HttpStatus.BAD_REQUEST, "NAVER_NOE500", "네이버 데이터 베이스 오류입니다."),
+    NOE_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "NAVER_NOE_INVALID_REQUEST", "파라미터가 잘못되었거나 요청문이 잘못되었습니다."),
+    NOE_UNAUTHORIZED_CLIENT(HttpStatus.BAD_REQUEST, "NAVER_NOE_UNAUTHORIZED_CIENT", "인증받지 않은 인증 코드로 요청했습니다."),
+    NOE_UNSUPPORTED_RESPONSE_TYPE(HttpStatus.BAD_REQUEST, "NAVER_NOE_UNSUPPORTED_RESPONSE_TYPE", "정의되지 않은 반환 형식으로 요청했습니다."),
+    NOE_SERVER_ERROR(HttpStatus.BAD_REQUEST, "NAVER_SERVER_ERROR", "네이버 인증 서버의 오류로 요청을 처리하지 못했습니다."),
 
     // OIDC error
     OIDC_OLD_PUBLIC_KEY_ERROR(HttpStatus.BAD_REQUEST, "OIDC_ERORR_1", "OIDC 공개키 갱신이 필요합니다."),

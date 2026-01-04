@@ -1,7 +1,7 @@
 package com.storix.storix_api.domains.user.application.usecase.helper;
 
-import com.storix.storix_api.controller.auth.dto.LoginWithTokenResponse;
-import com.storix.storix_api.controller.auth.dto.OAuthLoginWithTokenResponse;
+import com.storix.storix_api.domains.user.controller.dto.LoginWithTokenResponse;
+import com.storix.storix_api.domains.user.controller.dto.OAuthLoginWithTokenResponse;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
@@ -73,6 +73,7 @@ public class TokenGenerateHelper {
                 .jti(oti.jti())
                 .provider(provider)
                 .oid(oid)
+                .onboardingToken(oti.onboardingToken())
                 .ttl(ttlSeconds)
                 .build();
         tokenAdaptor.saveOnboardingToken(newOnboardingToken);
