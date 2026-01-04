@@ -1,5 +1,6 @@
 package com.storix.storix_api.global.apiPayload.exception;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import lombok.Builder;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ErrorResponse (
         Boolean isSuccess,
         String code,
