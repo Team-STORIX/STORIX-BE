@@ -4,6 +4,7 @@ import com.storix.storix_api.domains.search.dto.TrendingItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -12,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -23,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class SearchHistoryService {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     // 날짜별 키 접두사
     private static final String TRENDING_KEY_PREFIX = "search:trending:";
@@ -128,11 +126,8 @@ public class SearchHistoryService {
             } else {
                 int prevRank = prevRankIndex.intValue() + 1;
 
-                if (prevRank > currentRank) {
-                    status = "UP";
-                } else if (prevRank < currentRank) {
-                    status = "DOWN";
-                }
+                if (prevRank > currentRank) { status = "UP"; }
+                else if (prevRank < currentRank) { status = "DOWN"; }
             }
 
             result.add(TrendingItem.builder()
@@ -162,5 +157,31 @@ public class SearchHistoryService {
         String key = RECENT_KEY_PREFIX + userId;
 
         redisTemplate.opsForList().remove(key, 1, keyword);
+    }
+
+    /** 5. 추천 검색어 (검색 결과 없는 경우) */
+    public String getFallbackRecommendation() {
+
+        try {
+            // 오늘 날짜 기준으로 급상승 키 생성
+            String today = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+            String todayKey = TRENDING_KEY_PREFIX + today;
+
+            Set<String> rank11to20 = redisTemplate.opsForZSet().reverseRange(todayKey, 10, 19);
+
+            if (rank11to20 == null || rank11to20.isEmpty()) {
+                return null;
+            }
+
+            // 랜덤 선택 로직
+            List<String> candidatesKeyword = new ArrayList<>(rank11to20);
+            Collections.shuffle(candidatesKeyword);
+
+            return candidatesKeyword.get(0);
+
+        } catch (Exception e) {
+            log.warn("[추천 검색어 조회 실패] ", e);
+            return null;
+        }
     }
 }

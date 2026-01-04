@@ -1,6 +1,9 @@
 package com.storix.storix_api.domains.user.repository;
 
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
+import com.storix.storix_api.domains.user.domain.Role;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.storix.storix_api.domains.user.domain.User;
 
@@ -15,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             OAuthProvider provider,
             String oid
     );
+
+    Slice<User> findByRoleAndNickNameContaining(Role role, String nickName, Pageable pageable);
 }
