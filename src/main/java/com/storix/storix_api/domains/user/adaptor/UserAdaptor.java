@@ -104,7 +104,7 @@ public class UserAdaptor {
     public void isLoginIdDuplicate(String loginId) {
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
         if (artistUser.isPresent()) {
-            new ErrorResponse(ErrorCode.BAD_REQUEST);
+            throw DuplicateUserException.EXCEPTION;
         }
     }
 
