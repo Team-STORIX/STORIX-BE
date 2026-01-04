@@ -78,6 +78,7 @@ public class AuthService {
         if (isUserPresent) throw DuplicateUserException.EXCEPTION;
 
         CreateReaderUserCommand m = new CreateReaderUserCommand(
+                req.marketingAgree(),
                 provider,
                 oid,
                 req.nickName(),

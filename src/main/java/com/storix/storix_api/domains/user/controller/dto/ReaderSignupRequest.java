@@ -2,14 +2,15 @@ package com.storix.storix_api.domains.user.controller.dto;
 
 import com.storix.storix_api.domains.user.domain.Gender;
 import com.storix.storix_api.domains.works.domain.Genre;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.util.Set;
 
 public record ReaderSignupRequest(
+
+    @AssertTrue(message = "마케팅 동의는 필수입니다.")
+    Boolean marketingAgree,
+
     @NotBlank(message = "닉네임은 필수입니다.")
     @Size(min = 2, max = 10, message = "닉네임은 2~10자까지 가능합니다.")
     @Pattern(

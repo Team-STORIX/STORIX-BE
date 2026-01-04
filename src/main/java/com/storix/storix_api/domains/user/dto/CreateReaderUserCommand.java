@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public record CreateReaderUserCommand(
+        Boolean marketingAgree,
         OAuthProvider provider,
         String oid,
         String nickName,
@@ -20,6 +21,7 @@ public record CreateReaderUserCommand(
                         Collections.emptySet() : new LinkedHashSet<>(favoriteGenreList);
 
         return new User(
+                marketingAgree,
                 oauthInfo,
                 nickName,
                 gender,

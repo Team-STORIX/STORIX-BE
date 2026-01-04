@@ -53,9 +53,15 @@ public class User extends BaseTimeEntity {
     @Column(name = "profile_image_url")
     private String profileImageUrl = null;
 
-    @Min(1) @Max(5)
     @Column(nullable = false)
     private int level = 1;
+
+    @Min(0)
+    @Column(nullable = false)
+    private int point = 0;
+
+    @Column(name = "market_agree")
+    private Boolean marketingAgree;
 
     @Column(name = "is_adult_verified")
     private Boolean isAdultVerified = false;
@@ -88,7 +94,8 @@ public class User extends BaseTimeEntity {
     protected User() {}
 
     @Builder // 독자
-    public User(OAuthInfo oauthInfo, String nickName, Gender gender, Set<Genre> favoriteGenreList) {
+    public User(boolean marketingAgree, OAuthInfo oauthInfo, String nickName, Gender gender, Set<Genre> favoriteGenreList) {
+        this.marketingAgree = marketingAgree;
         this.oauthInfo = oauthInfo;
         this.nickName = nickName;
         this.gender = gender;
@@ -101,6 +108,7 @@ public class User extends BaseTimeEntity {
         this.loginId = loginId;
         this.password = password;
         this.role = Role.ARTIST;
+        this.marketingAgree = true;
     }
 
     /** 비즈니스 로직 **/
@@ -115,6 +123,17 @@ public class User extends BaseTimeEntity {
 //            throw new IllegalArgumentException("레벨 범위 오류");
 //        }
         this.level = level;
+    }
+
+    public void increasePoint(int point) {
+        this.point += point;
+    }
+
+    public void decreasePoint(int point) {
+//        if (this.point < point) {
+//            throw new IllegalArgumentException("포인트 부족"); -> 커스텀 에러
+//        }
+        this.point -= point;
     }
 
     // 계정 탈퇴
@@ -134,6 +153,8 @@ public class User extends BaseTimeEntity {
             loginId = null;
             password = null;
         }
+        marketingAgree = null;
+        isAdultVerified = null;
     }
 
 }
