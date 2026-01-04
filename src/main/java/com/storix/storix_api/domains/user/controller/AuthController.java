@@ -1,15 +1,15 @@
 package com.storix.storix_api.domains.user.controller;
 
+import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.adaptor.OnboardingUserDetails;
-import com.storix.storix_api.domains.user.application.usecase.AuthUseCase;
-import com.storix.storix_api.domains.user.application.usecase.AuthorizationUseCase;
-import com.storix.storix_api.domains.user.application.usecase.LoginUseCase;
-import com.storix.storix_api.domains.user.application.usecase.OAuthLoginUseCase;
+import com.storix.storix_api.domains.user.application.usecase.*;
 import com.storix.storix_api.domains.user.controller.dto.*;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,57 +23,55 @@ public class AuthController {
 
     private final AuthUseCase authUseCase;
     private final LoginUseCase loginUseCase;
+    private final LogoutUseCase logoutUseCase;
     private final OAuthLoginUseCase oauthLoginUseCase;
     private final AuthorizationUseCase authorizationUseCase;
+    private final WithDrawUseCase withDrawUseCase;
 
-    @Operation(summary = "카카오 로그인", description = "카카오로 로그인 하는 api 입니다.   \n회원가입한 유저의 경우 readerLoginResponse로 엑세스 토큰과 리프레쉬 토큰을 반환합니다.   \n회원가입이 필요한 유저의 경우 readerPreLoginResponse로 온보딩 토큰을 반환합니다.")
+    @Operation(summary = "카카오 로그인", description = "카카오로 로그인 하는 api 입니다.   \n회원가입한 유저의 경우 readerLoginResponse로 액세스 토큰을 리프레쉬 토큰 쿠키와 함께 반환합니다.   \n회원가입이 필요한 유저의 경우 readerPreLoginResponse로 온보딩 토큰을 반환합니다.")
     @GetMapping("/oauth/kakao/login")
     public ResponseEntity<CustomResponse<ReaderSocialLoginResponse>> kakaoLogin(
             @RequestParam("code") String code,
             @RequestParam("redirectUri") String redirectUri
     ) {
         OAuthAuthorizationRequest req = OAuthAuthorizationRequest.forKakao(code, redirectUri);
-        return ResponseEntity.ok()
-                .body(oauthLoginUseCase.readerOAuthLogin(req, OAuthProvider.KAKAO));
+        return oauthLoginUseCase.readerOAuthLogin(req, OAuthProvider.KAKAO);
     }
 
-    @Operation(summary = "네이버 로그인", description = "네이버로 로그인 하는 api 입니다. 회원가입한 유저의 경우 액세스 토큰 & 리프레쉬 토큰을, 아닌 경우 유저 정보 등록에 필요한 온보딩 토큰을 반환합니다.")
+    @Operation(summary = "네이버 로그인", description = "네이버로 로그인 하는 api 입니다.  \n회원가입한 유저의 경우 readerLoginResponse로 액세스 토큰을 리프레쉬 토큰 쿠키와 함께 반환합니다.   \n회원가입이 필요한 유저의 경우 readerPreLoginResponse로 온보딩 토큰을 반환합니다.")
     @GetMapping("/oauth/naver/login")
     public ResponseEntity<CustomResponse<ReaderSocialLoginResponse>> naverLogin(
             @RequestParam("code") String code,
             @RequestParam("state") String state
     ) {
         OAuthAuthorizationRequest req = OAuthAuthorizationRequest.forNaver(code, state);
-        return ResponseEntity.ok()
-                .body(oauthLoginUseCase.readerOAuthLogin(req, OAuthProvider.NAVER));
+        return oauthLoginUseCase.readerOAuthLogin(req, OAuthProvider.NAVER);
     }
 
-    @Operation(summary = "독자 계정 회원가입", description = "유저 정보를 최종적으로 등록하는 api 입니다.")
+    @Operation(summary = "독자 계정 회원가입", description = "유저 정보를 최종적으로 등록하는 api 입니다.  \n온보딩 토큰을 보내주세요.")
     @PostMapping("/users/reader/signup")
-    public ResponseEntity<CustomResponse<LoginWithTokenResponse>> readerUserSignup(
+    public ResponseEntity<CustomResponse<AuthorizationResponse>> readerUserSignup(
             @AuthenticationPrincipal OnboardingUserDetails onboardingUser,
-            @RequestBody ReaderSignupRequest req
+            @Valid @RequestBody ReaderSignupRequest req
     ) {
-        return ResponseEntity.ok()
-                .body(authUseCase.readerSignup(req, onboardingUser.getJti()));
+        return authUseCase.readerSignup(req, onboardingUser.getJti());
     }
 
     @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 여부를 체크하는 api 입니다.")
     @GetMapping("/nickname/valid")
     public ResponseEntity<CustomResponse<Void>> nickNameCheck(
-            @RequestParam("nickname") String nickName
+            @Valid @RequestBody NickNameCheckRequest req
     ) {
         return ResponseEntity.ok()
-                .body(authUseCase.checkAvailableNickname(nickName));
+                .body(authUseCase.checkAvailableNickname(req.nickName()));
     }
 
     @Operation(summary = "작가 계정 일반 로그인", description = "작가 계정에 로그인 하는 api 입니다.")
     @PostMapping("/users/artist/login")
-    public ResponseEntity<CustomResponse<LoginWithTokenResponse>> artistUserLogin(
-            @RequestBody ArtistLoginRequest req
+    public ResponseEntity<CustomResponse<AuthorizationResponse>> artistUserLogin(
+            @Valid @RequestBody ArtistLoginRequest req
     ) {
-        return ResponseEntity.ok()
-                .body(loginUseCase.artistLoginWithLoginId(req));
+        return loginUseCase.artistLoginWithLoginId(req);
     }
 
     @Operation(summary = "[백엔드용] 작가 계정 회원가입", description = "백엔드용 작가 계정 생성 api 입니다.")
@@ -85,22 +83,29 @@ public class AuthController {
                 .body(authUseCase.artistSignup(req));
     }
 
-    @Operation(summary = "액세스 토큰 재발급", description = "만료된 AccessToken을 재발급해주기 위해서 RefreshToken을 받는 api 입니다.")
-    @PostMapping("/refresh_token")
+    @Operation(summary = "토큰 재발급", description = "액세스 토큰을 리프레쉬 토큰 쿠키와 함께 재발급하는 api 입니다.   \n액세스 토큰 만료 시 호출해주세요.")
+    @PostMapping("/tokens/refresh")
     public ResponseEntity<CustomResponse<AuthorizationResponse>> reissueAccessToken(
-            @RequestBody RefreshTokenRequest req
+            @Parameter(hidden = true)
+            @CookieValue(value = "refreshToken", required = false) String refreshToken
     ) {
-        return ResponseEntity.ok()
-                .body(authorizationUseCase.getAccessTokenWithRefreshToken(req));
+        return authorizationUseCase.getTokenRefresh(refreshToken);
     }
 
-    @Operation(summary = "로그아웃", description = "로그아웃용 api 입니다.   \nrefreshToken을 보내주세요")
+    @Operation(summary = "로그아웃", description = "로그아웃용 api 입니다.   \n액세스 토큰을 보내주세요.")
     @PostMapping("/user/logout")
     public ResponseEntity<CustomResponse<Void>> logout(
-            @RequestBody LogoutRequest req
+            @AuthenticationPrincipal AuthUserDetails authUserDetails
     ) {
-        return ResponseEntity.ok()
-                .body(loginUseCase.userLogoutWithRefreshToken(req));
+        return logoutUseCase.execute(authUserDetails.getUserId());
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴용 api 입니다.   \n액세스 토큰을 보내주세요.")
+    @DeleteMapping("/user/withdraw")
+    public ResponseEntity<CustomResponse<Void>> withdraw(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails
+    ) {
+        return withDrawUseCase.execute(authUserDetails.getUserId());
     }
 
 }

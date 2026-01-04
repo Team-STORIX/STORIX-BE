@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.user.application.service;
 
+import com.storix.storix_api.domains.favorite.adaptor.FavoriteWorksAdaptor;
 import com.storix.storix_api.domains.user.controller.dto.ArtistSignupRequest;
 import com.storix.storix_api.domains.user.controller.dto.OAuthAuthorizationRequest;
 import com.storix.storix_api.domains.user.controller.dto.ReaderSignupRequest;
@@ -10,10 +11,10 @@ import com.storix.storix_api.domains.user.application.usecase.helper.OAuthHelper
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
+import com.storix.storix_api.domains.user.domain.Role;
+import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.domains.user.dto.*;
-import com.storix.storix_api.global.apiPayload.exception.user.DuplicateNicknameException;
-import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
-import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
+import com.storix.storix_api.global.apiPayload.exception.user.*;
 import com.storix.storix_api.global.apiPayload.exception.web.FeignClientServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ public class AuthService {
 
     private final UserAdaptor userAdaptor;
     private final TokenAdaptor tokenAdaptor;
+    private final FavoriteWorksAdaptor favoriteWorksAdaptor;
     private final OAuthHelper oauthHelper;
     private final PasswordEncoder passwordEncoder;
 
@@ -65,7 +67,6 @@ public class AuthService {
         return new ValidAuthDTO(isRegistered, naverUser.id());
     }
 
-
     // 독자 회원 가입 (소셜 로그인)
     @Transactional
     public AuthUserDetails signUpReaderUser(ReaderSignupRequest req, String jti) {
@@ -77,15 +78,18 @@ public class AuthService {
         if (isUserPresent) throw DuplicateUserException.EXCEPTION;
 
         CreateReaderUserCommand m = new CreateReaderUserCommand(
+                req.marketingAgree(),
                 provider,
                 oid,
                 req.nickName(),
                 req.gender(),
-                req.favoriteGenre()
+                req.favoriteGenreList()
         );
 
         AuthUserDetails authUserDetails = userAdaptor.saveReaderUser(m);
         tokenAdaptor.deleteOnboardingTokenByJti(jti);
+
+        favoriteWorksAdaptor.saveFavoriteWorks(authUserDetails.getUserId(), req.favoriteWorksIdList());
 
         return authUserDetails;
     }
@@ -114,5 +118,21 @@ public class AuthService {
         // TODO: 이때 WorksAndArtistMatcher 만들어두고 artistUserId 바로 넘기면 될듯요 (회원가입과 동시에 Works에 작가 회원id 정보 넣어주기)
 
         return artistUserId;
+    }
+
+    // 유저 회원 탈퇴
+    @Transactional
+    public void withDrawUser(Long userId) {
+        User user = userAdaptor.findUserById(userId);
+        // 소셜 서비스 unlink
+        if (user.getRole() == Role.READER) {
+            switch (user.getOauthInfo().getProvider()) {
+                case KAKAO -> oauthHelper.unlinkKakaoUser(user.getOauthInfo().getOid());
+                case NAVER -> oauthHelper.unlinkNaverUser(user.getOauthInfo().getOid());
+            }
+        }
+        user.withdraw();
+        tokenAdaptor.deleteRefreshTokenByUserId(userId);
+        favoriteWorksAdaptor.deleteFavoriteWorks(userId);
     }
 }

@@ -50,6 +50,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/oauth/**").permitAll()
                                 .requestMatchers("/api/v1/auth/nickname/valid").permitAll()
                                 .requestMatchers("/api/v1/auth/users/artist/login").permitAll()
+                                .requestMatchers("/api/v1/auth/token/refresh").permitAll()
                                 .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
                                 // [Search]
                                 .requestMatchers("/api/v1/search/**").permitAll()
@@ -80,6 +81,10 @@ public class SecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+
+        // cookie 허용
+        config.setAllowCredentials(true);
+        config.addExposedHeader("Set-Cookie");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

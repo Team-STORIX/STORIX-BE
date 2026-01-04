@@ -1,11 +1,17 @@
 package com.storix.storix_api.domains.user.domain;
 
+import com.storix.storix_api.domains.works.domain.Genre;
+import com.storix.storix_api.global.apiPayload.exception.user.AlreadyWithDrawUserException;
 import com.storix.storix_api.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -28,20 +34,48 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     // 계정 정보
-    @Column(nullable = false)
+    @Column(name = "nick_name", nullable = false, length = 10)
     private String nickName;
-    @Embedded private Profile profile;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
+
+    @ElementCollection(targetClass = Genre.class)
+    @CollectionTable(
+            name = "user_favorite_genre",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "genre", nullable = false)
+    private Set<Genre> favoriteGenreList = new HashSet<>();
+
+    @Column(name = "profile_image_url")
+    private String profileImageUrl = null;
+
+    @Column(nullable = false)
+    private int level = 1;
+
+    @Min(0)
+    @Column(nullable = false)
+    private int point = 0;
+
+    @Column(name = "market_agree")
+    private Boolean marketingAgree;
+
+    @Column(name = "is_adult_verified")
     private Boolean isAdultVerified = false;
 
     // 계정 상태
+    @Column(name = "account_state")
     private AccountState accountState = AccountState.NORMAL;
 
     // 계정 권한
+    @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt = LocalDateTime.now();
     private Role role = Role.READER;
 
     // 독자용 소셜 로그인
-    private String name;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "provider", column = @Column(name = "oauth_provider")),
@@ -50,18 +84,22 @@ public class User extends BaseTimeEntity {
     private OAuthInfo oauthInfo;
 
     // 작가용 아이디/비번
+    @Column(name = "login_id")
     private String loginId = null;
+
+    @Column(name = "password")
     private String password = null;
 
     /** 생성자 로직 **/
     protected User() {}
 
     @Builder // 독자
-    public User(OAuthInfo oauthInfo, String name, String nickName, Profile profile) {
+    public User(boolean marketingAgree, OAuthInfo oauthInfo, String nickName, Gender gender, Set<Genre> favoriteGenreList) {
+        this.marketingAgree = marketingAgree;
         this.oauthInfo = oauthInfo;
-        this.name = name;
         this.nickName = nickName;
-        this.profile = profile;
+        this.gender = gender;
+        this.favoriteGenreList = favoriteGenreList;
     }
 
     @Builder // 작가
@@ -70,6 +108,7 @@ public class User extends BaseTimeEntity {
         this.loginId = loginId;
         this.password = password;
         this.role = Role.ARTIST;
+        this.marketingAgree = true;
     }
 
     /** 비즈니스 로직 **/
@@ -79,7 +118,43 @@ public class User extends BaseTimeEntity {
     }
 
     // 계정 정보 수정
+    public void changeLevel(int level) {
+//        if (level < 1 || level > 5) {
+//            throw new IllegalArgumentException("레벨 범위 오류");
+//        }
+        this.level = level;
+    }
+
+    public void increasePoint(int point) {
+        this.point += point;
+    }
+
+    public void decreasePoint(int point) {
+//        if (this.point < point) {
+//            throw new IllegalArgumentException("포인트 부족"); -> 커스텀 에러
+//        }
+        this.point -= point;
+    }
 
     // 계정 탈퇴
+    public void withdraw() {
+        if (accountState.equals(AccountState.DELETED)) {
+            throw AlreadyWithDrawUserException.EXCEPTION;
+        }
+        accountState = AccountState.DELETED;
+        gender = null;
+        favoriteGenreList = null;
+        profileImageUrl = null;
+        if (role.equals(Role.READER)) {
+            nickName = "탈퇴한 유저";
+            oauthInfo = oauthInfo.withDrawOauthInfo();
+        } else {
+            nickName = "탈퇴한 작가";
+            loginId = null;
+            password = null;
+        }
+        marketingAgree = null;
+        isAdultVerified = null;
+    }
 
 }

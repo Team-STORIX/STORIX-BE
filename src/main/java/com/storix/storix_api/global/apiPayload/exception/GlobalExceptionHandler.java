@@ -3,8 +3,12 @@ package com.storix.storix_api.global.apiPayload.exception;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
@@ -21,5 +25,41 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException (MethodArgumentNotValidException e) {
+        List<FieldErrorResponse> fieldErrors =
+                e.getBindingResult().getFieldErrors().stream()
+                        .map(fe -> new FieldErrorResponse(
+                                fe.getField(),
+                                fe.getRejectedValue(),
+                                fe.getCode(),
+                                fe.getDefaultMessage()
+                        ))
+                        .toList();
+
+        ErrorCode errorCode = ErrorCode.INVALID_REQUEST;
+        ErrorResponse response = new ErrorResponse(errorCode, fieldErrors);
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParamException (MissingServletRequestParameterException e) {
+
+        FieldErrorResponse fer = FieldErrorResponse.builder()
+                .field(e.getParameterName())
+                .rejectedValue(null)
+                .reason("필수 파라미터가 누락되었습니다.")
+                .build();
+
+        ErrorCode errorCode = ErrorCode.INVALID_REQUEST;
+        ErrorResponse response = new ErrorResponse(errorCode, List.of(fer));
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(response);
+    }
 
 }

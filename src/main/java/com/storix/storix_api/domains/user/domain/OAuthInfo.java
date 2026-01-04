@@ -1,6 +1,6 @@
 package com.storix.storix_api.domains.user.domain;
 
-import jakarta.persistence.Column;
+import com.storix.storix_api.global.apiPayload.STORIXStatic;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,10 +18,8 @@ import lombok.NoArgsConstructor;
 public class OAuthInfo {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "oauth_provider")
     private OAuthProvider provider;
 
-    @Column(name = "oauth_oid")
     private String oid;
 
     @Builder
@@ -29,4 +29,10 @@ public class OAuthInfo {
     }
 
     // 회원 탈퇴 시
+    public OAuthInfo withDrawOauthInfo() {
+        return OAuthInfo.builder()
+                .oid(STORIXStatic.WITHDRAW_PREFIX + LocalDateTime.now() + ":" + oid)
+                .provider(provider)
+                .build();
+    }
 }

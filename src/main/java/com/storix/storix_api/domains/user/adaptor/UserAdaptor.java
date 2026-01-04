@@ -42,10 +42,10 @@ public class UserAdaptor {
      * */
     // 독자
     // OAuthInfo(oid, provider) -> userId(PK), role (토큰 서명용)
-    public AuthUserDetails findReaderUserByOAuthInfo(OAuthInfo oauthInfo) {
+    public User findReaderUserByOAuthInfo(OAuthInfo oauthInfo) {
         Optional<User> readerUser = userRepository.findByOauthInfoProviderAndOauthInfoOid(oauthInfo.getProvider(), oauthInfo.getOid());
         if (readerUser.isPresent()) {
-            return new AuthUserDetails(readerUser.get().getId(), readerUser.get().getRole().toString());
+            return readerUser.get();
         } else {
             throw UnknownUserException.EXCEPTION;
         }
@@ -53,11 +53,7 @@ public class UserAdaptor {
 
     public boolean isUserPresentWithProviderAndOid(OAuthProvider provider, String oid) {
         Optional<User> readerUser = userRepository.findByOauthInfoProviderAndOauthInfoOid(provider, oid);
-        if (readerUser.isPresent()) {
-            return true;
-        } else {
-            return false;
-        }
+        return readerUser.isPresent();
     }
 
     public boolean isNicknameDuplicate(String nickName) {
@@ -92,29 +88,33 @@ public class UserAdaptor {
 
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
 
-        if(!artistUser.isPresent()) { throw ArtistLoginException.EXCEPTION; }
+        if(artistUser.isEmpty()) { throw ArtistLoginException.EXCEPTION; }
 
-        LoginInfo loginInfo = new LoginInfo(artistUser.get().getLoginId(), artistUser.get().getPassword());
-
-        return loginInfo;
-
+        return new LoginInfo(artistUser.get().getLoginId(), artistUser.get().getPassword());
     }
 
-    public AuthUserDetails findArtistUserIdAndRoleByLoginId(String loginId){
+    public User findArtistUserByLoginId(String loginId){
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
         if(artistUser.isPresent()){
-            return new AuthUserDetails(artistUser.get().getId(), String.valueOf(artistUser.get().getRole()));
+            return artistUser.get();
         }
         throw UnknownUserException.EXCEPTION;
     }
 
-    public ErrorResponse isLoginIdDuplicate(String loginId) {
+    public void isLoginIdDuplicate(String loginId) {
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
         if (artistUser.isPresent()) {
-            return new ErrorResponse(ErrorCode.BAD_REQUEST);
+            throw DuplicateUserException.EXCEPTION;
         }
-        return null;
     }
 
     public void saveArtistUser(CreateArtistUserCommand cmd) { userRepository.save(cmd.toEntity()); }
+
+    public User findUserById(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw UnknownUserException.EXCEPTION;
+        }
+        return user.get();
+    }
 }
