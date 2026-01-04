@@ -17,15 +17,8 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
 
     private final WorksRepository worksRepository;
 
-
     @Override
     public Slice<Works> searchWorks(String keyword, Pageable pageable) {
-
-        return worksRepository.findByWorksNameContainingOrArtistNameContaining(keyword, keyword, pageable);
-    }
-
-    @Override
-    public List<String> searchArtistNames(String keyword, int limit) {
-        return worksRepository.findDistinctArtistNames(keyword, PageRequest.of(0, limit));
+        return worksRepository.findBySearchKeyword(keyword, pageable);
     }
 }
