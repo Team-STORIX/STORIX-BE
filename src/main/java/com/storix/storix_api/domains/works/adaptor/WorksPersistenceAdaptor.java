@@ -19,6 +19,6 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
 
     @Override
     public Slice<Works> searchWorks(String keyword, Pageable pageable) {
-        return worksRepository.findByWorksNameContaining(keyword, pageable);
+        return worksRepository.findBySearchKeyword(keyword, pageable);
     }
 }

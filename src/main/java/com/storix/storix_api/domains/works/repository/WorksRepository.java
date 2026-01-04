@@ -11,5 +11,10 @@ import java.util.List;
 
 public interface WorksRepository extends JpaRepository<Works, Long> {
 
-    Slice<Works> findByWorksNameContaining(String keyword, Pageable pageable);
+    @Query("SELECT w FROM Works w " +
+            "WHERE w.worksName LIKE %:keyword% " +
+            "OR w.author LIKE %:keyword% " +
+            "OR w.illustrator LIKE %:keyword% " +
+            "OR w.originalAuthor LIKE %:keyword%")
+    Slice<Works> findBySearchKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
