@@ -77,6 +77,9 @@ public class AuthService {
         boolean isUserPresent = userAdaptor.isUserPresentWithProviderAndOid(provider, oid);
         if (isUserPresent) throw DuplicateUserException.EXCEPTION;
 
+        boolean isNicknamePresent = userAdaptor.isNicknameDuplicate(req.nickName());
+        if (isNicknamePresent) throw DuplicateNicknameException.EXCEPTION;
+
         CreateReaderUserCommand m = new CreateReaderUserCommand(
                 req.marketingAgree(),
                 provider,
