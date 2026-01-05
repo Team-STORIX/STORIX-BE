@@ -1,6 +1,7 @@
 package com.storix.storix_api.global.apiPayload.exception;
 
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,25 @@ public class GlobalExceptionHandler {
                                 fe.getDefaultMessage()
                         ))
                         .toList();
+
+        ErrorCode errorCode = ErrorCode.INVALID_REQUEST;
+        ErrorResponse response = new ErrorResponse(errorCode, fieldErrors);
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+
+        List<FieldErrorResponse> fieldErrors = e.getConstraintViolations().stream()
+                .map(v -> FieldErrorResponse.builder()
+                        .field(v.getPropertyPath().toString())
+                        .rejectedValue(v.getInvalidValue())
+                        .reason(v.getMessage())
+                        .build())
+                .toList();
 
         ErrorCode errorCode = ErrorCode.INVALID_REQUEST;
         ErrorResponse response = new ErrorResponse(errorCode, fieldErrors);
