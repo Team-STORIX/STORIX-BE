@@ -15,6 +15,7 @@ public enum ErrorCode {
     NOT_FOUND(HttpStatus.NOT_FOUND, "COMMON_ERROR_004", "요청한 자원을 찾을 수 없습니다"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_ERROR_005", "서버 내부 오류가 발생했습니다"),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_ERROR_006", "요청값이 올바르지 않습니다."),
+    DATA_INTEGRITY_VIOLATION_REQUEST(HttpStatus.CONFLICT, "COMMON_ERROR_007", "DB 데이터 무결성 조건 위반입니다. 백엔드에게 연락주세요."),
 
     // Token error
     TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_001", "인가가 필요한 경로로 토큰이 전달되지 않았습니다"),

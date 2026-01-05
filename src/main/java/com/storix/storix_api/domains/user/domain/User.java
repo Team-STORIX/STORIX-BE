@@ -38,7 +38,6 @@ public class User extends BaseTimeEntity {
     private String nickName;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Gender gender;
 
     @ElementCollection(targetClass = Genre.class)
@@ -47,7 +46,7 @@ public class User extends BaseTimeEntity {
             joinColumns = @JoinColumn(name = "user_id")
     )
     @Enumerated(EnumType.STRING)
-    @Column(name = "genre", nullable = false)
+    @Column(name = "genre")
     private Set<Genre> favoriteGenreList = new HashSet<>();
 
     @Column(name = "profile_image_url")

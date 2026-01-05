@@ -2,6 +2,7 @@ package com.storix.storix_api.global.apiPayload.exception;
 
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RestControllerAdvice
@@ -56,6 +59,52 @@ public class GlobalExceptionHandler {
 
         ErrorCode errorCode = ErrorCode.INVALID_REQUEST;
         ErrorResponse response = new ErrorResponse(errorCode, List.of(fer));
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+
+        String field = "Database";
+        Object rejectedValue = null;
+        String reason = "데이터 무결성 제약조건 위반입니다.";
+
+        Throwable root = org.springframework.core.NestedExceptionUtils.getMostSpecificCause(e);
+        String rootMsg = root.getMessage() != null ? root.getMessage() : "";
+
+        Matcher m1 = Pattern
+                .compile("Column '([^']+)' cannot be null")
+                .matcher(rootMsg);
+        if (m1.find()) {
+            field = m1.group(1);
+            reason = "null이 될 수 없는 필드입니다.";
+        }
+
+        Matcher m2 = Pattern
+                .compile("Duplicate entry '([^']*)' for key '([^']+)'")
+                .matcher(rootMsg);
+        if (m2.find()) {
+            rejectedValue = m2.group(1);
+            field = m2.group(2);
+            reason = "중복된 값입니다.";
+        }
+
+        if (rootMsg.contains("foreign key constraint fails")) {
+            field = "ForeignKey";
+            reason = "참조 무결성 제약조건 위반입니다.";
+        }
+
+        FieldErrorResponse fer = FieldErrorResponse.builder()
+                .field(field)
+                .rejectedValue(rejectedValue)
+                .reason(reason)
+                .build();
+
+        ErrorCode errorCode = ErrorCode.DATA_INTEGRITY_VIOLATION_REQUEST;
+        ErrorResponse response = new ErrorResponse(errorCode, java.util.List.of(fer));
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
