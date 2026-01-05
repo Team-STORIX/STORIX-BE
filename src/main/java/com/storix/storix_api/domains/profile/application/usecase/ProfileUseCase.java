@@ -22,10 +22,10 @@ public class ProfileUseCase {
 
         if (role.equals(String.valueOf(Role.READER))) {
             UserInfo readerProfileInfo = profileService.getReaderProfileInfo(userId);
-            return CustomResponse.onSuccess(SuccessCode.SUCCESS, readerProfileInfo);
+            return CustomResponse.onSuccess(SuccessCode.PROFILE_LOAD_SUCCESS, readerProfileInfo);
         } else {
             UserInfo artistProfileInfo = profileService.getArtistProfileInfo(userId);
-            return CustomResponse.onSuccess(SuccessCode.SUCCESS, artistProfileInfo);
+            return CustomResponse.onSuccess(SuccessCode.PROFILE_LOAD_SUCCESS, artistProfileInfo);
         }
     }
 
