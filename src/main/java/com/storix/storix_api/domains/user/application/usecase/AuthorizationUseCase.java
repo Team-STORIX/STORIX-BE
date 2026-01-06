@@ -7,6 +7,7 @@ import com.storix.storix_api.domains.user.application.usecase.helper.TokenGenera
 import com.storix.storix_api.domains.user.controller.dto.LoginWithTokenResponse;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
+import com.storix.storix_api.global.apiPayload.exception.cookie.RefreshTokenNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 
@@ -19,6 +20,8 @@ public class AuthorizationUseCase {
     private final CookieHelper cookieHelper;
 
     public ResponseEntity<CustomResponse<AuthorizationResponse>> getTokenRefresh(String refreshToken) {
+
+        if (refreshToken == null || refreshToken.isBlank()) throw RefreshTokenNotExistException.EXCEPTION;
 
         LoginWithTokenResponse tokenResponse = tokenGenerateHelper.reissueTokens(refreshToken);
         AuthorizationResponse result = new AuthorizationResponse(tokenResponse.accessToken());

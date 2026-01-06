@@ -23,6 +23,8 @@ public enum ErrorCode {
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_003", "토큰이 만료되었습니다. 토큰을 재 발급 해주세요"),
     REFRESH_TOKEN_EXPIRED(HttpStatus.FORBIDDEN, "TOKEN_ERROR_004", "토큰이 만료되었습니다. 재로그인 해주세요"),
     ONBOARDING_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_005", "온보딩 토큰이 만료되었습니다. 소셜 로그인 재시도 해주세요"),
+    REFRESH_TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "COOKIE_ERROR_001", "쿠키가 만료되었거나 저장되지 않았습니다. 로그인 해주세요."),
+    REFRESH_TOKEN_NOT_VALID(HttpStatus.UNAUTHORIZED, "COOKIE_ERROR_002", "쿠키에 저장된 리프레쉬 토큰이 만료되었거나 쿠키가 비어있습니다. 재로그인 해주세요."),
 
     // Auth error
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "LOGIN_ERROR_001", "아이디 또는 비밀번호가 일치하지 않습니다"),
