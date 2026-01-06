@@ -76,7 +76,14 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of("https://storix.kr", "https://api.storix.kr", "http://localhost:3000"));
+        config.setAllowedOriginPatterns(List.of(
+                "https://storix.kr",
+                "https://www.storix.kr",
+                "https://api.storix.kr",
+                "http://localhost:3000",
+                "https://storix-fe-git-develop-kim-yunseongs-projects.vercel.app",
+                "https://storix-fe-git-main-kim-yunseongs-projects.vercel.app"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
