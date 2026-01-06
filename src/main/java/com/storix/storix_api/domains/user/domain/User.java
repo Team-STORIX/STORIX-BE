@@ -4,7 +4,6 @@ import com.storix.storix_api.domains.works.domain.Genre;
 import com.storix.storix_api.global.apiPayload.exception.user.AlreadyWithDrawUserException;
 import com.storix.storix_api.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,6 +50,9 @@ public class User extends BaseTimeEntity {
 
     @Column(name = "profile_image_url")
     private String profileImageUrl = null;
+
+    @Column(length = 30)
+    private String profileDescription;
 
     @Column(nullable = false)
     private int level = 1;
@@ -117,6 +119,14 @@ public class User extends BaseTimeEntity {
     }
 
     // 계정 정보 수정
+    public void changeNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public void changeProfileDescription(String profileDescription) {
+        this.profileDescription = profileDescription;
+    }
+
     public void changeLevel(int level) {
 //        if (level < 1 || level > 5) {
 //            throw new IllegalArgumentException("레벨 범위 오류");
