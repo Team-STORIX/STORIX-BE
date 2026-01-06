@@ -8,7 +8,7 @@ on:
 jobs:
   build-and-push:
     name: Build and Push to ECR
-    runs-on: ubuntu-24.04
+    runs-on: self-hosted
 
     steps:
       - name: Checkout GitHub repository
