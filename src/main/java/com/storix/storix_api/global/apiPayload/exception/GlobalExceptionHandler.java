@@ -1,7 +1,9 @@
 package com.storix.storix_api.global.apiPayload.exception;
 
+import com.storix.storix_api.domains.user.application.usecase.helper.CookieHelper;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +18,10 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final CookieHelper cookieHelper;
 
     @ExceptionHandler(STORIXCodeException.class)
     public ResponseEntity<ErrorResponse> STORIXCodeExceptionHandler (STORIXCodeException ex) {
@@ -29,8 +34,21 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    @ExceptionHandler(STORIXCookieException.class)
+    public ResponseEntity<ErrorResponse> handleRefreshTokenNotExist(STORIXCookieException ex) {
+
+        ErrorCode errorCode = ex.getErrorCode();
+        ErrorResponse body = new ErrorResponse(errorCode);
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .headers(cookieHelper.deleteCookie())
+                .body(body);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException (MethodArgumentNotValidException e) {
+
         List<FieldErrorResponse> fieldErrors =
                 e.getBindingResult().getFieldErrors().stream()
                         .map(fe -> new FieldErrorResponse(

@@ -7,6 +7,8 @@ import com.storix.storix_api.domains.user.adaptor.TokenAdaptor;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.*;
 import com.storix.storix_api.domains.user.dto.OnboardingTokenInfo;
+import com.storix.storix_api.global.apiPayload.exception.cookie.InvalidRefreshTokenException;
+import com.storix.storix_api.global.apiPayload.exception.user.ExpiredTokenException;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidTokenException;
 import com.storix.storix_api.global.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -50,8 +52,10 @@ public class TokenGenerateHelper {
     @Transactional
     public LoginWithTokenResponse reissueTokens(String refreshToken) {
 
-        if (!tokenProvider.isRefreshToken(refreshToken)) {
-            throw InvalidTokenException.EXCEPTION;
+        try {
+            tokenProvider.isRefreshToken(refreshToken);
+        } catch (ExpiredTokenException | InvalidTokenException e) {
+            throw InvalidRefreshTokenException.EXCEPTION;
         }
 
         Long userId = tokenProvider.parseRefreshToken(refreshToken);
