@@ -76,7 +76,7 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of("https://storix.kr"));
+        config.setAllowedOriginPatterns(List.of("https://storix.kr", "https://api.storix.kr", "http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
