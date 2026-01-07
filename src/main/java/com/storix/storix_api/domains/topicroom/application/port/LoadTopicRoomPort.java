@@ -12,7 +12,7 @@ public interface LoadTopicRoomPort {
 
     Slice<TopicRoomUser> findParticipationsByUserId(Long userId, Pageable pageable);
 
-    List<TopicRoom> findTop3Trending();
+    List<TopicRoom> findTop3Trending(LocalDateTime threshold);
 
     Slice<TopicRoom> searchByWorksIdsOrDescription(List<Long> worksIds, String keyword, Pageable pageable);
 

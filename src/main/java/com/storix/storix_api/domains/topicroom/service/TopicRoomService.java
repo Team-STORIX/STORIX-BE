@@ -50,7 +50,11 @@ public class TopicRoomService implements TopicRoomUseCase {
     @Override
     public List<TopicRoomResponseDto> getTodayTrendingRooms(Long userId) {
 
-        return loadTopicRoomPort.findTop3Trending().stream()
+        // 현재 시간으로부터 24시간 전 시점 계산
+        LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+
+        // 24시간 이내 생성된 방 중 인원순 Top 3 조회
+        return loadTopicRoomPort.findTop3Trending(twentyFourHoursAgo).stream()
                 .map(room -> {
                     boolean isJoined = userId != null && loadTopicRoomPort.existsByUserIdAndRoomId(userId, room.getId());
                     return toDto(room, isJoined);
@@ -167,11 +171,15 @@ public class TopicRoomService implements TopicRoomUseCase {
     }
 
     private String formatTimeAgo(LocalDateTime time) {
+
         if (time == null) return "대화 없음";
+
         long diff = Duration.between(time, LocalDateTime.now()).toMinutes();
+
         if (diff < 1) return "방금 전";
         if (diff < 60) return diff + "분 전";
         if (diff < 1440) return (diff / 60) + "시간 전";
+
         return (diff / 1440) + "일 전";
     }
 }

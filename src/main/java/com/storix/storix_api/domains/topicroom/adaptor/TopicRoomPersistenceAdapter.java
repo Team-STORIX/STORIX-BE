@@ -36,9 +36,10 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
         return topicRoomUserRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
     }
 
-    @Override public List<TopicRoom> findTop3Trending() {
+    @Override
+    public List<TopicRoom> findTop3Trending(LocalDateTime threshold) {
 
-        return topicRoomRepository.findTop3ByOrderByActiveUserNumberDesc();
+        return topicRoomRepository.findTop3ByCreatedAtAfterOrderByActiveUserNumberDesc(threshold);
     }
 
     @Override public Slice<TopicRoom> searchByWorksIdsOrDescription(List<Long> worksIds, String keyword, Pageable pageable) {
