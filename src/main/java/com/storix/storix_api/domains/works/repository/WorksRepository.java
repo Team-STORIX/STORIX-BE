@@ -17,4 +17,7 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "OR w.illustrator LIKE %:keyword% " +
             "OR w.originalAuthor LIKE %:keyword%")
     Slice<Works> findBySearchKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT w.id FROM Works w WHERE w.worksName LIKE %:keyword%")
+    List<Long> findAllIdsByKeyword(@Param("keyword") String keyword);
 }
