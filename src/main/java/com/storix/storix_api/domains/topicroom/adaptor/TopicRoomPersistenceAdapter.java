@@ -42,6 +42,16 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
         return topicRoomRepository.findTop3ByCreatedAtAfterOrderByActiveUserNumberDesc(threshold);
     }
 
+    @Override
+    public List<TopicRoom> findTopNAllTimeExcluding(int limit, List<Long> excludeIds) {
+
+        if (excludeIds.isEmpty()) {
+            excludeIds = List.of(-1L);
+        }
+
+        return topicRoomRepository.findTopAllTimeExcluding(excludeIds, PageRequest.of(0, limit));
+    }
+
     @Override public Slice<TopicRoom> searchByWorksIdsOrDescription(List<Long> worksIds, String keyword, Pageable pageable) {
 
         return topicRoomRepository.findBySearchCondition(worksIds, keyword, pageable);

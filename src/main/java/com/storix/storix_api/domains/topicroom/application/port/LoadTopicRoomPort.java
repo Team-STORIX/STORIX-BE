@@ -14,6 +14,8 @@ public interface LoadTopicRoomPort {
 
     List<TopicRoom> findTop3Trending(LocalDateTime threshold);
 
+    List<TopicRoom> findTopNAllTimeExcluding(int limit, List<Long> excludeIds);  // 데이터 부족 시 fallback용
+
     Slice<TopicRoom> searchByWorksIdsOrDescription(List<Long> worksIds, String keyword, Pageable pageable);
 
     long countJoinedRooms(Long userId);

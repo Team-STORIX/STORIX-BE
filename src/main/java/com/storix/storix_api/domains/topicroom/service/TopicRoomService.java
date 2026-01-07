@@ -51,14 +51,29 @@ public class TopicRoomService implements TopicRoomUseCase {
     public List<TopicRoomResponseDto> getTodayTrendingRooms(Long userId) {
 
         // 현재 시간으로부터 24시간 전 시점 계산
-        LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+        LocalDateTime threshold = LocalDateTime.now().minusHours(24);
 
-        // 24시간 이내 생성된 방 중 인원순 Top 3 조회
-        return loadTopicRoomPort.findTop3Trending(twentyFourHoursAgo).stream()
-                .map(room -> {
-                    boolean isJoined = userId != null && loadTopicRoomPort.existsByUserIdAndRoomId(userId, room.getId());
-                    return toDto(room, isJoined);
-                })
+        // 24시간 내 인기 토픽룸 조회
+        List<TopicRoom> trendingRooms = loadTopicRoomPort.findTop3Trending(threshold);
+
+        // fallback 로직 추가 - 24시간 내 생성된 토픽룸이 없는 경우
+        if (trendingRooms.size() < 3) {
+            int needed = 3 - trendingRooms.size();
+
+            // 중복 토픽룸 방지
+            List<Long> excludeIds = trendingRooms.stream()
+                    .map(TopicRoom::getId)
+                    .toList();
+
+            // 부족한 개수만큼만 전체 인기순 적용
+            List<TopicRoom> fallbackRooms = loadTopicRoomPort.findTopNAllTimeExcluding(needed, excludeIds);
+
+            trendingRooms.addAll(fallbackRooms);
+        }
+
+        return trendingRooms.stream()
+                .map(room -> toDto(room, userId != null &&
+                        loadTopicRoomPort.existsByUserIdAndRoomId(userId, room.getId())))
                 .toList();
     }
 

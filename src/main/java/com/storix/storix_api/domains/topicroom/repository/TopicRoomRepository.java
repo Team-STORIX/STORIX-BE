@@ -13,6 +13,11 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
 
     List<TopicRoom> findTop3ByCreatedAtAfterOrderByActiveUserNumberDesc(LocalDateTime threshold);
 
+    @Query("SELECT t FROM TopicRoom t " +
+            "WHERE t.id NOT IN :excludeIds " +
+            "ORDER BY t.activeUserNumber DESC")
+    List<TopicRoom> findTopAllTimeExcluding(@Param("excludeIds") List<Long> excludeIds, Pageable pageable);
+
     @Query("SELECT t FROM TopicRoom t WHERE t.worksId IN :worksIds OR t.topicRoomName LIKE %:keyword%")
     Slice<TopicRoom> findBySearchCondition(@Param("worksIds") List<Long> worksIds, @Param("keyword") String keyword, Pageable pageable);
 }
