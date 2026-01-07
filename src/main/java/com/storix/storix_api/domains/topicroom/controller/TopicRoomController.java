@@ -5,6 +5,7 @@ import com.storix.storix_api.domains.topicroom.application.usecase.TopicRoomUseC
 import com.storix.storix_api.domains.topicroom.dto.TopicRoomCreateRequestDto;
 import com.storix.storix_api.domains.topicroom.dto.TopicRoomReportRequestDto;
 import com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto;
+import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -30,22 +32,31 @@ public class TopicRoomController {
     @GetMapping("/me")
     @Operation(summary = "참여 중인 토픽룸 목록", description = "내가 참여 중인 토픽룸 리스트를 반환합니다.")
     public CustomResponse<Slice<TopicRoomResponseDto>> getMyRooms(
-            @AuthenticationPrincipal Long userId,
+            @AuthenticationPrincipal AuthUserDetails authUser,
             @PageableDefault(size = 3) Pageable pageable) {
+
+        // 비로그인 시 빈 리스트 반환
+        if (authUser == null) {
+            return CustomResponse.onSuccess(
+                    SuccessCode.SUCCESS,
+                    new SliceImpl<>(Collections.emptyList(), pageable, false)
+            );
+        }
 
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
-                topicRoomUseCase.getMyJoinedRooms(userId, pageable));
+                topicRoomUseCase.getMyJoinedRooms(authUser.getUserId(), pageable));
     }
 
     // 2. 오늘의 토픽룸
     @GetMapping("/today")
     @Operation(summary = "오늘의 토픽룸 목록", description = "오늘의 토픽룸 리스트를 반환합니다. 활성 사용자가 많은 토픽룸 3개가 포함됩니다.")
-    public CustomResponse<List<TopicRoomResponseDto>> getTodayTop3(@AuthenticationPrincipal Long userId) {
+    public CustomResponse<List<TopicRoomResponseDto>> getTodayTop3(
+            @AuthenticationPrincipal AuthUserDetails authUser) {
 
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
-                topicRoomUseCase.getTodayTrendingRooms(userId));
+                topicRoomUseCase.getTodayTrendingRooms(authUser.getUserId()));
     }
 
     // 3. 검색
@@ -63,20 +74,22 @@ public class TopicRoomController {
     @PostMapping
     @Operation(summary = "토픽룸 생성", description = "토픽룸을 생성합니다. 작품 선택 및 제목 설정은 필수입니다.")
     public CustomResponse<Long> create(
-            @AuthenticationPrincipal Long userId,
+            @AuthenticationPrincipal AuthUserDetails authUser,
             @Valid @RequestBody TopicRoomCreateRequestDto request) {
 
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
-                topicRoomUseCase.createRoom(userId, request));
+                topicRoomUseCase.createRoom(authUser.getUserId(), request));
     }
 
     // 5. 입장
     @PostMapping("/{roomId}/join")
     @Operation(summary = "토픽룸 입장", description = "토픽룸에 참여합니다. 한 사용자는 최대 9개까지 참여할 수 있습니다.")
-    public CustomResponse<String> join(@AuthenticationPrincipal Long userId, @PathVariable Long roomId) {
+    public CustomResponse<String> join(
+            @AuthenticationPrincipal AuthUserDetails authUser,
+            @PathVariable Long roomId) {
 
-        topicRoomUseCase.joinRoom(userId, roomId);
+        topicRoomUseCase.joinRoom(authUser.getUserId(), roomId);
 
         return CustomResponse.onSuccess(SuccessCode.SUCCESS);
     }
@@ -84,9 +97,11 @@ public class TopicRoomController {
     // 6. 퇴장
     @DeleteMapping("/{roomId}/leave")
     @Operation(summary = "토픽룸 퇴장", description = "참여 중이던 토픽룸에서 퇴장합니다.")
-    public CustomResponse<String> leave(@AuthenticationPrincipal Long userId, @PathVariable Long roomId) {
+    public CustomResponse<String> leave(
+            @AuthenticationPrincipal AuthUserDetails authUser,
+            @PathVariable Long roomId) {
 
-        topicRoomUseCase.leaveRoom(userId, roomId);
+        topicRoomUseCase.leaveRoom(authUser.getUserId(), roomId);
 
         return CustomResponse.onSuccess(SuccessCode.SUCCESS);
     }
@@ -95,11 +110,11 @@ public class TopicRoomController {
     @PostMapping("/{roomId}/report")
     @Operation(summary = "토픽룸 사용자 신고", description = "토픽룸 사용자를 신고합니다. 사유는 3개 중 선택 가능하며, 기타 사유의 경우 최대 100자 제한입니다.")
     public CustomResponse<String> report(
-            @AuthenticationPrincipal Long userId,
+            @AuthenticationPrincipal AuthUserDetails authUser,
             @PathVariable Long roomId,
             @Valid @RequestBody TopicRoomReportRequestDto request) {
 
-        topicRoomUseCase.reportUser(userId, roomId, request);
+        topicRoomUseCase.reportUser(authUser.getUserId(), roomId, request);
 
         return CustomResponse.onSuccess(SuccessCode.SUCCESS);
     }

@@ -72,14 +72,19 @@ public class TopicRoomService implements TopicRoomUseCase {
         }
 
         return trendingRooms.stream()
-                .map(room -> toDto(room, userId != null &&
-                        loadTopicRoomPort.existsByUserIdAndRoomId(userId, room.getId())))
+                .map(room -> {
+
+                    // userId가 있으면 참여 여부 확인, 없으면 false
+                    boolean isJoined = (userId != null) && loadTopicRoomPort.existsByUserIdAndRoomId(userId, room.getId());
+                    return toDto(room, isJoined);
+                })
+
                 .toList();
     }
 
     @Override
     public SearchResponseWrapperDto<TopicRoomResponseDto> searchRooms(String keyword, Pageable pageable) {
-        // [Facade] Works 도메인에서 ID 조회 -> TopicRoom 조회
+
         List<Long> worksIds = loadWorksPort.findAllIdsByKeyword(keyword);
         Slice<TopicRoom> rooms = loadTopicRoomPort.searchByWorksIdsOrDescription(worksIds, keyword, pageable);
 
