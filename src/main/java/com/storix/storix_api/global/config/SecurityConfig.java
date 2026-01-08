@@ -57,6 +57,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/search/**").permitAll()
 
                                 // [Topic Room]
+                                .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/topic-rooms/me").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms/*/join").authenticated()
