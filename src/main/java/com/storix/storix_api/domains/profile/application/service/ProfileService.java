@@ -19,6 +19,7 @@ public class ProfileService {
         User readerUser = userAdaptor.findUserById(userId);
 
         return UserInfo.builder()
+                .userId(userId)
                 .role(readerUser.getRole().toString())
                 .nickName(readerUser.getNickName())
                 .level(readerUser.getLevel())
@@ -33,6 +34,7 @@ public class ProfileService {
         User artistUser = userAdaptor.findUserById(userId);
 
         return UserInfo.builder()
+                .userId(userId)
                 .role(artistUser.getRole().toString())
                 .nickName(artistUser.getNickName())
                 .profileDescription(artistUser.getProfileDescription())
