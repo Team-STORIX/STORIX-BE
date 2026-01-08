@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -56,18 +57,21 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/search/**").permitAll()
 
                                 // [Topic Room]
-                                .requestMatchers(HttpMethod.GET,"/api/v1/topic-rooms/today").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/v1/topic-rooms/search").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/v1/topic-rooms/me").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/topic-rooms/me").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms/*/join").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/topic-rooms/*/leave").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms/*/report").authenticated()
 
+                                // 나머지 모든 요청은 인증 필요
                                 .anyRequest().authenticated()
 
                 )
 
                 // jwt filter
                 .addFilterBefore(errorHandlingFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(onboardingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(onboardingFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // spring security exception handler
                 .exceptionHandling(exceptions -> exceptions
@@ -76,6 +80,14 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers("/api/v1/topic-rooms/today")
+                .requestMatchers("/api/v1/topic-rooms/search/**")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**");
     }
 
     @Bean
