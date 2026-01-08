@@ -118,7 +118,7 @@ public class TopicRoomService implements TopicRoomUseCase {
 
         TopicRoom savedRoom = recordTopicRoomPort.saveRoom(room);
         recordTopicRoomPort.saveParticipation(user.getId(), savedRoom, TopicRoomRole.HOST);
-        savedRoom.addParticipant();
+        recordTopicRoomPort.incrementActiveUserNumber(savedRoom.getId());
 
         return savedRoom.getId();
     }
@@ -144,16 +144,19 @@ public class TopicRoomService implements TopicRoomUseCase {
 
         if (!loadTopicRoomPort.existsByUserIdAndRoomId(userId, roomId)) {
             recordTopicRoomPort.saveParticipation(userId, room, TopicRoomRole.MEMBER);
-            room.addParticipant();
+            recordTopicRoomPort.incrementActiveUserNumber(roomId);
         }
     }
 
     @Override
     @Transactional
     public void leaveRoom(Long userId, Long roomId) {
-        TopicRoom room = loadTopicRoomPort.findById(roomId);
-        recordTopicRoomPort.deleteParticipation(userId, roomId);
-        room.removeParticipant();
+
+        if (loadTopicRoomPort.existsByUserIdAndRoomId(userId, roomId)) {
+            recordTopicRoomPort.deleteParticipation(userId, roomId);
+
+            recordTopicRoomPort.decrementActiveUserNumber(roomId);
+        }
     }
 
     @Override

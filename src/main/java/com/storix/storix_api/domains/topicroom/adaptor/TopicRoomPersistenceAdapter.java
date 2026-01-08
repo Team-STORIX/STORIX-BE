@@ -91,4 +91,14 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     @Override public void saveReport(TopicRoomReport report) {
         topicRoomReportRepository.save(report);
     }
+
+    @Override
+    public void incrementActiveUserNumber(Long roomId) {
+        topicRoomRepository.incrementActiveUserNumber(roomId);
+    }
+
+    @Override
+    public void decrementActiveUserNumber(Long roomId) {
+        topicRoomRepository.decrementActiveUserNumber(roomId);
+    }
 }

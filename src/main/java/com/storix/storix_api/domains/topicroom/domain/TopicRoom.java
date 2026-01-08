@@ -32,11 +32,4 @@ public class TopicRoom extends BaseTimeEntity {
         this.worksId = worksId;
     }
 
-    public void addParticipant() {
-        this.activeUserNumber++;
-    }
-    public void removeParticipant() {
-        this.activeUserNumber--;
-    }
-
 }

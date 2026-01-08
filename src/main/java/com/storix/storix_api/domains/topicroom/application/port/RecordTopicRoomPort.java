@@ -13,4 +13,8 @@ public interface RecordTopicRoomPort {
     void deleteParticipation(Long userId, Long roomId);
 
     void saveReport(TopicRoomReport report);
+
+    void incrementActiveUserNumber(Long roomId);
+
+    void decrementActiveUserNumber(Long roomId);
 }

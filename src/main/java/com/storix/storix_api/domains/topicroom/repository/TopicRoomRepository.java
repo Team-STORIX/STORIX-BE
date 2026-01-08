@@ -3,6 +3,7 @@ package com.storix.storix_api.domains.topicroom.repository;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,4 +21,13 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
 
     @Query("SELECT t FROM TopicRoom t WHERE t.worksId IN :worksIds OR t.topicRoomName LIKE %:keyword%")
     Slice<TopicRoom> findBySearchCondition(@Param("worksIds") List<Long> worksIds, @Param("keyword") String keyword, Pageable pageable);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE TopicRoom t SET t.activeUserNumber = t.activeUserNumber + 1 WHERE t.id = :id")
+    void incrementActiveUserNumber(@Param("id") Long id);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE TopicRoom t SET t.activeUserNumber = t.activeUserNumber - 1 " +
+            "WHERE t.id = :id AND t.activeUserNumber > 0")
+    void decrementActiveUserNumber(@Param("id") Long id);
 }
