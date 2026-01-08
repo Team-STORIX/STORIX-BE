@@ -54,7 +54,14 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
                                 // [Search]
                                 .requestMatchers("/api/v1/search/**").permitAll()
+
+                                // [Topic Room]
+                                .requestMatchers(HttpMethod.GET,"/api/v1/topic-rooms/today").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/v1/topic-rooms/search").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/v1/topic-rooms/me").permitAll()
+
                                 .anyRequest().authenticated()
+
                 )
 
                 // jwt filter
