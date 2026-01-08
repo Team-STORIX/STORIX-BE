@@ -45,4 +45,12 @@ public class ProfileService {
         userAdaptor.checkNicknameDuplicateExceptSelf(nickName, userId);
     }
 
+    // 독자 닉네임 변경
+    @Transactional
+    public String changeNickname(String nickName, Long userId) {
+        User readerUser = userAdaptor.findUserById(userId);
+        readerUser.changeNickName(nickName);
+        return nickName;
+    }
+
 }

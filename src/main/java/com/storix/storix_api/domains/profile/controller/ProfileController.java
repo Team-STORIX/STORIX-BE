@@ -1,6 +1,7 @@
 package com.storix.storix_api.domains.profile.controller;
 
 import com.storix.storix_api.domains.profile.application.usecase.ProfileUseCase;
+import com.storix.storix_api.domains.profile.dto.UpdateNicknameRequest;
 import com.storix.storix_api.domains.profile.dto.UserInfo;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
@@ -34,6 +35,15 @@ public class ProfileController {
                 .body(profileUseCase.getUserProfile(authUserDetails));
     }
 
+    @Operation(summary = "닉네임 수정", description = "닉네임을 수정하는 api 입니다.")
+    @PostMapping("/nickname")
+    public ResponseEntity<CustomResponse<String>> updateNickName(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @Valid @RequestBody UpdateNicknameRequest req
+    ) {
+        return ResponseEntity.ok()
+                .body(profileUseCase.changeNickName(req.nickName(), authUserDetails.getUserId()));
+    }
 
     @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 여부를 체크하는 api 입니다.")
     @GetMapping("/nickname/valid")

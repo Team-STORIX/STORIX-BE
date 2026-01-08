@@ -30,6 +30,13 @@ public class ProfileUseCase {
         }
     }
 
+    // 독자 닉네임 변경
+    public CustomResponse<String> changeNickName(String nickName, Long userId) {
+        profileService.validNickname(nickName, userId);
+        String newNickname = profileService.changeNickname(nickName, userId);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_UPDATE_NICKNAME_SUCCESS, newNickname);
+    }
+
     // 독자 닉네임 중복 체크
     public CustomResponse<Void> checkAvailableNickname(String nickName, Long userId) {
         profileService.validNickname(nickName, userId);
