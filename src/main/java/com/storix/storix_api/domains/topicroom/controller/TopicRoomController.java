@@ -30,7 +30,7 @@ public class TopicRoomController {
 
     // 1. 참여 목록
     @GetMapping("/me")
-    @Operation(summary = "참여 중인 토픽룸 목록", description = "내가 참여 중인 토픽룸 리스트를 반환합니다.")
+    @Operation(summary = "참여 중인 토픽룸 조회", description = "내가 참여 중인 토픽룸 리스트를 반환합니다.")
     public CustomResponse<Slice<TopicRoomResponseDto>> getMyRooms(
             @AuthenticationPrincipal AuthUserDetails authUser,
             @PageableDefault(size = 3) Pageable pageable) {
@@ -50,13 +50,13 @@ public class TopicRoomController {
 
     // 2. 오늘의 토픽룸
     @GetMapping("/today")
-    @Operation(summary = "오늘의 토픽룸 목록", description = "오늘의 토픽룸 리스트를 반환합니다. 활성 사용자가 많은 토픽룸 3개가 포함됩니다.")
-    public CustomResponse<List<TopicRoomResponseDto>> getTodayTop3(
-            @AuthenticationPrincipal AuthUserDetails authUser) {
+    @Operation(summary = "오늘의 토픽룸 조회", description = "오늘의 토픽룸 리스트를 반환합니다. 활성 사용자가 많은 토픽룸 3개가 포함됩니다.")
+    public CustomResponse<List<TopicRoomResponseDto>> getTodayTop3() {
 
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
-                topicRoomUseCase.getTodayTrendingRooms(authUser.getUserId()));
+                topicRoomUseCase.getTodayTrendingRooms()
+        );
     }
 
     // 3. 검색
@@ -70,7 +70,7 @@ public class TopicRoomController {
                 topicRoomUseCase.searchRooms(keyword, pageable));
     }
 
-    // 4. 생성 (New)
+    // 4. 생성
     @PostMapping
     @Operation(summary = "토픽룸 생성", description = "토픽룸을 생성합니다. 작품 선택 및 제목 설정은 필수입니다.")
     public CustomResponse<Long> create(
