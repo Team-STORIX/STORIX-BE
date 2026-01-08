@@ -105,7 +105,7 @@ public class AuthService {
     // 작가 회원 가입 (일반 로그인)
     @Transactional
     public Long signUpArtistUser(ArtistSignupRequest req) {
-        userAdaptor.isLoginIdDuplicate(req.loginId());
+        userAdaptor.checkLoginIdDuplicate(req.loginId());
 
         CreateArtistUserCommand m = new CreateArtistUserCommand(
                 req.nickName(),

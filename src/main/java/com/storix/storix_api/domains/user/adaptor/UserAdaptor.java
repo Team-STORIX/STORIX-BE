@@ -110,7 +110,7 @@ public class UserAdaptor {
         throw UnknownUserException.EXCEPTION;
     }
 
-    public void isLoginIdDuplicate(String loginId) {
+    public void checkLoginIdDuplicate(String loginId) {
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
         if (artistUser.isPresent()) {
             throw DuplicateUserException.EXCEPTION;
