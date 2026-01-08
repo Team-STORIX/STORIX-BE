@@ -11,6 +11,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -68,7 +69,8 @@ public class User extends BaseTimeEntity {
     private Boolean isAdultVerified = false;
 
     // 계정 상태
-    @Column(name = "account_state")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_state", nullable = false)
     private AccountState accountState = AccountState.NORMAL;
 
     // 계정 권한
