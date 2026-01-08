@@ -127,7 +127,6 @@ public class TopicRoomService implements TopicRoomUseCase {
     @Transactional
     public void joinRoom(Long userId, Long roomId) {
 
-        // [Facade] User + TopicRoom + Works 정보 조합하여 입장 규칙 검사
         User user = loadUserPort.findById(userId);
         TopicRoom room = loadTopicRoomPort.findById(roomId);
         Works works = loadWorksPort.findById(room.getWorksId());
@@ -173,11 +172,10 @@ public class TopicRoomService implements TopicRoomUseCase {
         recordTopicRoomPort.saveReport(report);
     }
 
-    // [Facade] 여러 도메인 정보를 조합해 DTO 생성
     private TopicRoomResponseDto toDto(TopicRoom room, boolean isJoined) {
 
         Works works = loadWorksPort.findById(room.getWorksId());
-        LocalDateTime lastChat = loadTopicRoomPort.getLastMessageTime(room.getId());
+        LocalDateTime lastChat = room.getLastChatTime();
 
         return TopicRoomResponseDto.builder()
                 .topicRoomId(room.getId())
@@ -189,6 +187,12 @@ public class TopicRoomService implements TopicRoomUseCase {
                 .lastChatTime(formatTimeAgo(lastChat))
                 .isJoined(isJoined)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void updateRoomLastChatTime(Long roomId) {
+        recordTopicRoomPort.updateLastChatTime(roomId, LocalDateTime.now());
     }
 
     private String formatTimeAgo(LocalDateTime time) {

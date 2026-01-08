@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,12 +26,17 @@ public class TopicRoom extends BaseTimeEntity {
     private Long worksId;
 
     @Column(name = "active_user_number", nullable = false)
-    private Integer activeUserNumber = 0;
+    private Integer activeUserNumber;
+
+    @Column(name = "last_chat_time")
+    private LocalDateTime lastChatTime;
 
     @Builder
     public TopicRoom(String topicRoomName, Long worksId) {
         this.topicRoomName = topicRoomName;
         this.worksId = worksId;
+        this.activeUserNumber = 0;
+        this.lastChatTime = LocalDateTime.now();
     }
 
 }

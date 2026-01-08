@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TopicRoomUserRepository extends JpaRepository<TopicRoomUser, Long> {
 
-    Slice<TopicRoomUser> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+    Slice<TopicRoomUser> findByUserId(Long userId, Pageable pageable);
 
     long countByUserId(Long userId);
 

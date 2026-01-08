@@ -4,6 +4,8 @@ import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomReport;
 import com.storix.storix_api.domains.topicroom.domain.enums.TopicRoomRole;
 
+import java.time.LocalDateTime;
+
 public interface RecordTopicRoomPort {
 
     TopicRoom saveRoom(TopicRoom room);
@@ -17,4 +19,6 @@ public interface RecordTopicRoomPort {
     void incrementActiveUserNumber(Long roomId);
 
     void decrementActiveUserNumber(Long roomId);
+
+    void updateLastChatTime(Long roomId, LocalDateTime now);
 }

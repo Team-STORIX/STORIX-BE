@@ -33,7 +33,7 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
 
     @Override public Slice<TopicRoomUser> findParticipationsByUserId(Long userId, Pageable pageable) {
 
-        return topicRoomUserRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+        return topicRoomUserRepository.findByUserId(userId, pageable);
     }
 
     @Override
@@ -100,5 +100,10 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     @Override
     public void decrementActiveUserNumber(Long roomId) {
         topicRoomRepository.decrementActiveUserNumber(roomId);
+    }
+
+    @Override
+    public void updateLastChatTime(Long roomId, LocalDateTime now) {
+        topicRoomRepository.updateLastChatTime(roomId, now);
     }
 }
