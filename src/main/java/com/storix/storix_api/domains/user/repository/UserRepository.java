@@ -14,10 +14,10 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByNickName(String nickName);
 
-    @Query("""
-        select count(u) > 0 from User u
-        where u.nickName = :nickName and u.id <> :userId
-    """)
+    @Query("SELECT (COUNT(u) > 0) FROM User u " +
+            "WHERE u.nickName = :nickName " +
+            "  AND u.id <> :userId " +
+            "  AND u.accountState = 'NORMAL'")
     boolean existsNickNameExceptSelf(
             @Param("nickName") String nickName,
             @Param("userId") Long userId
