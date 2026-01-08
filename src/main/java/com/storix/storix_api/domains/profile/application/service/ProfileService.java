@@ -14,11 +14,12 @@ public class ProfileService {
     private final UserAdaptor userAdaptor;
 
     // 독자 프로필 조회
+    @Transactional(readOnly = true)
     public UserInfo getReaderProfileInfo(Long userId) {
         User readerUser = userAdaptor.findUserById(userId);
 
         return UserInfo.builder()
-                .role(readerUser.getRole().getValue())
+                .role(readerUser.getRole().toString())
                 .nickName(readerUser.getNickName())
                 .level(readerUser.getLevel())
                 .profileDescription(readerUser.getProfileDescription())
@@ -27,11 +28,12 @@ public class ProfileService {
     }
 
     // 작가 프로필 조회
+    @Transactional(readOnly = true)
     public UserInfo getArtistProfileInfo(Long userId) {
         User artistUser = userAdaptor.findUserById(userId);
 
         return UserInfo.builder()
-                .role(artistUser.getRole().getValue())
+                .role(artistUser.getRole().toString())
                 .nickName(artistUser.getNickName())
                 .profileDescription(artistUser.getProfileDescription())
                 .profileImageUrl(artistUser.getProfileImageUrl())
