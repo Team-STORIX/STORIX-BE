@@ -55,8 +55,7 @@ public class SecurityConfig {
                                 // [Search]
                                 .requestMatchers("/api/v1/search/**").permitAll()
                                 // [Profile]
-                                .requestMatchers("/api/v1/profile/me").permitAll()
-                                .requestMatchers("/api/v1/profile/**").hasRole("READER")
+                                .requestMatchers("/api/v1/profile/nickname/**").hasRole("READER")
 
                                 .anyRequest().authenticated()
                 )
