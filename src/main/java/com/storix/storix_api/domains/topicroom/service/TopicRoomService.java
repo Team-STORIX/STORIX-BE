@@ -18,6 +18,7 @@ import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.global.apiPayload.exception.topicRoom.MaxLimitException;
 import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnverifiedException;
+import com.storix.storix_api.global.utils.ProfanityFilterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -39,6 +40,7 @@ public class TopicRoomService implements TopicRoomUseCase {
     private final LoadUserPort loadUserPort;
     private final LoadWorksPort loadWorksPort;
     private final SearchHistoryService searchHistoryService;
+    private final ProfanityFilterService profanityFilterService;
 
     @Override
     public Slice<TopicRoomResponseDto> getMyJoinedRooms(Long userId, Pageable pageable) {
@@ -103,6 +105,8 @@ public class TopicRoomService implements TopicRoomUseCase {
     @Override
     @Transactional
     public Long createRoom(Long userId, TopicRoomCreateRequestDto request) {
+
+        profanityFilterService.validate(request.getTopicRoomName());
 
         User user = loadUserPort.findById(userId);
         Works works = loadWorksPort.findById(request.getWorksId());
