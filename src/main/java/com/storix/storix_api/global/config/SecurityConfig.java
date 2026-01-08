@@ -54,6 +54,10 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
                                 // [Search]
                                 .requestMatchers("/api/v1/search/**").permitAll()
+                                // [Profile]
+                                .requestMatchers("/api/v1/profile/me").permitAll()
+                                .requestMatchers("/api/v1/profile/**").hasRole("READER")
+
                                 .anyRequest().authenticated()
                 )
 

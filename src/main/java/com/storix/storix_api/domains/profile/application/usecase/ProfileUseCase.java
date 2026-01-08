@@ -15,6 +15,7 @@ public class ProfileUseCase {
 
     private final ProfileService profileService;
 
+    // 기본 프로필 조회
     public CustomResponse<UserInfo> getUserProfile(AuthUserDetails authUserDetails) {
 
         String role = authUserDetails.getRole();
@@ -27,6 +28,12 @@ public class ProfileUseCase {
             UserInfo artistProfileInfo = profileService.getArtistProfileInfo(userId);
             return CustomResponse.onSuccess(SuccessCode.PROFILE_LOAD_SUCCESS, artistProfileInfo);
         }
+    }
+
+    // 독자 닉네임 중복 체크
+    public CustomResponse<Void> checkAvailableNickname(String nickName, Long userId) {
+        profileService.validNickname(nickName, userId);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_NICKNAME_SUCCESS);
     }
 
 }

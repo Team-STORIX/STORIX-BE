@@ -10,9 +10,9 @@ import com.storix.storix_api.domains.user.repository.UserRepository;
 import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
 import com.storix.storix_api.global.apiPayload.code.ErrorCode;
 import com.storix.storix_api.global.apiPayload.exception.user.ArtistLoginException;
+import com.storix.storix_api.global.apiPayload.exception.user.DuplicateNicknameException;
 import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
 import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
-import com.storix.storix_api.global.apiPayload.exception.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -59,6 +59,12 @@ public class UserAdaptor {
     public boolean isNicknameDuplicate(String nickName) {
         Optional<User> readerUser = userRepository.findByNickName(nickName);
         return readerUser.isPresent();
+    }
+
+    public void checkNicknameDuplicateExceptSelf(String nickName, Long userId) {
+        if (userRepository.existsNickNameExceptSelf(nickName, userId)) {
+            throw DuplicateNicknameException.EXCEPTION;
+        }
     }
 
     // 독자 회원 가입

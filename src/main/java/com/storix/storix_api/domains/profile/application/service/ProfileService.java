@@ -5,6 +5,7 @@ import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,13 @@ public class ProfileService {
                 .profileDescription(artistUser.getProfileDescription())
                 .profileImageUrl(artistUser.getProfileImageUrl())
                 .build();
+    }
+
+    // 독자 닉네임 중복 체크
+    @Transactional(readOnly = true)
+    public void validNickname(String nickName, Long userId) {
+        userAdaptor.checkNicknameDuplicateWithArtists(nickName);
+        userAdaptor.checkNicknameDuplicateExceptSelf(nickName, userId);
     }
 
 }
