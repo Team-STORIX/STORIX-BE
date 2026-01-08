@@ -9,10 +9,7 @@ import com.storix.storix_api.domains.user.dto.LoginInfo;
 import com.storix.storix_api.domains.user.repository.UserRepository;
 import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
 import com.storix.storix_api.domains.works.repository.WorksRepository;
-import com.storix.storix_api.global.apiPayload.exception.user.ArtistLoginException;
-import com.storix.storix_api.global.apiPayload.exception.user.DuplicateNicknameException;
-import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
-import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
+import com.storix.storix_api.global.apiPayload.exception.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -64,13 +61,13 @@ public class UserAdaptor {
 
     public void checkNicknameDuplicateExceptSelf(String nickName, Long userId) {
         if (userRepository.existsNickNameExceptSelf(nickName, userId)) {
-            throw DuplicateNicknameException.EXCEPTION;
+            throw ProfileDuplicateNicknameException.EXCEPTION;
         }
     }
 
     public void checkNicknameDuplicateWithArtists(String nickName) {
         if (worksRepository.existsByAnyAuthorName(nickName)) {
-            throw DuplicateNicknameException.EXCEPTION;
+            throw ProfileForbiddenNicknameException.EXCEPTION;
         }
     }
 
