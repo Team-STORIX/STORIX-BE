@@ -57,8 +57,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/search/**").permitAll()
 
                                 // [Topic Room]
-                                .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/topic-rooms/me").permitAll()
+                                .requestMatchers("/api/v1/topic-rooms/today", "/api/v1/topic-rooms/search/**").hasAnyRole("READER", "ANONYMOUS")
+                                .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
                                 .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms/*/join").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/topic-rooms/*/leave").authenticated()
@@ -81,14 +82,6 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .requestMatchers("/api/v1/topic-rooms/today")
-                .requestMatchers("/api/v1/topic-rooms/search/**")
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**");
     }
 
     @Bean
