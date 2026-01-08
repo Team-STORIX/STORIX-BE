@@ -12,12 +12,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByNickName(String nickName);
+    boolean existsByActiveNickName(String activeNickName);
 
     @Query("""
         SELECT (COUNT(u) > 0)
         FROM User u
-        WHERE u.nickName = :nickName
+        WHERE u.activeNickName = :nickName
           AND u.id <> :userId
           AND u.accountState = com.storix.storix_api.domains.user.domain.AccountState.NORMAL
     """)

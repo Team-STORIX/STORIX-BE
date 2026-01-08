@@ -25,8 +25,6 @@ public class UserAdaptor {
     private final UserRepository userRepository;
     private final WorksRepository worksRepository;
 
-    // TODO: 인덱싱
-
     public Role findUserRoleByUserId(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
@@ -54,9 +52,10 @@ public class UserAdaptor {
         return readerUser.isPresent();
     }
 
-    public boolean isNicknameDuplicate(String nickName) {
-        Optional<User> readerUser = userRepository.findByNickName(nickName);
-        return readerUser.isPresent();
+    public void checkNicknameDuplicate(String nickName) {
+        if (userRepository.existsByActiveNickName(nickName)) {
+            throw DuplicateNicknameException.EXCEPTION;
+        }
     }
 
     public void checkNicknameDuplicateExceptSelf(String nickName, Long userId) {
