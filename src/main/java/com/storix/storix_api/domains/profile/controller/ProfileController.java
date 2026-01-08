@@ -1,6 +1,7 @@
 package com.storix.storix_api.domains.profile.controller;
 
 import com.storix.storix_api.domains.profile.application.usecase.ProfileUseCase;
+import com.storix.storix_api.domains.profile.dto.UpdateDescriptionRequest;
 import com.storix.storix_api.domains.profile.dto.UpdateNicknameRequest;
 import com.storix.storix_api.domains.profile.dto.UserInfo;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
@@ -62,4 +63,13 @@ public class ProfileController {
                 .body(profileUseCase.checkAvailableNickname(nickName, authUserDetails.getUserId()));
     }
 
+    @Operation(summary = "한 줄 소개 변경", description = "한 줄 소개를 변경하는 api 입니다.")
+    @PostMapping("/description")
+    public ResponseEntity<CustomResponse<String>> updateDescription(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @Valid @RequestBody UpdateDescriptionRequest req
+    ) {
+        return ResponseEntity.ok()
+                .body(profileUseCase.changeDescription(req.profileDescription(), authUserDetails.getUserId()));
+    }
 }

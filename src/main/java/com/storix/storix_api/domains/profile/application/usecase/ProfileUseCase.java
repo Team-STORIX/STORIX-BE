@@ -43,4 +43,9 @@ public class ProfileUseCase {
         return CustomResponse.onSuccess(SuccessCode.PROFILE_NICKNAME_SUCCESS);
     }
 
+    // 독자 한 줄 소개 변경
+    public CustomResponse<String> changeDescription(String profileDescription, Long userId) {
+        String newProfileDescription = profileService.changeDescription(profileDescription, userId);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_UPDATE_DESCRIPTION_SUCCESS, newProfileDescription);
+    }
 }

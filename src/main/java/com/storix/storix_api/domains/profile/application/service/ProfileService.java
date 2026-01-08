@@ -53,4 +53,11 @@ public class ProfileService {
         return nickName;
     }
 
+    // 독자 한 줄 소개 변경
+    @Transactional
+    public String changeDescription(String profileDescription, Long userId) {
+        User readerUser = userAdaptor.findUserById(userId);
+        readerUser.changeProfileDescription(profileDescription);
+        return profileDescription;
+    }
 }
