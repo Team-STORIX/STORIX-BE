@@ -17,4 +17,14 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "OR w.illustrator LIKE %:keyword% " +
             "OR w.originalAuthor LIKE %:keyword%")
     Slice<Works> findBySearchKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+        select count(w) > 0
+        from Works w
+        where w.author = :nickName
+           or w.illustrator = :nickName
+           or w.originalAuthor = :nickName
+    """)
+    boolean existsByAnyAuthorName(@Param("nickName") String nickName);
+
 }

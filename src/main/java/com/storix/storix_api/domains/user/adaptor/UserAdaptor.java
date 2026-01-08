@@ -8,7 +8,7 @@ import com.storix.storix_api.domains.user.dto.CreateReaderUserCommand;
 import com.storix.storix_api.domains.user.dto.LoginInfo;
 import com.storix.storix_api.domains.user.repository.UserRepository;
 import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
-import com.storix.storix_api.global.apiPayload.code.ErrorCode;
+import com.storix.storix_api.domains.works.repository.WorksRepository;
 import com.storix.storix_api.global.apiPayload.exception.user.ArtistLoginException;
 import com.storix.storix_api.global.apiPayload.exception.user.DuplicateNicknameException;
 import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
@@ -26,6 +26,7 @@ import java.util.Optional;
 public class UserAdaptor {
 
     private final UserRepository userRepository;
+    private final WorksRepository worksRepository;
 
     // TODO: 인덱싱
 
@@ -63,6 +64,12 @@ public class UserAdaptor {
 
     public void checkNicknameDuplicateExceptSelf(String nickName, Long userId) {
         if (userRepository.existsNickNameExceptSelf(nickName, userId)) {
+            throw DuplicateNicknameException.EXCEPTION;
+        }
+    }
+
+    public void checkNicknameDuplicateWithArtists(String nickName) {
+        if (worksRepository.existsByAnyAuthorName(nickName)) {
             throw DuplicateNicknameException.EXCEPTION;
         }
     }

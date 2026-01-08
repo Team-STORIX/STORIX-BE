@@ -99,7 +99,8 @@ public class AuthService {
 
     // 독자 닉네임 중복 체크
     public void validNickname(String nickName) {
-        // TODO: [Domain_works] 작가 닉네임 중복 체크
+        userAdaptor.checkNicknameDuplicateWithArtists(nickName);
+
         if (userAdaptor.isNicknameDuplicate(nickName)) {
             throw DuplicateNicknameException.EXCEPTION;
         }
