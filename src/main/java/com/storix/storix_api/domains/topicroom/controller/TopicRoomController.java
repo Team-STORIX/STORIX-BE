@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,7 +34,7 @@ public class TopicRoomController {
     @Operation(summary = "참여 중인 토픽룸 조회", description = "내가 참여 중인 토픽룸 리스트를 반환합니다.")
     public CustomResponse<Slice<TopicRoomResponseDto>> getMyRooms(
             @AuthenticationPrincipal AuthUserDetails authUser,
-            @PageableDefault(size = 3) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 3, sort = "topicRoom.lastChatTime", direction = Sort.Direction.DESC) Pageable pageable) {
 
         // 비로그인 시 빈 리스트 반환
         if (authUser == null) {
@@ -63,7 +64,8 @@ public class TopicRoomController {
     @GetMapping("/search")
     @Operation(summary = "토픽룸 검색", description = "토픽룸 검색 리스트를 반환합니다.")
     public CustomResponse<SearchResponseWrapperDto<TopicRoomResponseDto>> search(
-            @RequestParam String keyword, Pageable pageable) {
+            @RequestParam String keyword,
+            @ParameterObject @PageableDefault( size = 10, sort = "topicRoomName", direction = Sort.Direction.ASC) Pageable pageable) {
 
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
