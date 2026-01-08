@@ -13,7 +13,7 @@ public interface TopicRoomUseCase {
 
     Slice<TopicRoomResponseDto> getMyJoinedRooms(Long userId, Pageable pageable);
 
-    List<TopicRoomResponseDto> getTodayTrendingRooms(Long userId);
+    List<TopicRoomResponseDto> getTodayTrendingRooms();
 
     SearchResponseWrapperDto<TopicRoomResponseDto> searchRooms(String keyword, Pageable pageable);
 

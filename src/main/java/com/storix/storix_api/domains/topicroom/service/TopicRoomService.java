@@ -48,7 +48,7 @@ public class TopicRoomService implements TopicRoomUseCase {
     }
 
     @Override
-    public List<TopicRoomResponseDto> getTodayTrendingRooms(Long userId) {
+    public List<TopicRoomResponseDto> getTodayTrendingRooms() {
 
         // 현재 시간으로부터 24시간 전 시점 계산
         LocalDateTime threshold = LocalDateTime.now().minusHours(24);
@@ -72,13 +72,7 @@ public class TopicRoomService implements TopicRoomUseCase {
         }
 
         return trendingRooms.stream()
-                .map(room -> {
-
-                    // userId가 있으면 참여 여부 확인, 없으면 false
-                    boolean isJoined = (userId != null) && loadTopicRoomPort.existsByUserIdAndRoomId(userId, room.getId());
-                    return toDto(room, isJoined);
-                })
-
+                .map(room -> toDto(room, false))
                 .toList();
     }
 
