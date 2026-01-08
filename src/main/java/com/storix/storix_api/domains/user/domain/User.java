@@ -76,6 +76,9 @@ public class User extends BaseTimeEntity {
     // 계정 권한
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role = Role.READER;
 
     // 독자용 소셜 로그인
