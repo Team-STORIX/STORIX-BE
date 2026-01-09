@@ -8,7 +8,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "works")
+@Table(
+        name = "works",
+        indexes = {
+                @Index(name = "idx_works_author", columnList = "author"),
+                @Index(name = "idx_works_illustrator", columnList = "illustrator"),
+                @Index(name = "idx_works_original_author", columnList = "original_author")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Works {

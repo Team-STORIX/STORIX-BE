@@ -15,6 +15,7 @@ public class ProfileUseCase {
 
     private final ProfileService profileService;
 
+    // 기본 프로필 조회
     public CustomResponse<UserInfo> getUserProfile(AuthUserDetails authUserDetails) {
 
         String role = authUserDetails.getRole();
@@ -29,4 +30,22 @@ public class ProfileUseCase {
         }
     }
 
+    // 독자 닉네임 변경
+    public CustomResponse<String> changeNickName(String nickName, Long userId) {
+        profileService.validNickname(nickName, userId);
+        String newNickname = profileService.changeNickname(nickName, userId);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_UPDATE_NICKNAME_SUCCESS, newNickname);
+    }
+
+    // 독자 닉네임 중복 체크
+    public CustomResponse<Void> checkAvailableNickname(String nickName, Long userId) {
+        profileService.validNickname(nickName, userId);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_NICKNAME_SUCCESS);
+    }
+
+    // 독자 한 줄 소개 변경
+    public CustomResponse<String> changeDescription(String profileDescription, Long userId) {
+        String newProfileDescription = profileService.changeDescription(profileDescription, userId);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_UPDATE_DESCRIPTION_SUCCESS, newProfileDescription);
+    }
 }

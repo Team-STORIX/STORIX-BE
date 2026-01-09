@@ -1,18 +1,24 @@
 package com.storix.storix_api.domains.profile.controller;
 
 import com.storix.storix_api.domains.profile.application.usecase.ProfileUseCase;
+import com.storix.storix_api.domains.profile.dto.UpdateDescriptionRequest;
+import com.storix.storix_api.domains.profile.dto.UpdateNicknameRequest;
 import com.storix.storix_api.domains.profile.dto.UserInfo;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/profile")
 @RequiredArgsConstructor
@@ -30,4 +36,40 @@ public class ProfileController {
                 .body(profileUseCase.getUserProfile(authUserDetails));
     }
 
+    @Operation(summary = "닉네임 수정", description = "닉네임을 수정하는 api 입니다.")
+    @PostMapping("/nickname")
+    public ResponseEntity<CustomResponse<String>> updateNickName(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @Valid @RequestBody UpdateNicknameRequest req
+    ) {
+        return ResponseEntity.ok()
+                .body(profileUseCase.changeNickName(req.nickName(), authUserDetails.getUserId()));
+    }
+
+    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 여부를 체크하는 api 입니다.")
+    @GetMapping("/nickname/valid")
+    public ResponseEntity<CustomResponse<Void>> nickNameCheck(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @RequestParam("nickname")
+            @NotBlank(message = "닉네임은 필수입니다.")
+            @Size(min = 2, max = 10, message = "닉네임은 2~10자까지 가능합니다.")
+            @Pattern(
+                    regexp = "^(?=.*[가-힣a-zA-Z0-9])[가-힣a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ ]+$",
+                    message = "닉네임은 한글, 영문, 숫자, 공백만 가능하며 자음/모음/공백만으로는 불가능합니다."
+            )
+            String nickName
+    ) {
+        return ResponseEntity.ok()
+                .body(profileUseCase.checkAvailableNickname(nickName, authUserDetails.getUserId()));
+    }
+
+    @Operation(summary = "한 줄 소개 변경", description = "한 줄 소개를 변경하는 api 입니다.")
+    @PostMapping("/description")
+    public ResponseEntity<CustomResponse<String>> updateDescription(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @Valid @RequestBody UpdateDescriptionRequest req
+    ) {
+        return ResponseEntity.ok()
+                .body(profileUseCase.changeDescription(req.profileDescription(), authUserDetails.getUserId()));
+    }
 }

@@ -11,6 +11,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -23,6 +24,10 @@ import java.util.Set;
                 @UniqueConstraint(
                         name = "uk_oauth_provider_oid",
                         columnNames = {"oauth_provider", "oauth_oid"}
+                ),
+                @UniqueConstraint(
+                        name = "uk_active_nick_name",
+                        columnNames = "active_nick_name"
                 )
         }
 )
@@ -68,12 +73,22 @@ public class User extends BaseTimeEntity {
     private Boolean isAdultVerified = false;
 
     // 계정 상태
-    @Column(name = "account_state")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_state", nullable = false)
     private AccountState accountState = AccountState.NORMAL;
+
+    @Column(name = "deletedSuffix", length = 36)
+    private String deletedSuffix;
+
+    @Column(name = "active_nick_name", insertable = false, updatable = false, length = 50)
+    private String activeNickName;
 
     // 계정 권한
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role = Role.READER;
 
     // 독자용 소셜 로그인
@@ -151,6 +166,7 @@ public class User extends BaseTimeEntity {
             throw AlreadyWithDrawUserException.EXCEPTION;
         }
         accountState = AccountState.DELETED;
+        deletedSuffix = UUID.randomUUID().toString();
         gender = null;
         favoriteGenreList = null;
         profileImageUrl = null;
