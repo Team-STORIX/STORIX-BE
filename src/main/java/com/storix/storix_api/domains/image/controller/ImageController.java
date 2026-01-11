@@ -10,10 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/image")
@@ -24,7 +21,7 @@ public class ImageController {
     private final ImageUseCase imageUseCase;
 
     @Operation(summary = "게시물 이미지 업로드", description = "S3 버킷에 게시물 이미지를 업로드할 수 있는 presignedUrl을 발급하는 api 입니다.   \n해당 url로 이미지를 업로드 한 후, url과 함께 반환된 objectKey는 게시물 등록 api로 보내주세요.")
-    @GetMapping("/board")
+    @PostMapping("/board")
     public ResponseEntity<CustomResponse<PresignedUrlResponse>> getBoardImagePresignedUrl(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @RequestBody FileUploadRequest req
@@ -34,7 +31,7 @@ public class ImageController {
     }
 
     @Operation(summary = "프로필 이미지 업로드", description = "S3 버킷에 프로필 이미지를 업로드할 수 있는 presignedUrl을 발급하는 api 입니다.   \n해당 url로 이미지를 업로드 한 후, url과 함께 반환된 objectKey는 프로필 변경 api로 보내주세요.")
-    @GetMapping("/profile")
+    @PostMapping("/profile")
     public ResponseEntity<CustomResponse<PresignedUrlResponse>> getProfileImagePresignedUrl(
             @RequestBody FileUploadRequest req
     ) {
