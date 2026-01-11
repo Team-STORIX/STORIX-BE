@@ -48,4 +48,10 @@ public class ProfileUseCase {
         String newProfileDescription = profileService.changeDescription(profileDescription, userId);
         return CustomResponse.onSuccess(SuccessCode.PROFILE_UPDATE_DESCRIPTION_SUCCESS, newProfileDescription);
     }
+
+    // 프로필 사진 변경
+    public CustomResponse<String> changeImage (String objectKey, Long userId) {
+        String imageUrl = profileService.changeProfileImage(objectKey, userId);
+        return CustomResponse.onSuccess(SuccessCode.SUCCESS, imageUrl);
+    }
 }
