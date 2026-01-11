@@ -39,4 +39,9 @@ public class ImageUseCase {
         return CustomResponse.onSuccess(SuccessCode.IMAGE_ISSUE_PRESIGNED_URL_SUCCESS, result);
     }
 
+    public CustomResponse<String> getImageUrl(String objectKey) {
+        String presignedGetUrl = s3PresignHelper.createPresignedGetUrl(objectKey);
+        return CustomResponse.onSuccess(SuccessCode.SUCCESS, presignedGetUrl);
+    }
+
 }

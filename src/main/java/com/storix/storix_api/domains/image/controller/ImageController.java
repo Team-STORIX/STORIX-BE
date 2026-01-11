@@ -43,4 +43,13 @@ public class ImageController {
                 .body(imageUseCase.getProfileImagePresignedUrl(req));
     }
 
+    @Operation(summary = "[테스트용] 이미지 확인", description = "S3 버킷에 업로드된 프로필 이미지를 확인할 수 있는 presignedGetUrl을 발급하는 api 입니다.   \nobjectKey를 보내주세요.")
+    @GetMapping("/confirm")
+    public ResponseEntity<CustomResponse<String>> getProfileImagePresignedUrl(
+            @RequestParam String objectKey
+    ) {
+        return ResponseEntity.ok()
+                .body(imageUseCase.getImageUrl(objectKey));
+    }
+
 }
