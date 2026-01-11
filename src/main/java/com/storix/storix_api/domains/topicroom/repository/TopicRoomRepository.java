@@ -29,7 +29,7 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE TopicRoom t SET t.activeUserNumber = t.activeUserNumber - 1 " +
             "WHERE t.id = :id AND t.activeUserNumber > 0")
-    void decrementActiveUserNumber(@Param("id") Long id);
+    int decrementActiveUserNumber(@Param("id") Long id);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE TopicRoom t SET t.lastChatTime = :now WHERE t.id = :id")
