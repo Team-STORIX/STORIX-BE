@@ -1,0 +1,65 @@
+package com.storix.storix_api.domains.plus.application.service;
+
+import com.storix.storix_api.domains.plus.adaptor.BoardAdaptor;
+import com.storix.storix_api.domains.plus.controller.dto.ArtistBoardUploadRequest;
+import com.storix.storix_api.domains.plus.controller.dto.ReaderBoardUploadRequest;
+import com.storix.storix_api.domains.plus.dto.CreateArtistBoardCommand;
+import com.storix.storix_api.domains.plus.dto.CreateReaderBoardCommand;
+import com.storix.storix_api.domains.works.adaptor.WorksPersistenceAdaptor;
+import com.storix.storix_api.global.apiPayload.exception.plus.WorksIdNotExistException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class BoardService {
+
+    private final BoardAdaptor boardAdaptor;
+    private final WorksPersistenceAdaptor worksPersistenceAdaptor;
+
+    @Transactional
+    public void createReaderBoard(Long userId, ReaderBoardUploadRequest req) {
+
+        if (req.isWorksSelected()) {
+            if (req.worksId() == null) {
+                throw WorksIdNotExistException.EXCEPTION;
+            }
+            worksPersistenceAdaptor.checkWorksExistById(req.worksId());
+        }
+
+        CreateReaderBoardCommand cmd = new CreateReaderBoardCommand(
+                userId,
+                req.isWorksSelected(),
+                req.worksId(),
+                req.isSpoiler(),
+                req.content(),
+                req.objectKeys()
+        );
+
+        boardAdaptor.saveReaderBoard(cmd);
+    }
+
+    @Transactional
+    public void createArtistBoard(Long userId, ArtistBoardUploadRequest req) {
+
+        if (req.isWorksSelected()) {
+            if (req.worksId() == null) {
+                throw WorksIdNotExistException.EXCEPTION;
+            }
+            worksPersistenceAdaptor.checkWorksExistById(req.worksId());
+        }
+
+        CreateArtistBoardCommand cmd = new CreateArtistBoardCommand(
+                userId,
+                req.isWorksSelected(),
+                req.worksId(),
+                req.isContentForFan(),
+                req.point(),
+                req.content(),
+                req.objectKeys()
+        );
+
+        boardAdaptor.saveArtistBoard(cmd);
+    }
+}
