@@ -4,12 +4,15 @@ import com.storix.storix_api.domains.profile.dto.UserInfo;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
+
+    @Value("${AWS_S3_BASE_URL}") private String baseUrl;
 
     private final UserAdaptor userAdaptor;
 
@@ -24,7 +27,8 @@ public class ProfileService {
                 .nickName(readerUser.getNickName())
                 .level(readerUser.getLevel())
                 .profileDescription(readerUser.getProfileDescription())
-                .profileImageUrl(readerUser.getProfileImageUrl())
+                .profileImageUrl(readerUser.getProfileImageUrl() == null
+                        ? null : baseUrl + "/" + readerUser.getProfileImageUrl())
                 .build();
     }
 
@@ -63,5 +67,13 @@ public class ProfileService {
         User readerUser = userAdaptor.findUserById(userId);
         readerUser.changeProfileDescription(profileDescription);
         return profileDescription;
+    }
+
+    // 프로필 사진 변경
+    @Transactional
+    public String changeProfileImage(String objectKey, Long userId) {
+        User user = userAdaptor.findUserById(userId);
+        user.changeProfileImage(objectKey);
+        return baseUrl + "/" + objectKey;
     }
 }
