@@ -7,4 +7,6 @@ import org.springframework.data.domain.Slice;
 public interface LoadWorksPort {
 
     Slice<Works> searchWorks(String keyword, Pageable pageable);
+
+    void checkWorksExistById(Long worksId);
 }
