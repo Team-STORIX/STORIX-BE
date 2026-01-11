@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3PresignHelper {
@@ -55,9 +54,6 @@ public class S3PresignHelper {
 
         PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
 
-        log.info("Presigned URL to upload a file to: [{}]", presignedRequest.url().toString());
-        log.info("PUT HTTP method: [{}]", presignedRequest.httpRequest().method());
-
         return new PresignedUrlResponse(
                 presignedRequest.url().toString(),
                 objectKey,
@@ -66,11 +62,11 @@ public class S3PresignHelper {
     }
 
     // 작가 팬 콘텐츠 조회용
-    public String createPresignedGetUrl(String bucketName, String keyName) {
+    public String createPresignedGetUrl(String objectKey) {
 
         GetObjectRequest objectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(keyName)
+                .key(objectKey)
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -79,9 +75,6 @@ public class S3PresignHelper {
                 .build();
 
         PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
-
-        log.info("Presigned URL to download a file to: [{}]", presignedRequest.url().toString());
-        log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
 
         return presignedRequest.url().toExternalForm();
     }
