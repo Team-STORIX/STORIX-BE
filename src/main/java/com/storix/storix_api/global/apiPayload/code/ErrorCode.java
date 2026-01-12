@@ -41,6 +41,9 @@ public enum ErrorCode {
     // Profile error
     PROFILE_IMAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "PROFILE_ERROR_001", "업로드한 프로필 사진의 objectKey값을 보내주세요."),
 
+    // Image error
+    IMAGE_INVALID_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "IMAGE_ERROR_001", "지원하지 않는 Content Type입니다."),
+
     // Other Server error
     OTHER_SERVER_BAD_REQUEST(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_1", "Other server bad request"),
     OTHER_SERVER_UNAUTHORIZED(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_2", "Other server unauthorized"),

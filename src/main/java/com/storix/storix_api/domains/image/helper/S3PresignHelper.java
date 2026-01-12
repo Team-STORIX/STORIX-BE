@@ -1,9 +1,9 @@
 package com.storix.storix_api.domains.image.helper;
 
 import com.storix.storix_api.domains.image.dto.PresignedUrlResponse;
-import com.storix.storix_api.global.apiPayload.exception.plus.InvalidContentTypeException;
+
+import com.storix.storix_api.global.apiPayload.exception.image.ImageInvalidContentTypeException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -112,7 +112,7 @@ public class S3PresignHelper {
             case "image/jpeg" -> "jpg";
             case "image/png" -> "png";
             case "image/webp" -> "webp";
-            default -> throw InvalidContentTypeException.EXCEPTION;
+            default -> throw ImageInvalidContentTypeException.EXCEPTION;
         };
     }
 
