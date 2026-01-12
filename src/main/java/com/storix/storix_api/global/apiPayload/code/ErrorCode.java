@@ -37,6 +37,7 @@ public enum ErrorCode {
     PROFILE_DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_002", "이미 사용 중인 닉네임입니다."),
     PROFILE_FORBIDDEN_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_003", "사용할 수 없는 닉네임입니다."),
     PROFILE_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_004", "금칙어가 포함된 닉네임입니다."),
+    INVALID_ROLE_ERROR(HttpStatus.UNAUTHORIZED, "ROLE_ERROR_001", "잘못된 role값 입니다."),
 
     // Profile error
     PROFILE_IMAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "PROFILE_ERROR_001", "업로드한 프로필 사진의 objectKey값을 보내주세요."),

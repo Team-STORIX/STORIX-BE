@@ -29,7 +29,7 @@ public class TokenGenerateHelper {
     public LoginWithTokenResponse generateLoginWithToken(AuthUserDetails userDetails) {
 
         Long userId = userDetails.getUserId();
-        String role = userDetails.getRole();
+        String role = userDetails.getRole().getStringValue();
 
         String accessToken = tokenProvider.createAccessToken(userId, role);
         String refreshToken = tokenProvider.createRefreshToken(userId);
@@ -64,7 +64,7 @@ public class TokenGenerateHelper {
         tokenAdaptor.deleteRefreshToken(refreshToken);
 
         // AccessToken, RefreshToken 재발급
-        return generateLoginWithToken(new AuthUserDetails(userId, String.valueOf(role)));
+        return generateLoginWithToken(new AuthUserDetails(userId, role));
     }
 
     @Transactional

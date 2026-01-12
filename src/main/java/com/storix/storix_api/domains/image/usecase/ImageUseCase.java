@@ -18,9 +18,9 @@ public class ImageUseCase {
 
     private final S3PresignHelper s3PresignHelper;
 
-    public CustomResponse<List<PresignedUrlResponse>> getBoardImagePresignedUrl(String role, FileUploadRequest req) {
+    public CustomResponse<List<PresignedUrlResponse>> getBoardImagePresignedUrl(Role role, FileUploadRequest req) {
 
-        String prefix = Role.READER.toString().equals(role)
+        String prefix = Role.READER.equals(role)
                 ? "public/board/reader" : "public/board/artist";
 
         List<PresignedUrlResponse> results = req.files().stream()
