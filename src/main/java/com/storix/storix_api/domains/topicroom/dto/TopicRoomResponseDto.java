@@ -1,10 +1,12 @@
 package com.storix.storix_api.domains.topicroom.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
+@AllArgsConstructor
 public class TopicRoomResponseDto {
 
     private Long topicRoomId;
