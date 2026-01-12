@@ -145,24 +145,18 @@ public class TopicRoomService implements TopicRoomUseCase {
     @Override
     @Transactional
     public void joinRoom(Long userId, Long roomId) {
-
         User user = loadUserPort.findById(userId);
         TopicRoom room = loadTopicRoomPort.findById(roomId);
         Works works = loadWorksPort.findById(room.getWorksId());
 
-        if (!user.getIsAdultVerified() && "18세 이용가".equals(works.getAgeClassification())) {
+        if (!user.getIsAdultVerified() && "18세 이용가".equals(works.getAgeClassification())) throw UnverifiedException.EXCEPTION;
+        if (loadTopicRoomPort.countJoinedRooms(userId) >= 9) throw MaxLimitException.EXCEPTION;
 
-            throw UnverifiedException.EXCEPTION;
-        }
-
-        if (loadTopicRoomPort.countJoinedRooms(userId) >= 9) {
-
-            throw MaxLimitException.EXCEPTION;
-        }
-
-        if (!loadTopicRoomPort.existsByUserIdAndRoomId(userId, roomId)) {
+        try {
             recordTopicRoomPort.saveParticipation(userId, room, TopicRoomRole.MEMBER);
             recordTopicRoomPort.incrementActiveUserNumber(roomId);
+        } catch (DataIntegrityViolationException e) {
+
         }
     }
 
