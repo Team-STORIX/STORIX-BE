@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -55,25 +54,17 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
                                 // [Search]
                                 .requestMatchers("/api/v1/search/**").permitAll()
+                                // [Profile]
+                                .requestMatchers("/api/v1/profile/nickname/**").hasRole("READER")
+                                .requestMatchers("/api/v1/profile/**").hasAnyRole("READER","ARTIST")
 
-                                // [Topic Room]
-                                .requestMatchers(HttpMethod.GET, "/api/v1/topic-rooms/me").permitAll()
-                                .requestMatchers("/api/v1/topic-rooms/today", "/api/v1/topic-rooms/search/**").hasAnyRole("READER", "ANONYMOUS")
-                                .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
-                                .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms").authenticated()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms/*/join").authenticated()
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/topic-rooms/*/leave").authenticated()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/topic-rooms/*/report").authenticated()
-
-                                // 나머지 모든 요청은 인증 필요
                                 .anyRequest().authenticated()
-
                 )
 
                 // jwt filter
                 .addFilterBefore(errorHandlingFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(onboardingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // spring security exception handler
                 .exceptionHandling(exceptions -> exceptions
@@ -89,7 +80,14 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of("https://storix.kr", "https://api.storix.kr", "http://localhost:3000"));
+        config.setAllowedOriginPatterns(List.of(
+                "https://storix.kr",
+                "https://www.storix.kr",
+                "https://api.storix.kr",
+                "http://localhost:3000",
+                "https://storix-fe-git-develop-kim-yunseongs-projects.vercel.app",
+                "https://storix-fe-git-main-kim-yunseongs-projects.vercel.app"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 

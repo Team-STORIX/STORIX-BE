@@ -46,7 +46,11 @@ public class TopicRoomService implements TopicRoomUseCase {
     public Slice<TopicRoomResponseDto> getMyJoinedRooms(Long userId, Pageable pageable) {
 
         return loadTopicRoomPort.findParticipationsByUserId(userId, pageable)
-                .map(participation -> toDto(participation.getTopicRoom(), true));
+                .map(participation -> {
+                    TopicRoom room = participation.getTopicRoom();
+                    Works works = loadWorksPort.findById(room.getWorksId());
+                    return TopicRoomResponseDto.from(room, works, true);
+                });
     }
 
     @Override
@@ -106,9 +110,7 @@ public class TopicRoomService implements TopicRoomUseCase {
         String fallback = null;
 
         if (rooms.isEmpty()) {
-
             List<TrendingItem> trending = searchHistoryService.getTrendingKeywords();
-
             if (!trending.isEmpty()) {
                 Collections.shuffle(trending);
                 fallback = trending.get(0).getKeyword();
@@ -116,7 +118,7 @@ public class TopicRoomService implements TopicRoomUseCase {
         }
 
         return SearchResponseWrapperDto.<TopicRoomResponseDto>builder()
-                .result(rooms.map(room -> toDto(room, false)))
+                .result(rooms)
                 .fallbackRecommendation(fallback)
                 .build();
     }
@@ -163,11 +165,14 @@ public class TopicRoomService implements TopicRoomUseCase {
     @Override
     @Transactional
     public void leaveRoom(Long userId, Long roomId) {
-
         if (loadTopicRoomPort.existsByUserIdAndRoomId(userId, roomId)) {
             recordTopicRoomPort.deleteParticipation(userId, roomId);
-
             recordTopicRoomPort.decrementActiveUserNumber(roomId);
+
+            TopicRoom room = loadTopicRoomPort.findById(roomId);
+            if (room.getActiveUserNumber() <= 0) {
+                recordTopicRoomPort.deleteRoom(roomId);
+            }
         }
     }
 
@@ -185,39 +190,21 @@ public class TopicRoomService implements TopicRoomUseCase {
         recordTopicRoomPort.saveReport(report);
     }
 
-    private TopicRoomResponseDto toDto(TopicRoom room, boolean isJoined) {
-
-        Works works = loadWorksPort.findById(room.getWorksId());
-        LocalDateTime lastChat = room.getLastChatTime();
-
-        return TopicRoomResponseDto.builder()
-                .topicRoomId(room.getId())
-                .topicRoomName(room.getTopicRoomName())
-                .worksType(works.getWorksType().getDbValue())
-                .worksName(works.getWorksName())
-                .thumbnailUrl(works.getThumbnailUrl())
-                .activeUserNumber(room.getActiveUserNumber())
-                .lastChatTime(formatTimeAgo(lastChat))
-                .isJoined(isJoined)
-                .build();
-    }
-
     @Override
     @Transactional
     public void updateRoomLastChatTime(Long roomId) {
         recordTopicRoomPort.updateLastChatTime(roomId, LocalDateTime.now());
     }
 
-    private String formatTimeAgo(LocalDateTime time) {
-
-        if (time == null) return "대화 없음";
-
-        long diff = Duration.between(time, LocalDateTime.now()).toMinutes();
-
-        if (diff < 1) return "방금 전";
-        if (diff < 60) return diff + "분 전";
-        if (diff < 1440) return (diff / 60) + "시간 전";
-
-        return (diff / 1440) + "일 전";
+    // 참여 여부 마킹 로직 공통화
+    private void applyMembershipStatus(List<TopicRoomResponseDto> rooms, Long userId) {
+        if (userId != null && !rooms.isEmpty()) {
+            List<Long> joinedRoomIds = loadTopicRoomPort.findAllJoinedRoomIdsByUserId(userId);
+            rooms.forEach(dto -> {
+                if (joinedRoomIds.contains(dto.getTopicRoomId())) {
+                    dto.markAsJoined(true);
+                }
+            });
+        }
     }
 }

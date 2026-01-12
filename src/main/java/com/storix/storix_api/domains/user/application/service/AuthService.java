@@ -77,8 +77,7 @@ public class AuthService {
         boolean isUserPresent = userAdaptor.isUserPresentWithProviderAndOid(provider, oid);
         if (isUserPresent) throw DuplicateUserException.EXCEPTION;
 
-        boolean isNicknamePresent = userAdaptor.isNicknameDuplicate(req.nickName());
-        if (isNicknamePresent) throw DuplicateNicknameException.EXCEPTION;
+        userAdaptor.checkNicknameDuplicate(req.nickName());
 
         CreateReaderUserCommand m = new CreateReaderUserCommand(
                 req.marketingAgree(),
@@ -99,16 +98,14 @@ public class AuthService {
 
     // 독자 닉네임 중복 체크
     public void validNickname(String nickName) {
-        // TODO: [Domain_works] 작가 닉네임 중복 체크
-        if (userAdaptor.isNicknameDuplicate(nickName)) {
-            throw DuplicateNicknameException.EXCEPTION;
-        }
+        userAdaptor.checkNicknameDuplicateWithArtists(nickName);
+        userAdaptor.checkNicknameDuplicate(nickName);
     }
 
     // 작가 회원 가입 (일반 로그인)
     @Transactional
     public Long signUpArtistUser(ArtistSignupRequest req) {
-        userAdaptor.isLoginIdDuplicate(req.loginId());
+        userAdaptor.checkLoginIdDuplicate(req.loginId());
 
         CreateArtistUserCommand m = new CreateArtistUserCommand(
                 req.nickName(),

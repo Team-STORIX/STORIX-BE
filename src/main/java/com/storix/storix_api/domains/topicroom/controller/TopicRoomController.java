@@ -52,11 +52,15 @@ public class TopicRoomController {
     // 2. 오늘의 토픽룸
     @GetMapping("/today")
     @Operation(summary = "오늘의 토픽룸 조회", description = "오늘의 토픽룸 리스트를 반환합니다. 활성 사용자가 많은 토픽룸 3개가 포함됩니다.")
-    public CustomResponse<List<TopicRoomResponseDto>> getTodayTop3() {
+    public CustomResponse<List<TopicRoomResponseDto>> getTodayTop3(
+            @AuthenticationPrincipal AuthUserDetails authUser
+    ) {
+
+        Long userId = (authUser != null) ? authUser.getUserId() : null;
 
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
-                topicRoomUseCase.getTodayTrendingRooms()
+                topicRoomUseCase.getTodayTrendingRooms(userId)
         );
     }
 
@@ -65,11 +69,14 @@ public class TopicRoomController {
     @Operation(summary = "토픽룸 검색", description = "토픽룸 검색 리스트를 반환합니다.")
     public CustomResponse<SearchResponseWrapperDto<TopicRoomResponseDto>> search(
             @RequestParam String keyword,
+            @AuthenticationPrincipal AuthUserDetails authUser,
             @ParameterObject @PageableDefault( size = 10, sort = "topicRoomName", direction = Sort.Direction.ASC) Pageable pageable) {
+
+        Long userId = (authUser != null) ? authUser.getUserId() : null;
 
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
-                topicRoomUseCase.searchRooms(keyword, pageable));
+                topicRoomUseCase.searchRooms(keyword, userId, pageable));
     }
 
     // 4. 생성

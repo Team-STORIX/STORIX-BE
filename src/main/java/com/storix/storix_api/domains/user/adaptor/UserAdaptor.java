@@ -8,11 +8,8 @@ import com.storix.storix_api.domains.user.dto.CreateReaderUserCommand;
 import com.storix.storix_api.domains.user.dto.LoginInfo;
 import com.storix.storix_api.domains.user.repository.UserRepository;
 import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
-import com.storix.storix_api.global.apiPayload.code.ErrorCode;
-import com.storix.storix_api.global.apiPayload.exception.user.ArtistLoginException;
-import com.storix.storix_api.global.apiPayload.exception.user.DuplicateUserException;
-import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
-import com.storix.storix_api.global.apiPayload.exception.ErrorResponse;
+import com.storix.storix_api.domains.works.repository.WorksRepository;
+import com.storix.storix_api.global.apiPayload.exception.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -26,8 +23,7 @@ import java.util.Optional;
 public class UserAdaptor {
 
     private final UserRepository userRepository;
-
-    // TODO: 인덱싱
+    private final WorksRepository worksRepository;
 
     public Role findUserRoleByUserId(Long userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -56,9 +52,22 @@ public class UserAdaptor {
         return readerUser.isPresent();
     }
 
-    public boolean isNicknameDuplicate(String nickName) {
-        Optional<User> readerUser = userRepository.findByNickName(nickName);
-        return readerUser.isPresent();
+    public void checkNicknameDuplicate(String nickName) {
+        if (userRepository.existsByActiveNickName(nickName)) {
+            throw DuplicateNicknameException.EXCEPTION;
+        }
+    }
+
+    public void checkNicknameDuplicateExceptSelf(String nickName, Long userId) {
+        if (userRepository.existsNickNameExceptSelf(nickName, userId)) {
+            throw ProfileDuplicateNicknameException.EXCEPTION;
+        }
+    }
+
+    public void checkNicknameDuplicateWithArtists(String nickName) {
+        if (worksRepository.existsByAnyAuthorName(nickName)) {
+            throw ProfileForbiddenNicknameException.EXCEPTION;
+        }
     }
 
     // 독자 회원 가입
@@ -101,7 +110,7 @@ public class UserAdaptor {
         throw UnknownUserException.EXCEPTION;
     }
 
-    public void isLoginIdDuplicate(String loginId) {
+    public void checkLoginIdDuplicate(String loginId) {
         Optional<User> artistUser = userRepository.findArtistUserByLoginId(loginId);
         if (artistUser.isPresent()) {
             throw DuplicateUserException.EXCEPTION;
