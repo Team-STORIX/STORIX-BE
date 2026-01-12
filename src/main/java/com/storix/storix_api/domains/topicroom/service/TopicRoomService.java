@@ -20,12 +20,12 @@ import com.storix.storix_api.global.apiPayload.exception.topicRoom.MaxLimitExcep
 import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnverifiedException;
 import com.storix.storix_api.global.utils.ProfanityFilterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
