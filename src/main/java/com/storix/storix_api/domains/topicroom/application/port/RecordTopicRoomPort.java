@@ -21,4 +21,6 @@ public interface RecordTopicRoomPort {
     void decrementActiveUserNumber(Long roomId);
 
     void updateLastChatTime(Long roomId, LocalDateTime now);
+
+    void deleteRoom(Long roomId);
 }
