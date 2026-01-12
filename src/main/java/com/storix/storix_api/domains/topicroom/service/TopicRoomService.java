@@ -86,10 +86,22 @@ public class TopicRoomService implements TopicRoomUseCase {
     }
 
     @Override
-    public SearchResponseWrapperDto<TopicRoomResponseDto> searchRooms(String keyword, Pageable pageable) {
+    public SearchResponseWrapperDto<TopicRoomResponseDto> searchRooms(String keyword, Long userId, Pageable pageable) {
 
         List<Long> worksIds = loadWorksPort.findAllIdsByKeyword(keyword);
-        Slice<TopicRoom> rooms = loadTopicRoomPort.searchByWorksIdsOrDescription(worksIds, keyword, pageable);
+
+        Slice<TopicRoomResponseDto> rooms = loadTopicRoomPort.searchBySearchCondition(worksIds, keyword, pageable);
+        applyMembershipStatus(rooms.getContent(), userId);
+
+        // 로그인 유저라면 참여 중인 방 ID 리스트를 가져와서 마킹
+        if (userId != null && !rooms.isEmpty()) {
+            List<Long> joinedRoomIds = loadTopicRoomPort.findAllJoinedRoomIdsByUserId(userId);
+            rooms.forEach(dto -> {
+                if (joinedRoomIds.contains(dto.getTopicRoomId())) {
+                    dto.markAsJoined(true);
+                }
+            });
+        }
 
         String fallback = null;
 
