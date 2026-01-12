@@ -1,6 +1,7 @@
 package com.storix.storix_api.domains.topicroom.repository;
 
 import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
+import com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,8 +20,15 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
             "ORDER BY t.activeUserNumber DESC")
     List<TopicRoom> findTopAllTimeExcluding(@Param("excludeIds") List<Long> excludeIds, Pageable pageable);
 
-    @Query("SELECT t FROM TopicRoom t WHERE t.worksId IN :worksIds OR t.topicRoomName LIKE %:keyword%")
-    Slice<TopicRoom> findBySearchCondition(@Param("worksIds") List<Long> worksIds, @Param("keyword") String keyword, Pageable pageable);
+    @Query("""
+        SELECT new com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto(
+            t.id, t.topicRoomName, w.worksType, w.worksName, w.thumbnailUrl, t.activeUserNumber, t.lastChatTime, false
+        )
+        FROM TopicRoom t
+        JOIN Works w ON t.worksId = w.id
+        WHERE w.id IN :worksIds OR t.topicRoomName LIKE %:keyword%
+    """)
+    Slice<TopicRoomResponseDto> findBySearchCondition(@Param("worksIds") List<Long> worksIds, @Param("keyword") String keyword, Pageable pageable);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE TopicRoom t SET t.activeUserNumber = t.activeUserNumber + 1 WHERE t.id = :id")
