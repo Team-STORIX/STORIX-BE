@@ -44,4 +44,15 @@ public class ImageUseCase {
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, presignedGetUrl);
     }
 
+    public CustomResponse<List<PresignedUrlResponse>> getFanBoardImagePresignedUrl(FileUploadRequest req) {
+
+        String prefix = "private/board/artist";
+
+        List<PresignedUrlResponse> results = req.files().stream()
+                .map(file -> s3PresignHelper.createPresignedPutUrl(file.contentType(), prefix))
+                .toList();
+
+        return CustomResponse.onSuccess(SuccessCode.IMAGE_ISSUE_PRESIGNED_URL_SUCCESS, results);
+    }
+
 }
