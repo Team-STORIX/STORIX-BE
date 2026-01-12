@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface TopicRoomUserRepository extends JpaRepository<TopicRoomUser, Long> {
 
     @Query("select tru from TopicRoomUser tru join fetch tru.topicRoom where tru.userId = :userId")
@@ -16,4 +18,8 @@ public interface TopicRoomUserRepository extends JpaRepository<TopicRoomUser, Lo
     boolean existsByUserIdAndTopicRoomId(Long userId, Long topicRoomId);
 
     void deleteByUserIdAndTopicRoomId(Long userId, Long topicRoomId);
+
+    // 특정 유저가 참여 중인 모든 방 ID 조회
+    @Query("SELECT tru.topicRoom.id FROM TopicRoomUser tru WHERE tru.userId = :userId")
+    List<Long> findAllJoinedRoomIdsByUserId(@Param("userId") Long userId);
 }
