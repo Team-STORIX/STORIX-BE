@@ -13,9 +13,9 @@ public interface TopicRoomUseCase {
 
     Slice<TopicRoomResponseDto> getMyJoinedRooms(Long userId, Pageable pageable);
 
-    List<TopicRoomResponseDto> getTodayTrendingRooms();
+    List<TopicRoomResponseDto> getTodayTrendingRooms(Long userId);
 
-    SearchResponseWrapperDto<TopicRoomResponseDto> searchRooms(String keyword, Pageable pageable);
+    SearchResponseWrapperDto<TopicRoomResponseDto> searchRooms(String keyword, Long userId, Pageable pageable);
 
     Long createRoom(Long userId, TopicRoomCreateRequestDto request);
 
