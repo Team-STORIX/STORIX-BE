@@ -52,6 +52,6 @@ public class ProfileUseCase {
     // 프로필 사진 변경
     public CustomResponse<String> changeImage (String objectKey, Long userId) {
         String imageUrl = profileService.changeProfileImage(objectKey, userId);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, imageUrl);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_UPDATE_IMAGE_SUCCESS, imageUrl);
     }
 }
