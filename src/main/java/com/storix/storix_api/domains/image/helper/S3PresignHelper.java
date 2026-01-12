@@ -35,7 +35,7 @@ public class S3PresignHelper {
         return LocalDateTime.now().format(FORMATTER);
     }
 
-    // 공개 컨텐츠 용 (프로필, 게시글, 리뷰)
+    // 공개/비공개 컨텐츠 용 (프로필, 게시글, 리뷰)
     public PresignedUrlResponse createPresignedPutUrl(String contentType, String objectKeyPrefix) {
 
         String ext = contentTypeToExt(contentType);
@@ -61,7 +61,7 @@ public class S3PresignHelper {
         );
     }
 
-    // 작가 팬 콘텐츠 조회용
+    // 작가 팬 콘텐츠(비공개) 조회용
     public String createPresignedGetUrl(String objectKey) {
 
         GetObjectRequest objectRequest = GetObjectRequest.builder()
