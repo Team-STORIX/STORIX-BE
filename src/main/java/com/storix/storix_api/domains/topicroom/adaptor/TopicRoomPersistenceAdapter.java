@@ -6,6 +6,7 @@ import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomReport;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomUser;
 import com.storix.storix_api.domains.topicroom.domain.enums.TopicRoomRole;
+import com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomReportRepository;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomRepository;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomUserRepository;
@@ -32,38 +33,29 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     }
 
     @Override public Slice<TopicRoomUser> findParticipationsByUserId(Long userId, Pageable pageable) {
-
-        return topicRoomUserRepository.findByUserId(userId, pageable);
+        return topicRoomUserRepository.findByUserIdWithTopicRoom(userId, pageable);
     }
 
     @Override
-    public List<TopicRoom> findTop3Trending(LocalDateTime threshold) {
-
-        return topicRoomRepository.findTop3ByCreatedAtAfterOrderByActiveUserNumberDesc(threshold);
+    public List<TopicRoomResponseDto> findTop3TrendingWithWorks(LocalDateTime threshold) {
+        return topicRoomRepository.findTop3TrendingWithWorks(threshold);
     }
 
     @Override
-    public List<TopicRoom> findTopNAllTimeExcluding(int limit, List<Long> excludeIds) {
-
-        if (excludeIds.isEmpty()) {
-            excludeIds = List.of(-1L);
-        }
-
-        return topicRoomRepository.findTopAllTimeExcluding(excludeIds, PageRequest.of(0, limit));
+    public List<TopicRoomResponseDto> findTopAllTimeExcludingWithWorks(int limit, List<Long> excludeIds) {
+        if (excludeIds.isEmpty()) excludeIds = List.of(-1L);
+        return topicRoomRepository.findTopAllTimeExcludingWithWorks(excludeIds, PageRequest.of(0, limit));
     }
 
-    @Override public Slice<TopicRoom> searchByWorksIdsOrDescription(List<Long> worksIds, String keyword, Pageable pageable) {
-
+    @Override public Slice<TopicRoomResponseDto> searchBySearchCondition(List<Long> worksIds, String keyword, Pageable pageable) {
         return topicRoomRepository.findBySearchCondition(worksIds, keyword, pageable);
     }
 
     @Override public long countJoinedRooms(Long userId) {
-
         return topicRoomUserRepository.countByUserId(userId);
     }
 
     @Override public boolean existsByUserIdAndRoomId(Long userId, Long roomId) {
-
         return topicRoomUserRepository.existsByUserIdAndTopicRoomId(userId, roomId);
     }
 
@@ -73,18 +65,15 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     }
 
     @Override public TopicRoom saveRoom(TopicRoom room) {
-
         return topicRoomRepository.save(room);
     }
 
     @Override
     public void saveParticipation(Long userId, TopicRoom room, TopicRoomRole role) {
-
         topicRoomUserRepository.save(new TopicRoomUser(room, userId, role));
     }
 
     @Override public void deleteParticipation(Long userId, Long roomId) {
-
         topicRoomUserRepository.deleteByUserIdAndTopicRoomId(userId, roomId);
     }
 
@@ -106,4 +95,12 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     public void updateLastChatTime(Long roomId, LocalDateTime now) {
         topicRoomRepository.updateLastChatTime(roomId, now);
     }
+
+    // 참여 중인 방 ID 리스트 조회 (참여 여부 매핑용)
+    @Override public List<Long> findAllJoinedRoomIdsByUserId(Long userId) {
+        return topicRoomUserRepository.findAllJoinedRoomIdsByUserId(userId);
+    }
+
+    // 0명 시 방 삭제
+    @Override public void deleteRoom(Long roomId) { topicRoomRepository.deleteById(roomId); }
 }
