@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface WorksRepository extends JpaRepository<Works, Long> {
 
     @Query("SELECT w FROM Works w " +
@@ -21,5 +23,12 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "   OR w.illustrator = :nickName " +
             "   OR w.originalAuthor = :nickName")
     boolean existsByAnyAuthorName(@Param("nickName") String nickName);
+
+    @Query("SELECT w.id FROM Works w " +
+            "WHERE w.worksName LIKE %:keyword% " +
+            "OR w.author LIKE %:keyword% " +
+            "OR w.illustrator LIKE %:keyword% " +
+            "OR w.originalAuthor LIKE %:keyword%")
+    List<Long> findAllIdsByKeyword(@Param("keyword") String keyword);
 
 }

@@ -69,6 +69,15 @@ public enum ErrorCode {
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_ERROR_001", "알림을 찾을 수 없습니다"),
     NOTIFICATION_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "NOTIFICATION_ERROR_002", "인가되지 않은 접근입니다."),
 
+    // Topic Room error
+    ADULT_VERIFICATION_REQUIRED(HttpStatus.BAD_REQUEST, "TOPIC_ROOM_ERROR_001", "성인인증이 되지 않은 사용자입니다."),
+    TOPIC_ROOM_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "TOPIC_ROOM_ERROR_002", "토픽룸 최대 개수는 9개입니다."),
+    TOPIC_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC_ROOM_ERROR_003", "해당 토픽룸을 찾을 수 없습니다."),
+    INVALID_TOPIC_ROOM_TITLE(HttpStatus.BAD_REQUEST, "TOPIC_ROOM_ERROR_004", "토픽룸에 금칙어가 포함되어 있습니다."),
+
+    // Works error
+    WORKS_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKS_ERROR_001", "해당 작품을 찾을 수 없습니다."),
+  
     // Plus error
     PLUS_INVALID_RATING(HttpStatus.BAD_REQUEST, "PLUS_ERROR_001", "Enum 필드와 매핑할 수 없는 잘못된 평점값입니다."),
     PLUS_INVALID_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "PLUS_ERROR_002", "지원하지 않는 Content Type입니다."),
@@ -76,6 +85,7 @@ public enum ErrorCode {
     PLUS_DUPLICATE_REVIEW_UPLOAD(HttpStatus.BAD_REQUEST, "PLUS_ERROR_004", "해당 작품에 대한 리뷰가 이미 존재합니다."),
     PLUS_WORKS_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_005", "존재하지 않는 작품입니다."),
     PLUS_WORKS_ID_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_006", "작품 id값을 보내주세요.");
+  
 
     private final HttpStatus httpStatus;
     private final String code;
