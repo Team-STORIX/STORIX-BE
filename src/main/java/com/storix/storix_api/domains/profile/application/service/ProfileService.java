@@ -26,6 +26,7 @@ public class ProfileService {
                 .role(readerUser.getRole().toString())
                 .nickName(readerUser.getNickName())
                 .level(readerUser.getLevel())
+                .point(readerUser.getPoint())
                 .profileDescription(readerUser.getProfileDescription())
                 .profileImageUrl(readerUser.getProfileImageUrl() == null
                         ? null : baseUrl + "/" + readerUser.getProfileImageUrl())
