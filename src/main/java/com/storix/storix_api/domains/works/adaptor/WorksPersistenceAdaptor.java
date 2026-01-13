@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
         if (!worksRepository.existsById(worksId)) {
             throw WorksNotExistException.EXCEPTION;
         }
+    }
 
     @Override
     public Works findById(Long worksId) {
