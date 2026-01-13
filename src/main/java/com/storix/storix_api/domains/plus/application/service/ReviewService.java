@@ -1,6 +1,6 @@
 package com.storix.storix_api.domains.plus.application.service;
 
-import com.storix.storix_api.domains.library.LibraryAdaptor;
+import com.storix.storix_api.domains.library.adaptor.LibraryAdaptor;
 import com.storix.storix_api.domains.plus.adaptor.ReviewAdaptor;
 import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewRedirectResponse;
 import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewUploadRequest;

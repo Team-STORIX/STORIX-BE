@@ -1,4 +1,4 @@
-package com.storix.storix_api.domains.library;
+package com.storix.storix_api.domains.library.adaptor;
 
 import com.storix.storix_api.domains.library.repository.LibraryRepository;
 import lombok.RequiredArgsConstructor;
