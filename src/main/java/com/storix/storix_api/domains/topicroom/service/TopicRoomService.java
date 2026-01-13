@@ -179,7 +179,8 @@ public class TopicRoomService implements TopicRoomUseCase {
 
         recordTopicRoomPort.decrementActiveUserNumber(roomId);
 
-        TopicRoom room = loadTopicRoomPort.findById(roomId);
+        try {
+            TopicRoom room = loadTopicRoomPort.findById(roomId);
 
             // 인원수가 0 이하면 방 삭제 로직 실행
             if (room.getActiveUserNumber() <= 0) {
