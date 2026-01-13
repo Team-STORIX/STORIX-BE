@@ -7,4 +7,6 @@ import org.springframework.data.domain.Slice;
 public interface LoadUserPort {
 
     Slice<User> searchArtists(String keyword, Pageable pageable);
+
+    User findById(Long userId);
 }
