@@ -66,6 +66,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/plus/reader-review").hasRole("READER")
                                 .requestMatchers("/api/v1/plus/artist-board").hasRole("ARTIST")
 
+                                // [Image]
+                                .requestMatchers("/api/v1/image/fan-board").hasRole("ARTIST")
+
                                 // [TopicRoom]
                                 .requestMatchers("/api/v1/topic-rooms/today").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/search").permitAll()

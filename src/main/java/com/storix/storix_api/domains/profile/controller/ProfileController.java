@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.profile.controller;
 
 import com.storix.storix_api.domains.profile.application.usecase.ProfileUseCase;
 import com.storix.storix_api.domains.profile.dto.UpdateDescriptionRequest;
+import com.storix.storix_api.domains.profile.dto.UpdateImageRequest;
 import com.storix.storix_api.domains.profile.dto.UpdateNicknameRequest;
 import com.storix.storix_api.domains.profile.dto.UserInfo;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
@@ -72,4 +73,21 @@ public class ProfileController {
         return ResponseEntity.ok()
                 .body(profileUseCase.changeDescription(req.profileDescription(), authUserDetails.getUserId()));
     }
+
+    @Operation(summary = "프로필 사진 변경", description = "프로필 사진을 변경하는 api 입니다.   \n이미지를 선택한 직후의 렌더링은 프론트에서 진행해주시고, 이미지를 S3 버킷에 업로드한 후 objectKey와 함께 호출해주세요.")
+    @PostMapping("/image")
+    public ResponseEntity<CustomResponse<String>> updateImage(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @Valid @RequestBody UpdateImageRequest req
+            ) {
+        return ResponseEntity.ok()
+                .body(profileUseCase.changeImage(req.objectKey(), authUserDetails.getUserId()));
+    }
+
+    // 관심 작품 조회
+
+    // 관심 작가 조회
+
+    // [내 활동 조회] -> 게시글, 리뷰, 좋아요 조회
+
 }
