@@ -25,15 +25,4 @@ public class Library {
         this.id = userId;
     }
 
-    /** 비즈니스 로직 **/
-    public void increaseReviewCount() {
-        this.reviewCount ++;
-    }
-
-    public void decreaseReviewCount() {
-        if (reviewCount > 0) {
-            this.reviewCount --;
-        }
-    }
-
 }
