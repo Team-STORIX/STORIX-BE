@@ -36,10 +36,10 @@ public class S3PresignHelper {
     }
 
     // 공개/비공개 컨텐츠 용 (프로필, 게시글, 리뷰)
-    public PresignedUrlResponse createPresignedPutUrl(String contentType, String objectKeyPrefix) {
+    public PresignedUrlResponse createPresignedPutUrl(Long userId, String contentType, String objectKeyPrefix) {
 
         String ext = contentTypeToExt(contentType);
-        String objectKey = objectKeyPrefix + "/" + UUID.randomUUID() + "." + ext;
+        String objectKey = objectKeyPrefix + "/" + userId + "/" + UUID.randomUUID() + "." + ext;
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)

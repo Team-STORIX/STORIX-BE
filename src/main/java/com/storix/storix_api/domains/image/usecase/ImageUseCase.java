@@ -29,7 +29,8 @@ public class ImageUseCase {
                 ? "public/board/reader" : "public/board/artist";
 
         List<PresignedUrlResponse> results = req.files().stream()
-                .map(file -> s3PresignHelper.createPresignedPutUrl(file.contentType(), prefix))
+                .map(file -> s3PresignHelper.createPresignedPutUrl(
+                        authUserDetails.getUserId(), file.contentType(), prefix))
                 .toList();
 
         List<String> objectKeys = results.stream()
@@ -43,9 +44,7 @@ public class ImageUseCase {
     public CustomResponse<PresignedUrlResponse> getProfileImagePresignedUrl(Long userId, ProfileImageUploadRequest req) {
 
         PresignedUrlResponse result = s3PresignHelper.createPresignedPutUrl(
-                req.file().contentType(),
-                "public/profile"
-        );
+                userId, req.file().contentType(), "public/profile");
 
         s3CacheHelper.cacheProfileKey(userId, result.objectKey());
 
@@ -62,7 +61,8 @@ public class ImageUseCase {
         String prefix = "private/board/artist";
 
         List<PresignedUrlResponse> results = req.files().stream()
-                .map(file -> s3PresignHelper.createPresignedPutUrl(file.contentType(), prefix))
+                .map(file -> s3PresignHelper.createPresignedPutUrl(
+                        userId, file.contentType(), prefix))
                 .toList();
 
         List<String> objectKeys = results.stream()
