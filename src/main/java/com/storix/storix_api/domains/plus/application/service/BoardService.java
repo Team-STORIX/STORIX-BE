@@ -1,11 +1,13 @@
 package com.storix.storix_api.domains.plus.application.service;
 
+import com.storix.storix_api.domains.image.helper.S3CacheHelper;
 import com.storix.storix_api.domains.plus.adaptor.BoardAdaptor;
 import com.storix.storix_api.domains.plus.controller.dto.ArtistBoardUploadRequest;
 import com.storix.storix_api.domains.plus.controller.dto.ReaderBoardUploadRequest;
 import com.storix.storix_api.domains.plus.dto.CreateArtistBoardCommand;
 import com.storix.storix_api.domains.plus.dto.CreateReaderBoardCommand;
 import com.storix.storix_api.domains.works.adaptor.WorksPersistenceAdaptor;
+import com.storix.storix_api.global.apiPayload.exception.plus.PlusImageNotExistException;
 import com.storix.storix_api.global.apiPayload.exception.plus.WorksIdNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class BoardService {
 
     private final BoardAdaptor boardAdaptor;
     private final WorksPersistenceAdaptor worksPersistenceAdaptor;
+    private final S3CacheHelper s3CacheHelper;
 
     @Transactional
     public void createReaderBoard(Long userId, ReaderBoardUploadRequest req) {
@@ -26,6 +29,10 @@ public class BoardService {
                 throw WorksIdNotExistException.EXCEPTION;
             }
             worksPersistenceAdaptor.checkWorksExistById(req.worksId());
+        }
+
+        if (!s3CacheHelper.isValidBoardKeys(userId, req.objectKeys())) {
+            throw PlusImageNotExistException.EXCEPTION;
         }
 
         CreateReaderBoardCommand cmd = new CreateReaderBoardCommand(
@@ -48,6 +55,16 @@ public class BoardService {
                 throw WorksIdNotExistException.EXCEPTION;
             }
             worksPersistenceAdaptor.checkWorksExistById(req.worksId());
+        }
+
+        if (req.isContentForFan()) {
+            if (!s3CacheHelper.isValidFanContentKeys(userId, req.objectKeys())) {
+                throw PlusImageNotExistException.EXCEPTION;
+            }
+        } else {
+            if (!s3CacheHelper.isValidBoardKeys(userId, req.objectKeys())) {
+                throw PlusImageNotExistException.EXCEPTION;
+            }
         }
 
         CreateArtistBoardCommand cmd = new CreateArtistBoardCommand(
