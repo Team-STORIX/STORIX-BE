@@ -12,7 +12,7 @@ public interface RecordTopicRoomPort {
 
     void saveParticipation(Long userId, TopicRoom room, TopicRoomRole role);
 
-    void deleteParticipation(Long userId, Long roomId);
+    int deleteParticipation(Long userId, Long roomId);
 
     void saveReport(TopicRoomReport report);
 
