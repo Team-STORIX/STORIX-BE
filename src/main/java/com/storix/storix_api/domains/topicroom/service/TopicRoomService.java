@@ -133,6 +133,9 @@ public class TopicRoomService implements TopicRoomUseCase {
         User user = loadUserPort.findById(userId);
         Works works = loadWorksPort.findById(request.getWorksId());
 
+        if (!user.getIsAdultVerified() && "18세 이용가".equals(works.getAgeClassification()))
+            throw UnverifiedException.EXCEPTION;
+
         TopicRoom room = TopicRoom.builder()
                 .topicRoomName(request.getTopicRoomName())
                 .worksId(works.getId())
