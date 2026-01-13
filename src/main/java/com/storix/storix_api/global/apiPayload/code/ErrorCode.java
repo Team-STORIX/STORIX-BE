@@ -16,6 +16,8 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_ERROR_005", "서버 내부 오류가 발생했습니다"),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_ERROR_006", "요청값이 올바르지 않습니다."),
     DATA_INTEGRITY_VIOLATION_REQUEST(HttpStatus.CONFLICT, "COMMON_ERROR_007", "DB 데이터 무결성 조건 위반입니다. 백엔드에게 연락주세요."),
+    INVALID_JSON_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_ERROR_008", "요청 JSON 형식이 잘못되었습니다. 백엔드에게 문의주세요."),
+    UNHANDLED_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR_009", "핸들링하지 않은 에러입니다. 백엔드에게 연락주세요."),
 
     // Token error
     TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_001", "인가가 필요한 경로로 토큰이 전달되지 않았습니다"),
@@ -35,6 +37,13 @@ public enum ErrorCode {
     PROFILE_DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_002", "이미 사용 중인 닉네임입니다."),
     PROFILE_FORBIDDEN_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_003", "사용할 수 없는 닉네임입니다."),
     PROFILE_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_004", "금칙어가 포함된 닉네임입니다."),
+    INVALID_ROLE_ERROR(HttpStatus.UNAUTHORIZED, "ROLE_ERROR_001", "잘못된 role값 입니다."),
+
+    // Profile error
+    PROFILE_IMAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "PROFILE_ERROR_001", "업로드한 프로필 사진의 objectKey값을 보내주세요."),
+
+    // Image error
+    IMAGE_INVALID_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "IMAGE_ERROR_001", "지원하지 않는 Content Type입니다."),
 
     // Other Server error
     OTHER_SERVER_BAD_REQUEST(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_1", "Other server bad request"),
@@ -67,7 +76,19 @@ public enum ErrorCode {
 
     // Notification error
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_ERROR_001", "알림을 찾을 수 없습니다"),
-    NOTIFICATION_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "NOTIFICATION_ERROR_002", "인가되지 않은 접근입니다.");
+    NOTIFICATION_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "NOTIFICATION_ERROR_002", "인가되지 않은 접근입니다."),
+
+    // Topic Room error
+    ADULT_VERIFICATION_REQUIRED(HttpStatus.BAD_REQUEST, "TOPIC_ROOM_ERROR_001", "성인인증이 되지 않은 사용자입니다."),
+    TOPIC_ROOM_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "TOPIC_ROOM_ERROR_002", "토픽룸 최대 개수는 9개입니다."),
+    TOPIC_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC_ROOM_ERROR_003", "해당 토픽룸을 찾을 수 없습니다."),
+    INVALID_TOPIC_ROOM_TITLE(HttpStatus.BAD_REQUEST, "TOPIC_ROOM_ERROR_004", "토픽룸에 금칙어가 포함되어 있습니다."),
+    ALREADY_JOINED_ROOM(HttpStatus.CONFLICT, "TOPIC_ROOM_ERROR_005", "이미 참여 중인 토픽룸입니다."),
+    SELF_REPORT_ERROR(HttpStatus.BAD_REQUEST, "TOPIC_ROOM_ERROR_006", "자기 자신은 신고할 수 없습니다."),
+    TOPIC_ROOM_ALREADY_EXISTS(HttpStatus.CONFLICT, "TOPIC_ROOM_ERROR_007", "이미 해당 작품에 대한 토픽룸이 존재합니다."),
+
+    // Works error
+    WORKS_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKS_ERROR_001", "해당 작품을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

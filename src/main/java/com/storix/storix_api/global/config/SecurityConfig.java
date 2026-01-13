@@ -58,6 +58,14 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/profile/nickname/**").hasRole("READER")
                                 .requestMatchers("/api/v1/profile/**").hasAnyRole("READER","ARTIST")
 
+                                // [Image]
+                                .requestMatchers("/api/v1/image/fan-board").hasRole("ARTIST")
+
+                                // [TopicRoom]
+                                .requestMatchers("/api/v1/topic-rooms/today").permitAll()
+                                .requestMatchers("/api/v1/topic-rooms/search").permitAll()
+                                .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
+
                                 .anyRequest().authenticated()
                 )
 

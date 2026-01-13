@@ -18,7 +18,7 @@ public class ProfileUseCase {
     // 기본 프로필 조회
     public CustomResponse<UserInfo> getUserProfile(AuthUserDetails authUserDetails) {
 
-        String role = authUserDetails.getRole();
+        String role = authUserDetails.getRole().getStringValue();
         Long userId = authUserDetails.getUserId();
 
         if (role.equals(String.valueOf(Role.READER))) {

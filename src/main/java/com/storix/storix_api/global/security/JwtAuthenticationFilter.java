@@ -1,6 +1,7 @@
 package com.storix.storix_api.global.security;
 
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
+import com.storix.storix_api.domains.user.domain.Role;
 import com.storix.storix_api.global.security.dto.AccessTokenInfo;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -62,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         AccessTokenInfo accessTokenInfo = tokenProvider.parseAccessToken(token);
 
         AuthUserDetails userDetails = new AuthUserDetails(
-                accessTokenInfo.userId(), accessTokenInfo.role());
+                accessTokenInfo.userId(), Role.fromValue(accessTokenInfo.role()));
         return new UsernamePasswordAuthenticationToken(
                 userDetails, "user", userDetails.getAuthorities());
     }

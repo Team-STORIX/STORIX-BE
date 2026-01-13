@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.user.adaptor;
 
+import com.storix.storix_api.domains.user.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,12 +16,12 @@ public class AuthUserDetails implements UserDetails {
 
     private Long userId;
 
-    private String role;
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + role)
+                new SimpleGrantedAuthority("ROLE_" + role.getStringValue())
         );
     }
 
