@@ -142,6 +142,8 @@ public class User extends BaseTimeEntity {
         this.profileDescription = profileDescription;
     }
 
+    public void changeProfileImage(String objectKey) { this.profileImageUrl = objectKey; }
+
     public void changeLevel(int level) {
 //        if (level < 1 || level > 5) {
 //            throw new IllegalArgumentException("레벨 범위 오류");

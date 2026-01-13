@@ -1,12 +1,14 @@
 package com.storix.storix_api.domains.profile.application.usecase;
 
 import com.storix.storix_api.UseCase;
+import com.storix.storix_api.domains.image.helper.S3CacheHelper;
 import com.storix.storix_api.domains.profile.application.service.ProfileService;
 import com.storix.storix_api.domains.profile.dto.UserInfo;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.domains.user.domain.Role;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
+import com.storix.storix_api.global.apiPayload.exception.profile.ProfileImageNotExistException;
 import lombok.RequiredArgsConstructor;
 
 @UseCase
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class ProfileUseCase {
 
     private final ProfileService profileService;
+    private final S3CacheHelper s3CacheHelper;
 
     // 기본 프로필 조회
     public CustomResponse<UserInfo> getUserProfile(AuthUserDetails authUserDetails) {
@@ -47,5 +50,14 @@ public class ProfileUseCase {
     public CustomResponse<String> changeDescription(String profileDescription, Long userId) {
         String newProfileDescription = profileService.changeDescription(profileDescription, userId);
         return CustomResponse.onSuccess(SuccessCode.PROFILE_UPDATE_DESCRIPTION_SUCCESS, newProfileDescription);
+    }
+
+    // 프로필 사진 변경
+    public CustomResponse<String> changeImage (String objectKey, Long userId) {
+        if (!s3CacheHelper.isValidProfileKey(userId, objectKey)) {
+            throw ProfileImageNotExistException.EXCEPTION;
+        }
+        String imageUrl = profileService.changeProfileImage(objectKey, userId);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_UPDATE_IMAGE_SUCCESS, imageUrl);
     }
 }
