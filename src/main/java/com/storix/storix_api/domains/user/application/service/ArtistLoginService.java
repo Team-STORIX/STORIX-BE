@@ -25,7 +25,7 @@ public class ArtistLoginService implements UserDetailsService {
         User artistUser = userAdaptor.findArtistUserByLoginId(username);
         artistUser.login();
 
-        return new AuthUserDetails(artistUser.getId(), String.valueOf(artistUser.getRole()));
+        return new AuthUserDetails(artistUser.getId(), artistUser.getRole());
     }
 
     public void validateArtistLogin (String loginId, String password) {
