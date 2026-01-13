@@ -12,6 +12,15 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "topic_room",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_topic_room_works_id",
+                        columnNames = {"works_id"}
+                )
+        }
+)
 public class TopicRoom extends BaseTimeEntity {
 
     @Id
