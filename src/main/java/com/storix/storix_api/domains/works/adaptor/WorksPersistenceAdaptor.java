@@ -3,8 +3,8 @@ package com.storix.storix_api.domains.works.adaptor;
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.domains.works.repository.WorksRepository;
+import com.storix.storix_api.global.apiPayload.exception.works.UnknownWorksException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
@@ -20,5 +20,16 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     @Override
     public Slice<Works> searchWorks(String keyword, Pageable pageable) {
         return worksRepository.findBySearchKeyword(keyword, pageable);
+    }
+
+    @Override
+    public Works findById(Long worksId) {
+        return worksRepository.findById(worksId)
+                .orElseThrow(() -> UnknownWorksException.EXCEPTION);
+    }
+
+    @Override
+    public List<Long> findAllIdsByKeyword(String keyword) {
+        return worksRepository.findAllIdsByKeyword(keyword);
     }
 }
