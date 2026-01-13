@@ -2,8 +2,11 @@ package com.storix.storix_api.domains.plus.application.service;
 
 import com.storix.storix_api.domains.image.helper.S3CacheHelper;
 import com.storix.storix_api.domains.plus.adaptor.BoardAdaptor;
+import com.storix.storix_api.domains.plus.adaptor.BoardImageAdaptor;
 import com.storix.storix_api.domains.plus.controller.dto.ArtistBoardUploadRequest;
 import com.storix.storix_api.domains.plus.controller.dto.ReaderBoardUploadRequest;
+import com.storix.storix_api.domains.plus.domain.ArtistBoard;
+import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.dto.CreateArtistBoardCommand;
 import com.storix.storix_api.domains.plus.dto.CreateReaderBoardCommand;
 import com.storix.storix_api.domains.works.adaptor.WorksPersistenceAdaptor;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BoardService {
 
     private final BoardAdaptor boardAdaptor;
+    private final BoardImageAdaptor boardImageAdaptor;
     private final WorksPersistenceAdaptor worksPersistenceAdaptor;
     private final S3CacheHelper s3CacheHelper;
 
@@ -44,7 +48,11 @@ public class BoardService {
                 req.objectKeys()
         );
 
-        boardAdaptor.saveReaderBoard(cmd);
+        ReaderBoard readerBoard = boardAdaptor.saveReaderBoard(cmd);
+
+        if (!req.objectKeys().isEmpty()) {
+            boardImageAdaptor.saveReaderBoardImages(readerBoard, req.objectKeys());
+        }
     }
 
     @Transactional
@@ -77,6 +85,10 @@ public class BoardService {
                 req.objectKeys()
         );
 
-        boardAdaptor.saveArtistBoard(cmd);
+        ArtistBoard artistBoard = boardAdaptor.saveArtistBoard(cmd);
+
+        if (!req.objectKeys().isEmpty()) {
+            boardImageAdaptor.saveArtistBoardImages(artistBoard, req.objectKeys());
+        }
     }
 }

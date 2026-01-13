@@ -22,11 +22,11 @@ public class BoardAdaptor {
      * 독자
      * */
     // 독자 게시글 생성
-    public void saveReaderBoard(CreateReaderBoardCommand cmd) {
+    public ReaderBoard saveReaderBoard(CreateReaderBoardCommand cmd) {
         try {
             ReaderBoard readerBoard = cmd.toEntity();
             readerBoard.replaceImages(cmd.objectKeys());
-            readerBoardRepository.save(readerBoard);
+            return readerBoardRepository.save(readerBoard);
         } catch (DataIntegrityViolationException e) {
             throw DuplicateBoardUploadException.EXCEPTION;
         }
@@ -36,11 +36,11 @@ public class BoardAdaptor {
      * 작가
      * */
     // 작가 게시글 생성
-    public void saveArtistBoard(CreateArtistBoardCommand cmd) {
+    public ArtistBoard saveArtistBoard(CreateArtistBoardCommand cmd) {
         try {
             ArtistBoard artistBoard = cmd.toEntity();
             artistBoard.replaceImages(cmd.objectKeys());
-            artistBoardRepository.save(cmd.toEntity());
+            return artistBoardRepository.save(cmd.toEntity());
         } catch (DataIntegrityViolationException e) {
             throw DuplicateBoardUploadException.EXCEPTION;
         }
