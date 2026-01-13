@@ -195,6 +195,10 @@ public class TopicRoomService implements TopicRoomUseCase {
     @Transactional
     public void reportUser(Long reporterId, Long roomId, TopicRoomReportRequestDto request) {
 
+        if (reporterId.equals(request.getReportedUserId())) {
+            throw SelfReportException.EXCEPTION;
+        }
+
         TopicRoomReport report = TopicRoomReport.builder()
                 .reporterId(reporterId)
                 .reportedUserId(request.getReportedUserId())
