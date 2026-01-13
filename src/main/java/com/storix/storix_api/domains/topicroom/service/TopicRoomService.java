@@ -155,8 +155,10 @@ public class TopicRoomService implements TopicRoomUseCase {
         TopicRoom room = loadTopicRoomPort.findById(roomId);
         Works works = loadWorksPort.findById(room.getWorksId());
 
-        if (!user.getIsAdultVerified() && "18세 이용가".equals(works.getAgeClassification())) throw UnverifiedException.EXCEPTION;
-        if (loadTopicRoomPort.countJoinedRooms(userId) >= 9) throw MaxLimitException.EXCEPTION;
+        if (!user.getIsAdultVerified() && "18세 이용가".equals(works.getAgeClassification()))
+            throw UnverifiedException.EXCEPTION;
+        if (loadTopicRoomPort.countJoinedRooms(userId) >= 9)
+            throw MaxLimitException.EXCEPTION;
 
         try {
             recordTopicRoomPort.saveParticipation(userId, room, TopicRoomRole.MEMBER);
