@@ -165,14 +165,19 @@ public class TopicRoomService implements TopicRoomUseCase {
     @Override
     @Transactional
     public void leaveRoom(Long userId, Long roomId) {
-        if (loadTopicRoomPort.existsByUserIdAndRoomId(userId, roomId)) {
-            recordTopicRoomPort.deleteParticipation(userId, roomId);
-            recordTopicRoomPort.decrementActiveUserNumber(roomId);
 
-            TopicRoom room = loadTopicRoomPort.findById(roomId);
-            if (room.getActiveUserNumber() <= 0) {
-                recordTopicRoomPort.deleteRoom(roomId);
-            }
+        int deleteCount = recordTopicRoomPort.deleteParticipation(userId, roomId);
+
+        // 삭제된 행이 0개면 이미 나갔거나 참여 정보가 없는 상태
+        if (deleteCount == 0) { return; }
+
+        recordTopicRoomPort.decrementActiveUserNumber(roomId);
+
+        TopicRoom room = loadTopicRoomPort.findById(roomId);
+
+        // 인원수가 0 이하면 방 삭제 로직 실행
+        if(room.getActiveUserNumber() <= 0) {
+            recordTopicRoomPort.deleteRoom(roomId);
         }
     }
 
