@@ -3,7 +3,6 @@ package com.storix.storix_api.domains.plus.adaptor;
 import com.storix.storix_api.domains.plus.domain.Review;
 import com.storix.storix_api.domains.plus.dto.CreateReviewCommand;
 import com.storix.storix_api.domains.plus.repository.ReviewRepository;
-import com.storix.storix_api.global.apiPayload.exception.plus.DuplicateBoardUploadException;
 import com.storix.storix_api.global.apiPayload.exception.plus.DuplicateReviewUploadException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -19,7 +18,7 @@ public class ReviewAdaptor {
         try {
             return reviewRepository.save(cmd.toEntity());
         } catch (DataIntegrityViolationException e) {
-            throw DuplicateBoardUploadException.EXCEPTION;
+            throw DuplicateReviewUploadException.EXCEPTION;
         }
     }
 
