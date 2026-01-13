@@ -3,7 +3,6 @@ package com.storix.storix_api.domains.image.helper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -77,16 +76,18 @@ public class S3CacheHelper {
         return isValidAll(keyFor(userId, FAN_CONTENT_KEY_PREFIX), objectKeys);
     }
 
-    private static final String CONTAINS_ALL_SCRIPT =
-            "for i = 1, #ARGV do " +
-                    "  if redis.call('SISMEMBER', KEYS[1], ARGV[i]) == 0 then " +
-                    "    return 0 " +
-                    "  end " +
-                    "end " +
-                    "return 1";
-
-    private static final RedisScript<Long> CONTAINS_ALL_REDIS_SCRIPT =
-            new DefaultRedisScript<>(CONTAINS_ALL_SCRIPT, Long.class);
+    private static final DefaultRedisScript<Long> CONTAINS_ALL_REDIS_SCRIPT =
+            new DefaultRedisScript<>(
+                    """
+                    for i = 1, #ARGV do
+                      if redis.call('SISMEMBER', KEYS[1], ARGV[i]) == 0 then
+                        return 0
+                      end
+                    end
+                    return 1
+                    """,
+                    Long.class
+            );
 
     private boolean isValidAll(String redisKey, List<String> objectKeys) {
         if (objectKeys == null || objectKeys.isEmpty()) return false;
