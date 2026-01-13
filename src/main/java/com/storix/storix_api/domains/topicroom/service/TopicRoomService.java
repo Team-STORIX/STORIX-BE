@@ -164,7 +164,7 @@ public class TopicRoomService implements TopicRoomUseCase {
             recordTopicRoomPort.saveParticipation(userId, room, TopicRoomRole.MEMBER);
             recordTopicRoomPort.incrementActiveUserNumber(roomId);
         } catch (DataIntegrityViolationException e) {
-
+            throw AlreadyJoinedException.EXCEPTION;
         }
     }
 
