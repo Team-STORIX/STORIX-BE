@@ -19,6 +19,7 @@ import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.global.apiPayload.exception.topicRoom.*;
 import com.storix.storix_api.global.utils.ProfanityFilterService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -32,6 +33,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class TopicRoomService implements TopicRoomUseCase {
 
     private final LoadTopicRoomPort loadTopicRoomPort;
@@ -174,9 +176,12 @@ public class TopicRoomService implements TopicRoomUseCase {
 
         TopicRoom room = loadTopicRoomPort.findById(roomId);
 
-        // 인원수가 0 이하면 방 삭제 로직 실행
-        if(room.getActiveUserNumber() <= 0) {
-            recordTopicRoomPort.deleteRoom(roomId);
+            // 인원수가 0 이하면 방 삭제 로직 실행
+            if (room.getActiveUserNumber() <= 0) {
+                recordTopicRoomPort.deleteRoom(roomId);
+            }
+        } catch (UnknownTopicRoomException e) {
+            log.info("[leaveRoom] 다른 스레드에 의해 이미 지워진 토픽룸 {}번", roomId);
         }
     }
 
