@@ -2,6 +2,19 @@ package com.storix.storix_api.domains.library.repository;
 
 import com.storix.storix_api.domains.library.domain.Library;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface LibraryRepository extends JpaRepository<Library, Long> {
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Library l SET l.reviewCount = l.reviewCount + 1 WHERE l.id = :id")
+    void incrementReviewCount(@Param("id") Long id);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Library l SET l.reviewCount = l.reviewCount - 1 " +
+            "WHERE l.id = :id AND l.reviewCount > 0")
+    int decrementReviewCount(@Param("id") Long id);
+
 }
