@@ -26,4 +26,6 @@ public interface LoadTopicRoomPort {
     boolean existsByUserIdAndRoomId(Long userId, Long roomId);
 
     LocalDateTime getLastMessageTime(Long roomId);
+
+    boolean existsByWorksId(Long worksId);
 }
