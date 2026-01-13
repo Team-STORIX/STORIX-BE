@@ -3,6 +3,7 @@ package com.storix.storix_api.domains.topicroom.repository;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomUser;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,7 +18,9 @@ public interface TopicRoomUserRepository extends JpaRepository<TopicRoomUser, Lo
 
     boolean existsByUserIdAndTopicRoomId(Long userId, Long topicRoomId);
 
-    void deleteByUserIdAndTopicRoomId(Long userId, Long topicRoomId);
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM TopicRoomUser tru WHERE tru.userId = :userId AND tru.topicRoom.id = :roomId")
+    int deleteByUserIdAndTopicRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
     // 특정 유저가 참여 중인 모든 방 ID 조회
     @Query("SELECT tru.topicRoom.id FROM TopicRoomUser tru WHERE tru.userId = :userId")
