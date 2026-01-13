@@ -32,7 +32,16 @@ public enum SuccessCode {
     PROFILE_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_001", "유저 정보 조회에 성공했습니다."),
     PROFILE_NICKNAME_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_002", "변경 가능한 닉네임입니다."),
     PROFILE_UPDATE_NICKNAME_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_003", "닉네임 변경에 성공했습니다."),
-    PROFILE_UPDATE_DESCRIPTION_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_004", "한 줄 소개 변경에 성공했습니다.");
+    PROFILE_UPDATE_DESCRIPTION_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_004", "한 줄 소개 변경에 성공했습니다."),
+    PROFILE_UPDATE_IMAGE_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_005", "프로필 이미지 변경에 성공했습니다."),
+
+    // Image success
+    IMAGE_ISSUE_PRESIGNED_URL_SUCCESS(HttpStatus.OK, "IMAGE_SUCCESS_001", "이미지를 업로드할 Presigned Url 발급에 성공했습니다."),
+
+    // Plus success
+    PLUS_BOARD_UPLOAD_SUCCESS(HttpStatus.CREATED, "PLUS_SUCCESS_001", "게시물 등록에 성공했습니다."),
+    PLUS_REVIEW_UPLOAD_SUCCESS(HttpStatus.CREATED,"PLUS_SUCCESS_022", "리뷰 등록에 성공했습니다.");
+  
 
     private final HttpStatus httpStatus;
     private final String code;

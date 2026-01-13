@@ -16,6 +16,8 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_ERROR_005", "서버 내부 오류가 발생했습니다"),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_ERROR_006", "요청값이 올바르지 않습니다."),
     DATA_INTEGRITY_VIOLATION_REQUEST(HttpStatus.CONFLICT, "COMMON_ERROR_007", "DB 데이터 무결성 조건 위반입니다. 백엔드에게 연락주세요."),
+    INVALID_JSON_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_ERROR_008", "요청 JSON 형식이 잘못되었습니다. 백엔드에게 문의주세요."),
+    UNHANDLED_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR_009", "핸들링하지 않은 에러입니다. 백엔드에게 연락주세요."),
 
     // Token error
     TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "TOKEN_ERROR_001", "인가가 필요한 경로로 토큰이 전달되지 않았습니다"),
@@ -37,6 +39,13 @@ public enum ErrorCode {
     PROFILE_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_004", "금칙어가 포함된 닉네임입니다."),
     LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, "USER_ERROR_001", "로그인이 필요합니다."),
 
+    INVALID_ROLE_ERROR(HttpStatus.UNAUTHORIZED, "ROLE_ERROR_001", "잘못된 role값 입니다."),
+
+    // Profile error
+    PROFILE_IMAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "PROFILE_ERROR_001", "업로드한 프로필 사진의 objectKey값을 보내주세요."),
+
+    // Image error
+    IMAGE_INVALID_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "IMAGE_ERROR_001", "지원하지 않는 Content Type입니다."),
 
     // Other Server error
     OTHER_SERVER_BAD_REQUEST(HttpStatus.BAD_REQUEST, "FEIGN_ERROR_1", "Other server bad request"),
@@ -82,7 +91,6 @@ public enum ErrorCode {
 
     // Works error
     WORKS_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKS_ERROR_001", "해당 작품을 찾을 수 없습니다.");
-
 
     private final HttpStatus httpStatus;
     private final String code;

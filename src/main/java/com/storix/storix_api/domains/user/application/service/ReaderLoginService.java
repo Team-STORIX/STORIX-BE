@@ -22,7 +22,7 @@ public class ReaderLoginService {
 
         User user = userAdaptor.findReaderUserByOAuthInfo(oauthInfo);
         user.login();
-        return new AuthUserDetails(user.getId(), String.valueOf(user.getRole()));
+        return new AuthUserDetails(user.getId(), user.getRole());
     }
 
     // 회원가입하지 않은 경우

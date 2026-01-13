@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -143,6 +144,32 @@ public class GlobalExceptionHandler {
 
         ErrorCode errorCode = ErrorCode.DATA_INTEGRITY_VIOLATION_REQUEST;
         ErrorResponse response = new ErrorResponse(errorCode, java.util.List.of(fer));
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(HttpMessageConversionException.class)
+    public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageConversionException e) {
+
+        log.warn("Format exception", e);
+
+        ErrorCode errorCode = ErrorCode.INVALID_JSON_REQUEST;
+        ErrorResponse response = new ErrorResponse(errorCode);
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAll(Exception e) {
+
+        log.error("Unhandled exception", e);
+
+        ErrorCode errorCode = ErrorCode.UNHANDLED_ERROR;
+        ErrorResponse response = new ErrorResponse(errorCode);
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())

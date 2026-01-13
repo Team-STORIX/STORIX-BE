@@ -74,7 +74,7 @@ public class UserAdaptor {
     public AuthUserDetails saveReaderUser(CreateReaderUserCommand cmd) {
         try {
             User user = userRepository.save(cmd.toEntity());
-            return new AuthUserDetails(user.getId(), user.getRole().toString());
+            return new AuthUserDetails(user.getId(), user.getRole());
         } catch (DataIntegrityViolationException e) {
             throw DuplicateUserException.EXCEPTION;
         }

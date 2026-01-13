@@ -13,6 +13,9 @@ public record UserInfo(
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Integer level,
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    Integer point,
+
     String profileDescription
 ) {
 }
