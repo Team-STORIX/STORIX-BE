@@ -133,6 +133,11 @@ public class TopicRoomService implements TopicRoomUseCase {
         User user = loadUserPort.findById(userId);
         Works works = loadWorksPort.findById(request.getWorksId());
 
+        // 이미 해당 작품의 토픽룸이 존재하는지 확인
+        if (loadTopicRoomPort.existsByWorksId(works.getId())) {
+            throw TopicRoomAlreadyExistsException.EXCEPTION;
+        }
+
         if (!user.getIsAdultVerified() && "18세 이용가".equals(works.getAgeClassification()))
             throw UnverifiedException.EXCEPTION;
 
@@ -141,11 +146,17 @@ public class TopicRoomService implements TopicRoomUseCase {
                 .worksId(works.getId())
                 .build();
 
-        TopicRoom savedRoom = recordTopicRoomPort.saveRoom(room);
-        recordTopicRoomPort.saveParticipation(user.getId(), savedRoom, TopicRoomRole.HOST);
-        recordTopicRoomPort.incrementActiveUserNumber(savedRoom.getId());
+        try {
+            TopicRoom savedRoom = recordTopicRoomPort.saveRoom(room);
+            recordTopicRoomPort.saveParticipation(user.getId(), savedRoom, TopicRoomRole.HOST);
+            recordTopicRoomPort.incrementActiveUserNumber(savedRoom.getId());
 
-        return savedRoom.getId();
+            return savedRoom.getId();
+        } catch (DataIntegrityViolationException e) {
+
+            // uk constraints 위반 시 에러 던지도록
+            throw TopicRoomAlreadyExistsException.EXCEPTION;
+        }
     }
 
     @Override
