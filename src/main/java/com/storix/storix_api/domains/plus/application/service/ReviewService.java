@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.plus.application.service;
 
+import com.storix.storix_api.domains.library.LibraryAdaptor;
 import com.storix.storix_api.domains.plus.adaptor.ReviewAdaptor;
 import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewRedirectResponse;
 import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewUploadRequest;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
     private final ReviewAdaptor reviewAdaptor;
+    private final LibraryAdaptor libraryAdaptor;
 
     @Transactional
     public ReaderReviewRedirectResponse createReview(Long userId, ReaderReviewUploadRequest req) {
@@ -29,6 +31,8 @@ public class ReviewService {
         );
 
         Review review = reviewAdaptor.saveReview(cmd);
+        libraryAdaptor.incrementReviewCount(userId);
+
         return new ReaderReviewRedirectResponse(review.getWorksId(), review.getLibraryUserId(), review.getId());
     }
 
