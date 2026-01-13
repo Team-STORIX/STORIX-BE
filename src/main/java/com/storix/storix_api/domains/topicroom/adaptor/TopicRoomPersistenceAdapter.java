@@ -103,4 +103,9 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
 
     // 0명 시 방 삭제
     @Override public void deleteRoom(Long roomId) { topicRoomRepository.deleteById(roomId); }
+
+    @Override
+    public boolean existsByWorksId(Long worksId) {
+        return topicRoomRepository.existsByWorksId(worksId);
+    }
 }

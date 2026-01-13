@@ -58,4 +58,6 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE TopicRoom t SET t.lastChatTime = :now WHERE t.id = :id")
     void updateLastChatTime(@Param("id") Long id, @Param("now") LocalDateTime now);
+
+    boolean existsByWorksId(Long worksId);
 }
