@@ -73,8 +73,8 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
         topicRoomUserRepository.save(new TopicRoomUser(room, userId, role));
     }
 
-    @Override public void deleteParticipation(Long userId, Long roomId) {
-        topicRoomUserRepository.deleteByUserIdAndTopicRoomId(userId, roomId);
+    @Override public int deleteParticipation(Long userId, Long roomId) {
+        return topicRoomUserRepository.deleteByUserIdAndTopicRoomId(userId, roomId);
     }
 
     @Override public void saveReport(TopicRoomReport report) {
