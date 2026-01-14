@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface WorksRepository extends JpaRepository<Works, Long> {
 
@@ -31,4 +32,8 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "OR w.originalAuthor LIKE %:keyword%")
     List<Long> findAllIdsByKeyword(@Param("keyword") String keyword);
 
+    @Query("SELECT w FROM Works w " +
+            "LEFT JOIN FETCH w.hashtags " +
+            "WHERE w.id = :worksId")
+    Optional<Works> findByIdWithHashtags(@Param("worksId") Long worksId);
 }
