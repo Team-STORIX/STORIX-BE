@@ -17,4 +17,13 @@ public interface LibraryRepository extends JpaRepository<Library, Long> {
             "WHERE l.id = :id AND l.reviewCount > 0")
     int decrementReviewCount(@Param("id") Long id);
 
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Library l SET l.boardCount = l.boardCount + 1 WHERE l.id = :id")
+    void incrementBoardCount(@Param("id") Long id);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Library l SET l.boardCount = l.boardCount - 1 " +
+            "WHERE l.id = :id AND l.boardCount > 0")
+    int decrementBoardCount(@Param("id") Long id);
+
 }
