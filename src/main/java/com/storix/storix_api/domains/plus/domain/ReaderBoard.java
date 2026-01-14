@@ -6,9 +6,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "reader_board")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
