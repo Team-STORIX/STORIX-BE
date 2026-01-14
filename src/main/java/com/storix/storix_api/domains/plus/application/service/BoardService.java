@@ -10,9 +10,11 @@ import com.storix.storix_api.domains.plus.domain.ArtistBoard;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.dto.CreateArtistBoardCommand;
 import com.storix.storix_api.domains.plus.dto.CreateReaderBoardCommand;
-import com.storix.storix_api.domains.works.adaptor.WorksPersistenceAdaptor;
+import com.storix.storix_api.domains.user.application.port.LoadUserPort;
+import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.global.apiPayload.exception.plus.PlusImageNotExistException;
 import com.storix.storix_api.global.apiPayload.exception.plus.WorksIdNotExistException;
+import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnverifiedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,10 @@ public class BoardService {
     private final BoardAdaptor boardAdaptor;
     private final BoardImageAdaptor boardImageAdaptor;
     private final LibraryAdaptor libraryAdaptor;
-    private final WorksPersistenceAdaptor worksPersistenceAdaptor;
+
+    private final LoadWorksPort loadWorksPort;
+    private final LoadUserPort loadUserPort;
+
     private final S3CacheHelper s3CacheHelper;
 
     @Transactional
@@ -36,9 +41,17 @@ public class BoardService {
             if (req.worksId() == null) {
                 throw WorksIdNotExistException.EXCEPTION;
             }
-            worksPersistenceAdaptor.checkWorksExistById(req.worksId());
+            loadWorksPort.checkWorksExistById(req.worksId());
 
             worksId = req.worksId();
+            if (loadWorksPort.isWorksForAdult(worksId)) {
+
+                Boolean isAdult = loadUserPort.findIsAdultVerifiedById(userId);
+
+                if (!Boolean.TRUE.equals(isAdult)) {
+                    throw UnverifiedException.EXCEPTION;
+                }
+            }
         }
 
         if (!req.objectKeys().isEmpty()) {
@@ -74,7 +87,7 @@ public class BoardService {
             if (req.worksId() == null) {
                 throw WorksIdNotExistException.EXCEPTION;
             }
-            worksPersistenceAdaptor.checkWorksExistById(req.worksId());
+            loadWorksPort.checkWorksExistById(req.worksId());
 
             worksId = req.worksId();
         }
