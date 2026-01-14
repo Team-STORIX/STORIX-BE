@@ -40,8 +40,4 @@ public class ReaderBoardImage {
         return new ReaderBoardImage(readerBoard, objectKey, sortOrder);
     }
 
-    public void changeOrder(int sortOrder) {
-        this.sortOrder = sortOrder;
-    }
-
 }

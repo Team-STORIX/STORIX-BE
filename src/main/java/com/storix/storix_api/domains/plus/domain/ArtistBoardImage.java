@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "artist_board_image")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArtistBoardImage {
+public class ArtistBoardImage extends BoardImage {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "artist_board_image_id")
@@ -17,13 +17,6 @@ public class ArtistBoardImage {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artist_board_id", nullable = false)
     private ArtistBoard artistBoard;
-
-    @Column(name = "image_object_key", nullable = false)
-    private String imageObjectKey;
-
-    @Column(name = "sort_order", nullable = false)
-    private int sortOrder;
-
 
     /** 생성자 로직 **/
     @Builder
@@ -35,10 +28,6 @@ public class ArtistBoardImage {
 
     public static ArtistBoardImage of(ArtistBoard artistBoard, String objectKey, int sortOrder) {
         return new ArtistBoardImage(artistBoard, objectKey, sortOrder);
-    }
-
-    public void changeOrder(int sortOrder) {
-        this.sortOrder = sortOrder;
     }
 
 }
