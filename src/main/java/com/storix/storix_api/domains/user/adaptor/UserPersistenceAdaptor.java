@@ -1,7 +1,5 @@
 package com.storix.storix_api.domains.user.adaptor;
 
-import ch.qos.logback.core.status.ErrorStatus;
-import com.nimbusds.oauth2.sdk.GeneralException;
 import com.storix.storix_api.domains.user.application.port.LoadUserPort;
 import com.storix.storix_api.domains.user.domain.Role;
 import com.storix.storix_api.domains.user.domain.User;
