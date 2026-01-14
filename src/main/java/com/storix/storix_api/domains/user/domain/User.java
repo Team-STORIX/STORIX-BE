@@ -117,7 +117,6 @@ public class User extends BaseTimeEntity {
         this.nickName = nickName;
         this.gender = gender;
         this.favoriteGenreList = favoriteGenreList;
-        initLibrary();
     }
 
     @Builder(builderMethodName = "artistBuilder")
@@ -127,11 +126,6 @@ public class User extends BaseTimeEntity {
         this.password = password;
         this.role = Role.ARTIST;
         this.marketingAgree = true;
-    }
-
-    private void initLibrary() {
-        if (this.role == Role.ARTIST) return;
-        new Library(this.id);
     }
 
     /** 비즈니스 로직 **/
