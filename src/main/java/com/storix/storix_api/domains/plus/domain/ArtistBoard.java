@@ -40,10 +40,6 @@ public class ArtistBoard extends BaseTimeEntity {
     @Column(length = 300, nullable = false)
     private String content;
 
-    @OneToMany(mappedBy = "artistBoard", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("sortOrder ASC")
-    private List<ArtistBoardImage> images = new ArrayList<>();
-
     // 게시글 반응
     @Column(name = "like_count", nullable = false)
     private int likeCount = 0;
