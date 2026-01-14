@@ -1,6 +1,5 @@
 package com.storix.storix_api.domains.user.domain;
 
-import com.storix.storix_api.domains.library.domain.Library;
 import com.storix.storix_api.domains.works.domain.Genre;
 import com.storix.storix_api.global.apiPayload.exception.user.AlreadyWithDrawUserException;
 import com.storix.storix_api.global.model.BaseTimeEntity;
