@@ -25,7 +25,6 @@ public class BoardAdaptor {
     public ReaderBoard saveReaderBoard(CreateReaderBoardCommand cmd) {
         try {
             ReaderBoard readerBoard = cmd.toEntity();
-            readerBoard.replaceImages(cmd.objectKeys());
             return readerBoardRepository.save(readerBoard);
         } catch (DataIntegrityViolationException e) {
             throw DuplicateBoardUploadException.EXCEPTION;
@@ -39,7 +38,6 @@ public class BoardAdaptor {
     public ArtistBoard saveArtistBoard(CreateArtistBoardCommand cmd) {
         try {
             ArtistBoard artistBoard = cmd.toEntity();
-            artistBoard.replaceImages(cmd.objectKeys());
             return artistBoardRepository.save(cmd.toEntity());
         } catch (DataIntegrityViolationException e) {
             throw DuplicateBoardUploadException.EXCEPTION;

@@ -67,15 +67,4 @@ public class ReaderBoard extends BaseTimeEntity {
         this.replyCount ++;
     }
 
-    public void replaceImages(List<String> objectKeys) {
-        this.images.clear();
-        for (int i = 0; i < objectKeys.size(); i++) {
-            this.images.add(ReaderBoardImage.of(this, objectKeys.get(i), i));
-        }
-    }
-
-    public void addImage(String objectKey, int sortOrder) {
-        this.images.add(ReaderBoardImage.of(this, objectKey, sortOrder));
-    }
-
 }
