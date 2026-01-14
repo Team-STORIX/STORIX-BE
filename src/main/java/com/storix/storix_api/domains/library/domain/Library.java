@@ -18,6 +18,9 @@ public class Library {
     @Column(name = "review_count", nullable = false)
     private int reviewCount = 0;
 
+    @Column(name = "board_count", nullable = false)
+    private int boardCount = 0;
+
 
     /** 생성자 로직 **/
     @Builder
