@@ -10,6 +10,10 @@ public interface LoadWorksPort {
 
     Slice<Works> searchWorks(String keyword, Pageable pageable);
 
+    void checkWorksExistById(Long worksId);
+
+    boolean isWorksForAdult(Long worksId);
+  
     Works findById(Long worksId);
 
     // 키워드로 작품 ID 리스트만 조회 (검색용)

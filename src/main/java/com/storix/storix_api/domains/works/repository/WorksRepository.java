@@ -36,4 +36,10 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "LEFT JOIN FETCH w.hashtags " +
             "WHERE w.id = :worksId")
     Optional<Works> findByIdWithHashtags(@Param("worksId") Long worksId);
+
+    @Query("SELECT (w.ageClassification = com.storix.storix_api.domains.works.domain.AgeClassification.AGE_18) " +
+            "FROM Works w " +
+            "WHERE w.id = :worksId")
+    boolean isWorksForAdult(@Param("worksId") Long worksId);
+
 }

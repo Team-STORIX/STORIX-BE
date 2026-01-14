@@ -43,7 +43,8 @@ public class ProfileService {
                 .role(artistUser.getRole().toString())
                 .nickName(artistUser.getNickName())
                 .profileDescription(artistUser.getProfileDescription())
-                .profileImageUrl(artistUser.getProfileImageUrl())
+                .profileImageUrl(artistUser.getProfileImageUrl() == null
+                        ? null : baseUrl + "/" + artistUser.getProfileImageUrl())
                 .build();
     }
 

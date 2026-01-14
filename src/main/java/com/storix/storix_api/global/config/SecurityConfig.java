@@ -46,17 +46,25 @@ public class SecurityConfig {
                         (requests) -> requests
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+          
                                 // [Auth]
                                 .requestMatchers("/api/v1/auth/oauth/**").permitAll()
                                 .requestMatchers("/api/v1/auth/nickname/valid").permitAll()
                                 .requestMatchers("/api/v1/auth/users/artist/login").permitAll()
                                 .requestMatchers("/api/v1/auth/tokens/refresh").permitAll()
                                 .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
+          
                                 // [Search]
                                 .requestMatchers("/api/v1/search/**").permitAll()
+          
                                 // [Profile]
                                 .requestMatchers("/api/v1/profile/nickname/**").hasRole("READER")
                                 .requestMatchers("/api/v1/profile/**").hasAnyRole("READER","ARTIST")
+
+                                // [Plus]
+                                .requestMatchers("/ap1/v1/plus/reader-board").hasRole("READER")
+                                .requestMatchers("/api/v1/plus/reader-review").hasRole("READER")
+                                .requestMatchers("/api/v1/plus/artist-board").hasRole("ARTIST")
 
                                 // [Image]
                                 .requestMatchers("/api/v1/image/fan-board").hasRole("ARTIST")
@@ -65,6 +73,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/topic-rooms/today").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/search").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
+
+                                // [Works]
+                                .requestMatchers("/api/v1/works/**").permitAll()
 
                                 .anyRequest().authenticated()
                 )
