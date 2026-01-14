@@ -16,4 +16,6 @@ public interface LoadWorksPort {
 
     // 키워드로 작품 ID 리스트만 조회 (검색용)
     List<Long> findAllIdsByKeyword(String keyword);
+
+    Works findByIdWithHashtags(Long worksId);
 }
