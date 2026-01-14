@@ -1,6 +1,7 @@
 package com.storix.storix_api.domains.plus.application.service;
 
 import com.storix.storix_api.domains.image.helper.S3CacheHelper;
+import com.storix.storix_api.domains.library.adaptor.LibraryAdaptor;
 import com.storix.storix_api.domains.plus.adaptor.BoardAdaptor;
 import com.storix.storix_api.domains.plus.adaptor.BoardImageAdaptor;
 import com.storix.storix_api.domains.plus.controller.dto.ArtistBoardUploadRequest;
@@ -22,6 +23,7 @@ public class BoardService {
 
     private final BoardAdaptor boardAdaptor;
     private final BoardImageAdaptor boardImageAdaptor;
+    private final LibraryAdaptor libraryAdaptor;
     private final WorksPersistenceAdaptor worksPersistenceAdaptor;
     private final S3CacheHelper s3CacheHelper;
 
@@ -55,6 +57,8 @@ public class BoardService {
         if (!req.objectKeys().isEmpty()) {
             boardImageAdaptor.saveReaderBoardImages(readerBoard, req.objectKeys());
         }
+
+        libraryAdaptor.incrementBoardCount(userId);
     }
 
     @Transactional
