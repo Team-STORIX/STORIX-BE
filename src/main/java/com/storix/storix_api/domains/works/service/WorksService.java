@@ -34,13 +34,12 @@ public class WorksService implements WorksUseCase {
             }
 
             // 로그인 유저지만 성인 인증 되지 않은 경우
-            User user = loadUserPort.findById(userId);
+            Boolean isAdult = loadUserPort.findIsAdultVerifiedById(userId);
 
-            if (!Boolean.TRUE.equals(user.getIsAdultVerified())) {
+            if (!Boolean.TRUE.equals(isAdult)) {
                 throw UnverifiedException.EXCEPTION;
             }
         }
-
         return WorksDetailResponseDto.from(works);
     }
 
