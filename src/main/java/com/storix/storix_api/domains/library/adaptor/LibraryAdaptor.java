@@ -19,6 +19,14 @@ public class LibraryAdaptor {
         return libraryRepository.decrementReviewCount(libraryUserId);
     }
 
+    public void incrementBoardCount(Long libraryUserId) {
+        libraryRepository.incrementBoardCount(libraryUserId);
+    }
+
+    public int decrementBoardCount(Long libraryUserId) {
+        return libraryRepository.decrementBoardCount(libraryUserId);
+    }
+
     public void initLibrary(Long userId) {
         libraryRepository.save(new Library(userId));
     }
