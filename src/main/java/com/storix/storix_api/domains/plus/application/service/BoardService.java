@@ -35,8 +35,10 @@ public class BoardService {
             worksPersistenceAdaptor.checkWorksExistById(req.worksId());
         }
 
-        if (!s3CacheHelper.isValidBoardKeys(userId, req.objectKeys())) {
-            throw PlusImageNotExistException.EXCEPTION;
+        if (!req.objectKeys().isEmpty()) {
+            if (!s3CacheHelper.isValidBoardKeys(userId, req.objectKeys())) {
+                throw PlusImageNotExistException.EXCEPTION;
+            }
         }
 
         CreateReaderBoardCommand cmd = new CreateReaderBoardCommand(
@@ -65,13 +67,15 @@ public class BoardService {
             worksPersistenceAdaptor.checkWorksExistById(req.worksId());
         }
 
-        if (req.isContentForFan()) {
-            if (!s3CacheHelper.isValidFanContentKeys(userId, req.objectKeys())) {
-                throw PlusImageNotExistException.EXCEPTION;
-            }
-        } else {
-            if (!s3CacheHelper.isValidBoardKeys(userId, req.objectKeys())) {
-                throw PlusImageNotExistException.EXCEPTION;
+        if (!req.objectKeys().isEmpty()) {
+            if (req.isContentForFan()) {
+                if (!s3CacheHelper.isValidFanContentKeys(userId, req.objectKeys())) {
+                    throw PlusImageNotExistException.EXCEPTION;
+                }
+            } else {
+                if (!s3CacheHelper.isValidBoardKeys(userId, req.objectKeys())) {
+                    throw PlusImageNotExistException.EXCEPTION;
+                }
             }
         }
 
