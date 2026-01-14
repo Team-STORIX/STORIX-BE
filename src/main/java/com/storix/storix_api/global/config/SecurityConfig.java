@@ -74,6 +74,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/topic-rooms/search").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
 
+                                // [Works]
+                                .requestMatchers("/api/v1/works/**").permitAll()
+
                                 .anyRequest().authenticated()
                 )
 
