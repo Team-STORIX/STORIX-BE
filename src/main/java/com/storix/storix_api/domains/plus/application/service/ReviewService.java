@@ -6,6 +6,9 @@ import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewRedirectRes
 import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewUploadRequest;
 import com.storix.storix_api.domains.plus.domain.Review;
 import com.storix.storix_api.domains.plus.dto.CreateReviewCommand;
+import com.storix.storix_api.domains.user.application.port.LoadUserPort;
+import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
+import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnverifiedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +20,22 @@ public class ReviewService {
     private final ReviewAdaptor reviewAdaptor;
     private final LibraryAdaptor libraryAdaptor;
 
+    private final LoadWorksPort loadWorksPort;
+    private final LoadUserPort loadUserPort;
+
     @Transactional
     public ReaderReviewRedirectResponse createReview(Long userId, ReaderReviewUploadRequest req) {
 
         reviewAdaptor.existsByUserAndWorks(userId, req.worksId());
+
+        if (loadWorksPort.isWorksForAdult(req.worksId())) {
+
+            Boolean isAdult = loadUserPort.findIsAdultVerifiedById(userId);
+
+            if (!Boolean.TRUE.equals(isAdult)) {
+                throw UnverifiedException.EXCEPTION;
+            }
+        }
 
         CreateReviewCommand cmd = new CreateReviewCommand(
                 userId,
