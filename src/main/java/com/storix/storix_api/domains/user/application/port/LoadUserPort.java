@@ -9,4 +9,6 @@ public interface LoadUserPort {
     Slice<User> searchArtists(String keyword, Pageable pageable);
 
     User findById(Long userId);
+
+    Boolean findIsAdultVerifiedById(Long userId);
 }

@@ -34,4 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     );
 
     Slice<User> findByRoleAndNickNameContaining(Role role, String nickName, Pageable pageable);
+
+    @Query("SELECT u.isAdultVerified FROM User u WHERE u.id = :userId")
+    Boolean findIsAdultVerifiedById(@Param("userId") Long userId);
 }

@@ -32,4 +32,10 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     public List<Long> findAllIdsByKeyword(String keyword) {
         return worksRepository.findAllIdsByKeyword(keyword);
     }
+
+    @Override
+    public Works findByIdWithHashtags(Long worksId) {
+        return worksRepository.findByIdWithHashtags(worksId)
+                .orElseThrow(() -> UnknownWorksException.EXCEPTION);
+    }
 }
