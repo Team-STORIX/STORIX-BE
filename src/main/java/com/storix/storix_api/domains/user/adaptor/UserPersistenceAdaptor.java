@@ -30,4 +30,10 @@ public class UserPersistenceAdaptor implements LoadUserPort {
         return userRepository.findById(userId)
                 .orElseThrow(() -> UnknownUserException.EXCEPTION);
     }
+
+    @Override
+    public Boolean findIsAdultVerifiedById(Long userId) {
+        Boolean result = userRepository.findIsAdultVerifiedById(userId);
+        return result != null ? result : false;
+    }
 }
