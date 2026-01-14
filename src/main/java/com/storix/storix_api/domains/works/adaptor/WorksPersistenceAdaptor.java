@@ -32,6 +32,11 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     }
 
     @Override
+    public boolean isWorksForAdult(Long worksId) {
+        return worksRepository.isWorksForAdult(worksId);
+    }
+
+    @Override
     public Works findById(Long worksId) {
         return worksRepository.findById(worksId)
                 .orElseThrow(() -> UnknownWorksException.EXCEPTION);

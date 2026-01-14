@@ -11,6 +11,8 @@ public interface LoadWorksPort {
     Slice<Works> searchWorks(String keyword, Pageable pageable);
 
     void checkWorksExistById(Long worksId);
+
+    boolean isWorksForAdult(Long worksId);
   
     Works findById(Long worksId);
 
