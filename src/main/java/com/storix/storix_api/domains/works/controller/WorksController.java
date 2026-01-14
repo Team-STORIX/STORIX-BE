@@ -6,7 +6,6 @@ import com.storix.storix_api.domains.works.dto.WorksDetailResponseDto;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +25,6 @@ public class WorksController {
     @Operation(summary = "작품 상세 조회", description = "작품 id로 상세 정보를 조회합니다. 18세 이용가 작품은 로그인 및 성인 인증이 필요합니다.")
     @GetMapping("/{worksId}")
     public CustomResponse<WorksDetailResponseDto> getWorksDetail(
-            @Parameter(hidden = true)
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @PathVariable Long worksId
     ) {
