@@ -90,7 +90,17 @@ public enum ErrorCode {
     TOPIC_ROOM_ALREADY_EXISTS(HttpStatus.CONFLICT, "TOPIC_ROOM_ERROR_007", "이미 해당 작품에 대한 토픽룸이 존재합니다."),
 
     // Works error
-    WORKS_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKS_ERROR_001", "해당 작품을 찾을 수 없습니다.");
+    WORKS_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKS_ERROR_001", "해당 작품을 찾을 수 없습니다."),
+  
+    // Plus error
+    PLUS_INVALID_RATING(HttpStatus.BAD_REQUEST, "PLUS_ERROR_001", "Enum 필드와 매핑할 수 없는 잘못된 평점값입니다."),
+    PLUS_INVALID_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "PLUS_ERROR_002", "지원하지 않는 Content Type입니다."),
+    PLUS_DUPLICATE_BOARD_UPLOAD(HttpStatus.BAD_REQUEST, "PLUS_ERROR_003", "중복 게시글 업로드 요청입니다."),
+    PLUS_DUPLICATE_REVIEW_UPLOAD(HttpStatus.BAD_REQUEST, "PLUS_ERROR_004", "해당 작품에 대한 리뷰가 이미 존재합니다."),
+    PLUS_WORKS_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_005", "존재하지 않는 작품입니다."),
+    PLUS_WORKS_ID_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_006", "작품 id값을 보내주세요."),
+    PLUS_IMAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_007", "게시물 이미지 objectKey 값이 잘못되었습니다.");
+  
 
     private final HttpStatus httpStatus;
     private final String code;

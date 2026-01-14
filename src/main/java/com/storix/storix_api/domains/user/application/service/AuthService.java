@@ -1,6 +1,7 @@
 package com.storix.storix_api.domains.user.application.service;
 
 import com.storix.storix_api.domains.favorite.adaptor.FavoriteWorksAdaptor;
+import com.storix.storix_api.domains.library.adaptor.LibraryAdaptor;
 import com.storix.storix_api.domains.user.controller.dto.ArtistSignupRequest;
 import com.storix.storix_api.domains.user.controller.dto.OAuthAuthorizationRequest;
 import com.storix.storix_api.domains.user.controller.dto.ReaderSignupRequest;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserAdaptor userAdaptor;
+    private final LibraryAdaptor libraryAdaptor;
     private final TokenAdaptor tokenAdaptor;
     private final FavoriteWorksAdaptor favoriteWorksAdaptor;
     private final OAuthHelper oauthHelper;
@@ -92,6 +94,7 @@ public class AuthService {
         tokenAdaptor.deleteOnboardingTokenByJti(jti);
 
         favoriteWorksAdaptor.saveFavoriteWorks(authUserDetails.getUserId(), req.favoriteWorksIdList());
+        libraryAdaptor.initLibrary(authUserDetails.getUserId());
 
         return authUserDetails;
     }
@@ -133,6 +136,8 @@ public class AuthService {
         }
         user.withdraw();
         tokenAdaptor.deleteRefreshTokenByUserId(userId);
+
         favoriteWorksAdaptor.deleteFavoriteWorks(userId);
+        libraryAdaptor.deleteLibrary(userId);
     }
 }

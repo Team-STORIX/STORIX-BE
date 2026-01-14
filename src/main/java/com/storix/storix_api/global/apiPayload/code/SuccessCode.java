@@ -41,7 +41,6 @@ public enum SuccessCode {
     // Plus success
     PLUS_BOARD_UPLOAD_SUCCESS(HttpStatus.CREATED, "PLUS_SUCCESS_001", "게시물 등록에 성공했습니다."),
     PLUS_REVIEW_UPLOAD_SUCCESS(HttpStatus.CREATED,"PLUS_SUCCESS_022", "리뷰 등록에 성공했습니다.");
-  
 
     private final HttpStatus httpStatus;
     private final String code;

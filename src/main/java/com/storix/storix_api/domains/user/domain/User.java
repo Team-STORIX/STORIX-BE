@@ -109,7 +109,7 @@ public class User extends BaseTimeEntity {
     /** 생성자 로직 **/
     protected User() {}
 
-    @Builder // 독자
+    @Builder(builderMethodName = "readerBuilder")
     public User(boolean marketingAgree, OAuthInfo oauthInfo, String nickName, Gender gender, Set<Genre> favoriteGenreList) {
         this.marketingAgree = marketingAgree;
         this.oauthInfo = oauthInfo;
@@ -118,7 +118,7 @@ public class User extends BaseTimeEntity {
         this.favoriteGenreList = favoriteGenreList;
     }
 
-    @Builder // 작가
+    @Builder(builderMethodName = "artistBuilder")
     public User(String nickName, String loginId, String password) {
         this.nickName = nickName;
         this.loginId = loginId;
