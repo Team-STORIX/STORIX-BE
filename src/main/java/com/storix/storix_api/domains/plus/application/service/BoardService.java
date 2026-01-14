@@ -30,11 +30,15 @@ public class BoardService {
     @Transactional
     public void createReaderBoard(Long userId, ReaderBoardUploadRequest req) {
 
+        Long worksId = null;
+
         if (req.isWorksSelected()) {
             if (req.worksId() == null) {
                 throw WorksIdNotExistException.EXCEPTION;
             }
             worksPersistenceAdaptor.checkWorksExistById(req.worksId());
+
+            worksId = req.worksId();
         }
 
         if (!req.objectKeys().isEmpty()) {
@@ -46,7 +50,7 @@ public class BoardService {
         CreateReaderBoardCommand cmd = new CreateReaderBoardCommand(
                 userId,
                 req.isWorksSelected(),
-                req.worksId(),
+                worksId,
                 req.isSpoiler(),
                 req.content(),
                 req.objectKeys()
@@ -64,11 +68,15 @@ public class BoardService {
     @Transactional
     public void createArtistBoard(Long userId, ArtistBoardUploadRequest req) {
 
+        Long worksId = null;
+
         if (req.isWorksSelected()) {
             if (req.worksId() == null) {
                 throw WorksIdNotExistException.EXCEPTION;
             }
             worksPersistenceAdaptor.checkWorksExistById(req.worksId());
+
+            worksId = req.worksId();
         }
 
         if (!req.objectKeys().isEmpty()) {
@@ -86,7 +94,7 @@ public class BoardService {
         CreateArtistBoardCommand cmd = new CreateArtistBoardCommand(
                 userId,
                 req.isWorksSelected(),
-                req.worksId(),
+                worksId,
                 req.isContentForFan(),
                 req.point(),
                 req.content(),
