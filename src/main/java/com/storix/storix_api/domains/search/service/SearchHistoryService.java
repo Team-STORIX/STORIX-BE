@@ -26,6 +26,7 @@ public class SearchHistoryService {
     // 날짜별 키 접두사
     private static final String TRENDING_KEY_PREFIX = "search:trending:";
     private static final String RECENT_KEY_PREFIX = "search:recent:";
+    private static final String LIBRARY_RECENT_KEY_PREFIX = "library:recent";
 
     // 최근 검색어 개수 (10)
     private static final int MAX_RECENT_SIZE = 10;
@@ -51,6 +52,7 @@ public class SearchHistoryService {
                     "redis.call('EXPIRE', KEYS[1], ARGV[3]); " +
                     "return 1;";
 
+    // 홈
     /** 1. 검색어 저장 (인기 + 최근 검색어) */
     @Async("logThreadPool")
     public void addSearchLog(Long userId, String keyword) {
@@ -183,5 +185,47 @@ public class SearchHistoryService {
             log.warn("[추천 검색어 조회 실패] ", e);
             return null;
         }
+    }
+
+    // 서재
+    /** 1. 검색어 저장 (최근 검색어) */
+    @Async("logThreadPool")
+    public void addLibrarySearchLog(Long userId, String keyword) {
+        try {
+            if (keyword == null || keyword.isBlank()) return;
+
+            String key = LIBRARY_RECENT_KEY_PREFIX + userId;
+
+            // Lua Script
+            // KEYS[1]: 키 이름
+            // ARGV[1]: 검색어, ARGV[2]: 리스트 크기 제한(인덱스), ARGV[3]: TTL(초 단위)
+            RedisScript<Long> script = new DefaultRedisScript<>(ADD_RECENT_SEARCH_SCRIPT, Long.class);
+
+            redisTemplate.execute(script,
+                    Collections.singletonList(key), // KEYS
+                    keyword,                        // ARGV[1]
+                    String.valueOf(MAX_RECENT_SIZE - 1), // ARGV[2] (trim index)
+                    String.valueOf(TimeUnit.DAYS.toSeconds(RECENT_KEY_TTL_DAYS)) // ARGV[3] (seconds)
+            );
+
+        } catch (Exception e) {
+            log.error("서재 검색어 로그 저장 실패: {}", e.getMessage());
+        }
+    }
+
+    /** 2. 최근 검색어 조회 */
+    public List<String> getLibraryRecentKeywords(Long userId) {
+
+        String key = LIBRARY_RECENT_KEY_PREFIX + userId;
+        List<String> keywords = redisTemplate.opsForList().range(key, 0, MAX_RECENT_SIZE - 1);
+
+        return keywords != null ? keywords : List.of();
+    }
+
+    /** 3. 최근 검색어 삭제 */
+    public void deleteLibraryRecentKeyword(Long userId, String keyword) {
+
+        String key = LIBRARY_RECENT_KEY_PREFIX + userId;
+        redisTemplate.opsForList().remove(key, 1, keyword);
     }
 }
