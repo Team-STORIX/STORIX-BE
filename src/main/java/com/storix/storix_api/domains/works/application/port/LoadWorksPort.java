@@ -9,10 +9,6 @@ import java.util.List;
 public interface LoadWorksPort {
 
     Slice<Works> searchWorks(String keyword, Pageable pageable);
-
-    void checkWorksExistById(Long worksId);
-
-    boolean isWorksForAdult(Long worksId);
   
     Works findById(Long worksId);
 
@@ -20,4 +16,13 @@ public interface LoadWorksPort {
     List<Long> findAllIdsByKeyword(String keyword);
 
     Works findByIdWithHashtags(Long worksId);
+
+    // 리뷰 도메인 용
+    void checkWorksExistById(Long worksId);
+
+    boolean isWorksForAdult(Long worksId);
+
+    void updateIncrementingReviewInfoToWorks(Long worksId, double newRating);
+
+    void updateDecrementingReviewInfoToWorks(Long worksId, double newRating);
 }

@@ -4,6 +4,7 @@ import com.storix.storix_api.domains.works.domain.Works;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -41,5 +42,45 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "FROM Works w " +
             "WHERE w.id = :worksId")
     boolean isWorksForAdult(@Param("worksId") Long worksId);
+
+    // 리뷰 관련 정보 업데이트
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE Works w
+        SET
+          w.avgRating =
+            ROUND(
+              (COALESCE(w.avgRating, 0.0) * COALESCE(w.reviewsCount, 0) + :newRating) / (COALESCE(w.reviewsCount, 0) + 1),
+              1),
+          w.reviewsCount = COALESCE(w.reviewsCount, 0) + 1
+        WHERE w.id = :worksId
+    """)
+    void incrementReviewsCountAndUpdateAverageRating(
+            @Param("worksId") Long worksId,
+            @Param("newRating") double newRating
+    );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE Works w
+        SET
+          w.avgRating =
+            CASE
+              WHEN COALESCE(w.reviewsCount, 0) <= 1 THEN NULL
+              ELSE ROUND(
+                (COALESCE(w.avgRating, 0.0) * COALESCE(w.reviewsCount, 0) - :deletedRating) / (COALESCE(w.reviewsCount, 0) - 1),
+                1)
+            END,
+          w.reviewsCount =
+            CASE
+              WHEN COALESCE(w.reviewsCount, 0) <= 1 THEN 0
+              ELSE COALESCE(w.reviewsCount, 0) - 1
+            END
+        WHERE w.id = :worksId
+    """)
+    void decrementReviewsCountAndUpdateAverageRating(
+            @Param("worksId") Long worksId,
+            @Param("deletedRating") double deletedRating
+    );
 
 }

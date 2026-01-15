@@ -25,18 +25,6 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     }
 
     @Override
-    public void checkWorksExistById(Long worksId) {
-        if (!worksRepository.existsById(worksId)) {
-            throw WorksNotExistException.EXCEPTION;
-        }
-    }
-
-    @Override
-    public boolean isWorksForAdult(Long worksId) {
-        return worksRepository.isWorksForAdult(worksId);
-    }
-
-    @Override
     public Works findById(Long worksId) {
         return worksRepository.findById(worksId)
                 .orElseThrow(() -> UnknownWorksException.EXCEPTION);
@@ -52,4 +40,28 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
         return worksRepository.findByIdWithHashtags(worksId)
                 .orElseThrow(() -> UnknownWorksException.EXCEPTION);
     }
+
+    // 리뷰 도메인 용
+    @Override
+    public void checkWorksExistById(Long worksId) {
+        if (!worksRepository.existsById(worksId)) {
+            throw WorksNotExistException.EXCEPTION;
+        }
+    }
+
+    @Override
+    public boolean isWorksForAdult(Long worksId) {
+        return worksRepository.isWorksForAdult(worksId);
+    }
+
+    @Override
+    public void updateIncrementingReviewInfoToWorks(Long worksId, double newRating) {
+        worksRepository.incrementReviewsCountAndUpdateAverageRating(worksId, newRating);
+    }
+
+    @Override
+    public void updateDecrementingReviewInfoToWorks(Long worksId, double newRating) {
+        worksRepository.decrementReviewsCountAndUpdateAverageRating(worksId, newRating);
+    }
+
 }
