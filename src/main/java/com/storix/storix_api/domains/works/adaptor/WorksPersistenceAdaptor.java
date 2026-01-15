@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.adaptor;
 
+import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.domains.works.repository.WorksRepository;
@@ -62,6 +63,17 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     @Override
     public void updateDecrementingReviewInfoToWorks(Long worksId, double newRating) {
         worksRepository.decrementReviewsCountAndUpdateAverageRating(worksId, newRating);
+    }
+
+    // 서재 도메인 용
+    @Override
+    public List<LibraryWorksInfo> getLibraryWorksInfo(List<Long> worksIds) {
+        return worksRepository.findLibraryWorksInfoByIds(worksIds);
+    }
+
+    @Override
+    public Slice<LibraryWorksInfo> searchLibraryWorksInfoByIds(List<Long> worksIds, String keyword, Pageable pageable) {
+        return worksRepository.searchLibraryWorksInfoByIds(worksIds, keyword, pageable);
     }
 
 }

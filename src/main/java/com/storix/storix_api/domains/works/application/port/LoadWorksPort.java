@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.application.port;
 
+import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -25,4 +26,9 @@ public interface LoadWorksPort {
     void updateIncrementingReviewInfoToWorks(Long worksId, double newRating);
 
     void updateDecrementingReviewInfoToWorks(Long worksId, double newRating);
+
+    // 서재 도메인 용
+    List<LibraryWorksInfo> getLibraryWorksInfo(List<Long> worksIds);
+
+    Slice<LibraryWorksInfo> searchLibraryWorksInfoByIds(List<Long> worksIds, String keyword, Pageable pageable);
 }
