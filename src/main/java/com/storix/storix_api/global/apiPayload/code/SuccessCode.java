@@ -40,7 +40,13 @@ public enum SuccessCode {
 
     // Plus success
     PLUS_BOARD_UPLOAD_SUCCESS(HttpStatus.CREATED, "PLUS_SUCCESS_001", "게시물 등록에 성공했습니다."),
-    PLUS_REVIEW_UPLOAD_SUCCESS(HttpStatus.CREATED,"PLUS_SUCCESS_022", "리뷰 등록에 성공했습니다.");
+    PLUS_REVIEW_UPLOAD_SUCCESS(HttpStatus.CREATED,"PLUS_SUCCESS_022", "리뷰 등록에 성공했습니다."),
+
+    // Library success
+    LIBRARY_WORKS_LOAD_SUCCESS(HttpStatus.OK, "LIBRARY_SUCCESS_001", "서재 정보 조회에 성공했습니다."),
+    LIBRARY_SEARCH_SUCCESS(HttpStatus.OK, "LIBRARY_SUCCESS_002", "서재 내 검색에 성공했습니다."),
+    LIBRARY_RECENT_LOAD_SUCCESS(HttpStatus.OK, "LIBRARY_SUCCESS_003", "서재 최근 검색어 조회에 성공했습니다."),
+    LIBRARY_RECENT_REMOVE_SUCCESS(HttpStatus.OK, "LIBRARY_SUCCESS_004", "서재 최근 검색어 삭제에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
