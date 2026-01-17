@@ -6,17 +6,21 @@ import com.storix.storix_api.domains.plus.controller.dto.ArtistBoardUploadReques
 import com.storix.storix_api.domains.plus.controller.dto.ReaderBoardUploadRequest;
 import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewRedirectResponse;
 import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewUploadRequest;
+import com.storix.storix_api.domains.search.application.usecase.SearchUseCase;
+import com.storix.storix_api.domains.search.dto.PlusSearchResponseWrapperDto;
+import com.storix.storix_api.domains.search.dto.WorksSearchResponseDto;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
+import com.storix.storix_api.domains.works.domain.WorksPlusSortType;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
+import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/plus")
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "[+] 탭", description = "[+] 탭 관련 API")
 public class PlusController {
 
+    private final SearchUseCase searchUseCase;
     private final BoardUseCase boardUseCase;
     private final ReviewUseCase reviewUseCase;
 
@@ -55,6 +60,21 @@ public class PlusController {
     ) {
         return ResponseEntity.ok()
                 .body(boardUseCase.createArtistBoard(authUserDetails.getUserId(), req));
+    }
+
+    @GetMapping("/reader/works")
+    @Operation(summary = "작품 검색", description = "작품명 검색합니다. 결과값은 무한 스크롤로 구성됩니다.")
+    public CustomResponse<PlusSearchResponseWrapperDto<WorksSearchResponseDto>> searchFavoriteWorks(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "NAME") WorksPlusSortType sort,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
+
+        return CustomResponse.onSuccess(
+                SuccessCode.SUCCESS,
+                searchUseCase.searchWorksForWriting(keyword, pageable)
+        );
     }
 
 }
