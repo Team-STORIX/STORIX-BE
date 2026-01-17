@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.repository;
 
+import com.storix.storix_api.domains.works.dto.WorksInfo;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +16,11 @@ import java.util.Optional;
 public interface WorksRepository extends JpaRepository<Works, Long> {
 
     @Query("SELECT w FROM Works w " +
-            "WHERE w.worksName LIKE %:keyword% " +
+            "WHERE ( w.worksName LIKE %:keyword% " +
             "OR w.author LIKE %:keyword% " +
             "OR w.illustrator LIKE %:keyword% " +
-            "OR w.originalAuthor LIKE %:keyword%")
+            "OR w.originalAuthor LIKE %:keyword% ) " +
+            "AND w.ageClassification <> com.storix.storix_api.domains.works.domain.AgeClassification.AGE_18 ")
     Slice<Works> findBySearchKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT (COUNT(w) > 0) FROM Works w " +
