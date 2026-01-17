@@ -6,9 +6,8 @@ import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewRedirectRes
 import com.storix.storix_api.domains.plus.controller.dto.ReaderReviewUploadRequest;
 import com.storix.storix_api.domains.plus.domain.Review;
 import com.storix.storix_api.domains.plus.dto.CreateReviewCommand;
-import com.storix.storix_api.domains.user.application.port.LoadUserPort;
+import com.storix.storix_api.domains.works.application.helper.AdultWorksHelper;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
-import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnverifiedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,21 +20,16 @@ public class ReviewService {
     private final LibraryAdaptor libraryAdaptor;
 
     private final LoadWorksPort loadWorksPort;
-    private final LoadUserPort loadUserPort;
+
+    private final AdultWorksHelper adultWorksHelper;
 
     @Transactional
     public ReaderReviewRedirectResponse createReview(Long userId, ReaderReviewUploadRequest req) {
 
         reviewAdaptor.existsByUserAndWorks(userId, req.worksId());
 
-        if (loadWorksPort.isWorksForAdult(req.worksId())) {
-
-            Boolean isAdult = loadUserPort.findIsAdultVerifiedById(userId);
-
-            if (!Boolean.TRUE.equals(isAdult)) {
-                throw UnverifiedException.EXCEPTION;
-            }
-        }
+        // 성인 작품 여부 확인 및 핸들링
+        adultWorksHelper.CheckUserAuthorityWithWorks(userId, req.worksId());
 
         CreateReviewCommand cmd = new CreateReviewCommand(
                 userId,
@@ -56,4 +50,10 @@ public class ReviewService {
         return new ReaderReviewRedirectResponse(review.getWorksId(), review.getLibraryUserId(), review.getId());
     }
 
+    @Transactional
+    public void isReviewExist(Long userId, Long worksId) {
+
+        // 리뷰 중복 확인
+        reviewAdaptor.existsByUserAndWorks(userId, worksId);
+    }
 }

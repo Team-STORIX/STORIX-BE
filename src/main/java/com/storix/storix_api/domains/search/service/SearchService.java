@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.search.service;
 
 import com.storix.storix_api.domains.search.application.usecase.SearchUseCase;
 import com.storix.storix_api.domains.search.dto.ArtistSearchResponseDto;
+import com.storix.storix_api.domains.search.dto.PlusSearchResponseWrapperDto;
 import com.storix.storix_api.domains.search.dto.SearchResponseWrapperDto;
 import com.storix.storix_api.domains.search.dto.WorksSearchResponseDto;
 import com.storix.storix_api.domains.user.application.port.LoadUserPort;
@@ -63,6 +64,18 @@ public class SearchService implements SearchUseCase {
         return SearchResponseWrapperDto.<ArtistSearchResponseDto>builder()
                 .result(resultDto)
                 .fallbackRecommendation(fallback)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public PlusSearchResponseWrapperDto<WorksSearchResponseDto> searchWorksForWriting(String keyword, Pageable pageable) {
+
+        // 작품 검색
+        Slice<Works> worksSlice = loadWorksPort.searchWorks(keyword, pageable);
+
+        return PlusSearchResponseWrapperDto.<WorksSearchResponseDto>builder()
+                .result(worksSlice.map(this::toWorkDto))
                 .build();
     }
 
