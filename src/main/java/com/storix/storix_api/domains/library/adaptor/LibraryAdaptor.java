@@ -11,6 +11,7 @@ public class LibraryAdaptor {
 
     private final LibraryRepository libraryRepository;
 
+    // 리뷰 개수 업데이트
     public void incrementReviewCount(Long libraryUserId) {
         libraryRepository.incrementReviewCount(libraryUserId);
     }
@@ -19,6 +20,7 @@ public class LibraryAdaptor {
         return libraryRepository.decrementReviewCount(libraryUserId);
     }
 
+    // 게시물 개수 업데이트
     public void incrementBoardCount(Long libraryUserId) {
         libraryRepository.incrementBoardCount(libraryUserId);
     }
@@ -27,12 +29,18 @@ public class LibraryAdaptor {
         return libraryRepository.decrementBoardCount(libraryUserId);
     }
 
+    // 서재 업데이트
     public void initLibrary(Long userId) {
         libraryRepository.save(new Library(userId));
     }
 
     public void deleteLibrary(Long userId) {
         libraryRepository.deleteById(userId);
+    }
+
+    // 서재 정보 조회
+    public int findReviewCount(Long userId) {
+        return libraryRepository.findReviewCountByUserId(userId);
     }
 
 }

@@ -46,7 +46,12 @@ public class ReviewService {
         );
 
         Review review = reviewAdaptor.saveReview(cmd);
+
+        // 서재 도메인 업데이트
         libraryAdaptor.incrementReviewCount(userId);
+
+        // 작품 도메인 업데이트
+        loadWorksPort.updateIncrementingReviewInfoToWorks(req.worksId(), req.rating().getRatingValue());
 
         return new ReaderReviewRedirectResponse(review.getWorksId(), review.getLibraryUserId(), review.getId());
     }

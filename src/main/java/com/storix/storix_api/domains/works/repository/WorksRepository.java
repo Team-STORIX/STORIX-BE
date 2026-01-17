@@ -1,9 +1,11 @@
 package com.storix.storix_api.domains.works.repository;
 
+import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -41,5 +43,59 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "FROM Works w " +
             "WHERE w.id = :worksId")
     boolean isWorksForAdult(@Param("worksId") Long worksId);
+
+    // 리뷰 관련 정보 업데이트
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE Works w
+        SET
+          w.avgRating =
+            ROUND(
+              (COALESCE(w.avgRating, 0.0) * COALESCE(w.reviewsCount, 0) + :newRating) / (COALESCE(w.reviewsCount, 0) + 1),
+              1),
+          w.reviewsCount = COALESCE(w.reviewsCount, 0) + 1
+        WHERE w.id = :worksId
+    """)
+    void incrementReviewsCountAndUpdateAverageRating(
+            @Param("worksId") Long worksId,
+            @Param("newRating") double newRating
+    );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE Works w
+        SET
+          w.avgRating =
+            CASE
+              WHEN COALESCE(w.reviewsCount, 0) <= 1 THEN NULL
+              ELSE ROUND(
+                (COALESCE(w.avgRating, 0.0) * COALESCE(w.reviewsCount, 0) - :deletedRating) / (COALESCE(w.reviewsCount, 0) - 1),
+                1)
+            END,
+          w.reviewsCount =
+            CASE
+              WHEN COALESCE(w.reviewsCount, 0) <= 1 THEN 0
+              ELSE COALESCE(w.reviewsCount, 0) - 1
+            END
+        WHERE w.id = :worksId
+    """)
+    void decrementReviewsCountAndUpdateAverageRating(
+            @Param("worksId") Long worksId,
+            @Param("deletedRating") double deletedRating
+    );
+
+    // 서재 관련 작품 정보 조회
+    @Query("SELECT new com.storix.storix_api.domains.works.dto.LibraryWorksInfo(w.id, w.worksName, w.artistName, w.thumbnailUrl, w.worksType, w.genre) " +
+            "FROM Works w " +
+            "WHERE w.id IN :worksIds")
+    List<LibraryWorksInfo> findLibraryWorksInfoByIds(@Param("worksIds") List<Long> worksIds);
+
+    @Query("SELECT new com.storix.storix_api.domains.works.dto.LibraryWorksInfo(w.id, w.worksName, w.artistName, w.thumbnailUrl, w.worksType, w.genre) " +
+            "FROM Works w " +
+            "WHERE w.id IN :worksIds " +
+            "AND w.worksName LIKE %:keyword% ")
+    Slice<LibraryWorksInfo> searchLibraryWorksInfoByIds(@Param("worksIds") List<Long> worksIds,
+                                                        @Param("keyword") String keyword,
+                                                        Pageable pageable);
 
 }

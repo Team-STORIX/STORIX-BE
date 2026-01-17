@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.plus.domain;
 
+import com.storix.storix_api.domains.plus.adaptor.RatingConverter;
 import com.storix.storix_api.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -37,8 +38,8 @@ public class Review extends BaseTimeEntity {
     @Column(name = "is_spoiler")
     private boolean isSpoiler;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(precision = 2, scale = 1, nullable = false)
+    @Convert(converter = RatingConverter.class)
     private Rating rating;
 
     @Column(length = 500, nullable = false)
