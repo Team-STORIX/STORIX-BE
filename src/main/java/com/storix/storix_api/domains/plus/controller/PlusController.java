@@ -33,7 +33,7 @@ public class PlusController {
     private final ReviewUseCase reviewUseCase;
 
     @Operation(summary = "독자 게시물 등록", description = "독자 게시물을 등록하는 api 입니다.   \n이미지를 선택한 직후의 렌더링은 프론트에서 진행해주시고, 이미지를 S3 버킷에 업로드한 후 objectKey와 함께 호출해주세요.")
-    @PostMapping("/reader-board")
+    @PostMapping("/reader/board")
     public ResponseEntity<CustomResponse<Void>> uploadReaderBoard(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @RequestBody ReaderBoardUploadRequest req
@@ -43,7 +43,7 @@ public class PlusController {
     }
 
     @Operation(summary = "독자 리뷰 등록", description = "독자 리뷰를 등록하는 api 입니다.")
-    @PostMapping("/reader-review")
+    @PostMapping("/reader/review")
     public ResponseEntity<CustomResponse<ReaderReviewRedirectResponse>> uploadReaderReview(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @RequestBody ReaderReviewUploadRequest req
@@ -53,7 +53,7 @@ public class PlusController {
     }
 
     @Operation(summary = "작가 게시물 등록", description = "작가 게시물을 등록하는 api 입니다.   \n이미지를 선택한 직후의 렌더링은 프론트에서 진행해주시고, 이미지를 S3 버킷에 업로드한 후 objectKey와 함께 호출해주세요.")
-    @PostMapping("/artist-board")
+    @PostMapping("/artist/board")
     public ResponseEntity<CustomResponse<Void>> uploadArtistBoard(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @RequestBody ArtistBoardUploadRequest req
