@@ -1,6 +1,5 @@
 package com.storix.storix_api.domains.works.repository;
 
-import com.storix.storix_api.domains.works.dto.WorksInfo;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
 import org.springframework.data.domain.Pageable;
