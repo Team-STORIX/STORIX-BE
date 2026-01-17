@@ -77,4 +77,14 @@ public class PlusController {
         );
     }
 
+    @Operation(summary = "리뷰 중복 여부 조회", description = "리뷰 중복 여부를 조회하는 api 입니다.")
+    @GetMapping("/reader/review/{worksId}")
+    public ResponseEntity<CustomResponse<Void>> checkDuplicateReview(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @PathVariable Long worksId
+    ) {
+        return ResponseEntity.ok()
+                .body(reviewUseCase.checkDuplicateReview(authUserDetails.getUserId(), worksId));
+    }
+
 }
