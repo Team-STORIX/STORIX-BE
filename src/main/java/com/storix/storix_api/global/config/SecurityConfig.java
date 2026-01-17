@@ -81,9 +81,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/works/**").permitAll()
 
                                 // [Favorite]
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/favorite/**").hasRole("READER")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/favorite/**")
                                 .access(new WebExpressionAuthorizationManager("!hasRole('ARTIST')"))
+                                .requestMatchers("/api/v1/favorite/**").hasRole("READER")
 
                                 .anyRequest().authenticated()
                 )
