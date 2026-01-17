@@ -72,7 +72,7 @@ public class PlusController {
         Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
 
         return CustomResponse.onSuccess(
-                SuccessCode.SUCCESS,
+                SuccessCode.PLUS_WORKS_LOAD_SUCCESS,
                 searchUseCase.searchWorksForWriting(keyword, pageable)
         );
     }

@@ -21,7 +21,7 @@ public class ReviewUseCase {
 
     public CustomResponse<Void> checkDuplicateReview(Long userId, Long worksId) {
         reviewService.isReviewExist(userId, worksId);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS);
+        return CustomResponse.onSuccess(SuccessCode.PLUS_REVIEW_CHECK_SUCCESS);
     }
 
 }
