@@ -44,6 +44,13 @@ public enum SuccessCode {
     PLUS_WORKS_LOAD_SUCCESS(HttpStatus.OK, "PLUS_SUCCESS_003", "작품 정보 조회에 성공했습니다."),
     PLUS_REVIEW_CHECK_SUCCESS(HttpStatus.OK, "PLUS_SUCCESS_004", "리뷰 작성이 가능합니다."),
 
+    // Favorite success
+    FAVORITE_WORKS_LOAD_SUCCESS(HttpStatus.OK, "FAVORITE_SUCCESS_001", "관심 작품 등록 여부 조회에 성공했습니다."),
+    FAVORITE_WORKS_ADD_SUCCESS(HttpStatus.CREATED, "FAVORITE_SUCCESS_002", "관심 작품 등록에 성공했습니다."),
+    FAVORITE_WORKS_DELETE_SUCCESS(HttpStatus.OK, "FAVORITE_SUCCESS_003", "관심 작품 등록 해제에 성공했습니다."),
+    FAVORITE_ARTIST_LOAD_SUCCESS(HttpStatus.OK, "FAVORITE_SUCCESS_004", "관심 작가 등록 여부 조회에 성공했습니다."),
+    FAVORITE_ARTIST_ADD_SUCCESS(HttpStatus.CREATED, "FAVORITE_SUCCESS_005", "관심 작가 등록에 성공했습니다."),
+    FAVORITE_ARTIST_DELETE_SUCCESS(HttpStatus.OK, "FAVORITE_SUCCESS_006", "관심 작가 등록 해제에 성공했습니다."),
 
     // Library success
     LIBRARY_WORKS_LOAD_SUCCESS(HttpStatus.OK, "LIBRARY_SUCCESS_001", "서재 정보 조회에 성공했습니다."),
