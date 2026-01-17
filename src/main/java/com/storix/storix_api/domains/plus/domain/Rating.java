@@ -6,7 +6,12 @@ import com.storix.storix_api.global.apiPayload.exception.plus.InvalidRatingExcep
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
@@ -26,16 +31,44 @@ public enum Rating {
     private final String dbValue;
     private final double ratingValue;
 
+    // Map { String / BigDecimal }
+    private static final Map<String, Rating> BY_DB_STRING =
+            Arrays.stream(values())
+                    .collect(Collectors.toUnmodifiableMap(
+                            Rating::getDbValue,
+                            Function.identity()
+                    ));
+
+    private static final Map<BigDecimal, Rating> BY_DB_DECIMAL =
+            Arrays.stream(values())
+                    .collect(Collectors.toUnmodifiableMap(
+                            r -> new BigDecimal(r.dbValue),
+                            Function.identity()
+                    ));
+
+    // 응답 DTO용
     @JsonCreator
     public static Rating from(String value) {
-        return Arrays.stream(values())
-                .filter(r -> r.dbValue.equals(value))
-                .findFirst()
-                .orElseThrow(() -> InvalidRatingException.EXCEPTION);
+        if (value == null) return null;
+        Rating rating = BY_DB_STRING.get(value);
+        if (rating == null) throw InvalidRatingException.EXCEPTION;
+        return rating;
     }
 
     @JsonValue
     public String toJson() {
         return dbValue;
     }
+
+    // DB BigDecimal -> Rating 변환용
+    public static Rating from(BigDecimal value) {
+        if (value == null) return null;
+
+        BigDecimal key = value.stripTrailingZeros().setScale(1, RoundingMode.UNNECESSARY);
+
+        Rating rating = BY_DB_DECIMAL.get(key);
+        if (rating == null) throw InvalidRatingException.EXCEPTION;
+        return rating;
+    }
+
 }
