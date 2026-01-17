@@ -18,4 +18,10 @@ public class ReviewUseCase {
         ReaderReviewRedirectResponse result = reviewService.createReview(userId, req);
         return CustomResponse.onSuccess(SuccessCode.PLUS_REVIEW_UPLOAD_SUCCESS, result);
     }
+
+    public CustomResponse<Void> checkDuplicateReview(Long userId, Long worksId) {
+        reviewService.isReviewExist(userId, worksId);
+        return CustomResponse.onSuccess(SuccessCode.SUCCESS);
+    }
+
 }
