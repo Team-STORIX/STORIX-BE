@@ -50,4 +50,10 @@ public class ReviewService {
         return new ReaderReviewRedirectResponse(review.getWorksId(), review.getLibraryUserId(), review.getId());
     }
 
+    @Transactional
+    public void isReviewExist(Long userId, Long worksId) {
+
+        // 리뷰 중복 확인
+        reviewAdaptor.existsByUserAndWorks(userId, worksId);
+    }
 }
