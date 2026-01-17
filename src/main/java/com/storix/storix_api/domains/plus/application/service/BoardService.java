@@ -71,14 +71,6 @@ public class BoardService {
         libraryAdaptor.incrementBoardCount(userId);
     }
 
-    // 독자 게시물 삭제
-    @Transactional
-    public void deleteReaderBoard(Long userId, Long readerBoardId) {
-        boardAdaptor.deleteSingleReaderBoard(userId, readerBoardId);
-        libraryAdaptor.decrementBoardCount(userId);
-    }
-
-    // 작가 게시물 생성
     @Transactional
     public void createArtistBoard(Long userId, ArtistBoardUploadRequest req) {
 
