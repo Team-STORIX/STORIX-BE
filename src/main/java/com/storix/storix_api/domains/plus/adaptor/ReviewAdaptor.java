@@ -42,4 +42,8 @@ public class ReviewAdaptor {
         return reviewRepository.findAllWorksIdsByUserId(userId);
     }
 
+    public List<ReviewedWorksIdAndRatingInfo> findAllReviewInfoByFavoriteWorks(Long userId, List<Long> worksIds) {
+        return reviewRepository.findAllReviewInfoByFavoriteWorks(userId, worksIds);
+    }
+
 }
