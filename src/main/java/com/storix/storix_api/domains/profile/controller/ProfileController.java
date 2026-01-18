@@ -9,6 +9,7 @@ import com.storix.storix_api.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -92,7 +93,7 @@ public class ProfileController {
     public ResponseEntity<CustomResponse<ProfileFavoriteArtistWrapperDto<FavoriteArtistInfo>>> getFavoriteArtistList(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @RequestParam(defaultValue = "LATEST") ProfileSortType sort,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") @Min(0) int page
     ) {
         Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
         return ResponseEntity.ok()
@@ -105,7 +106,7 @@ public class ProfileController {
     public ResponseEntity<CustomResponse<ProfileFavoriteWorksWrapperDto<FavoriteWorksWithReviewInfo>>> getFavoriteWorksList(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @RequestParam(defaultValue = "LATEST") ProfileSortType sort,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") @Min(0) int page
     ) {
         Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
         return ResponseEntity.ok()
