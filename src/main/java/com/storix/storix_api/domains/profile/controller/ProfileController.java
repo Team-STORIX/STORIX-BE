@@ -31,8 +31,6 @@ public class ProfileController {
     private final ProfileUseCase profileUseCase;
     private final ProfileFavoriteUseCase profileFavoriteUseCase;
 
-    private final ProfileActivityUseCase profileActivityUseCase;
-
     @Operation(summary = "기본 프로필 조회", description = "기본 프로필을 조회하는 api 입니다.")
     @GetMapping("/me")
     public ResponseEntity<CustomResponse<UserInfo>> getProfile(
