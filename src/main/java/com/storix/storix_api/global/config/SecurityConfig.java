@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -62,7 +63,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/profile/**").hasAnyRole("READER","ARTIST")
 
                                 // [Plus]
-                                .requestMatchers("/ap1/v1/plus/reader/**").hasRole("READER")
+                                .requestMatchers("/api/v1/plus/reader/**").hasRole("READER")
                                 .requestMatchers("/api/v1/plus/artist/**").hasRole("ARTIST")
 
                                 // [Image]
@@ -78,6 +79,11 @@ public class SecurityConfig {
 
                                 // [Works]
                                 .requestMatchers("/api/v1/works/**").permitAll()
+
+                                // [Favorite]
+                                .requestMatchers(HttpMethod.GET, "/api/v1/favorite/**")
+                                .access(new WebExpressionAuthorizationManager("!hasRole('ARTIST')"))
+                                .requestMatchers("/api/v1/favorite/**").hasRole("READER")
 
                                 .anyRequest().authenticated()
                 )
