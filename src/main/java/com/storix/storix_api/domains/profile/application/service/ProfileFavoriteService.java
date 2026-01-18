@@ -49,6 +49,10 @@ public class ProfileFavoriteService {
         Slice<Long> artistIdsSlice = favoriteArtistAdaptor.findAllFavoriteArtistsId(userId, pageable);
         List<Long> artistIds = artistIdsSlice.getContent();
 
+        if (artistIds.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, artistIdsSlice.hasNext());
+        }
+
         // 관심 작가 정보 조회
         List<FavoriteArtistInfo> artistList = userAdaptor.findAllFavoriteArtistInfoByArtistIds(artistIds);
 
@@ -78,6 +82,10 @@ public class ProfileFavoriteService {
         // 관심 작품 등록 리스트 조회
         Slice<Long> worksIdsSlice = favoriteWorksAdaptor.findAllFavoriteWorksId(userId, pageable);
         List<Long> worksIds = worksIdsSlice.getContent();
+
+        if (worksIds.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, worksIdsSlice.hasNext());
+        }
 
         // 1) 관심 작품 정보 조회
         Map<Long, WorksInfo> worksMap =
