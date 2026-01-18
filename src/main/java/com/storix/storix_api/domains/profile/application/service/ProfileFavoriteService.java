@@ -58,7 +58,11 @@ public class ProfileFavoriteService {
 
         // 관심 작가 등록 순으로 정렬
         Map<Long, FavoriteArtistInfo> map = artistList.stream()
-                .collect(Collectors.toMap(FavoriteArtistInfo::artistId, Function.identity()));
+                .collect(Collectors.toMap(
+                        FavoriteArtistInfo::artistId,
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                ));
 
         List<FavoriteArtistInfo> ordered = artistIds.stream()
                 .map(map::get)
@@ -98,7 +102,8 @@ public class ProfileFavoriteService {
         Map<Long, Rating> ratingMap = reviewedList.stream()
                 .collect(Collectors.toMap(
                         ReviewedWorksIdAndRatingInfo::worksId,
-                        ReviewedWorksIdAndRatingInfo::rating
+                        ReviewedWorksIdAndRatingInfo::rating,
+                        (existing, replacement) -> existing
                 ));
 
         // 관심 작품 등록 순으로 1) 관심 작품 정보, 2) 리뷰 관련 정보 정렬
