@@ -10,6 +10,7 @@ import com.storix.storix_api.global.apiPayload.exception.works.UnknownWorksExcep
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -73,11 +74,19 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     // 서재 도메인 용
     @Override
     public List<LibraryWorksInfo> getLibraryWorksInfo(List<Long> worksIds) {
+        if (worksIds == null || worksIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return worksRepository.findLibraryWorksInfoByIds(worksIds);
     }
 
     @Override
     public Slice<LibraryWorksInfo> searchLibraryWorksInfoByIds(List<Long> worksIds, String keyword, Pageable pageable) {
+        if (worksIds == null || worksIds.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, false);
+        }
+
         return worksRepository.searchLibraryWorksInfoByIds(worksIds, keyword, pageable);
     }
 
