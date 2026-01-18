@@ -20,7 +20,7 @@ public class FavoriteService {
     private final UserAdaptor userAdaptor;
 
     // [작품] 관심 작품 관련
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean isFavoriteWorks(Long userId, Long worksId) {
         return favoriteWorksAdaptor.isFavoriteWorksAlreadySelected(userId, worksId);
     }
@@ -41,7 +41,7 @@ public class FavoriteService {
     }
 
     // [작품] 관심 작가 관련
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean isFavoriteArtist(Long userId, Long artistId) {
 
         // 작가 계정 확인
