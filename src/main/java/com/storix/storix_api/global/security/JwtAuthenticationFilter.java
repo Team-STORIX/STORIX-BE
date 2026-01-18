@@ -34,7 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || uri.equals("/api/v1/auth/nickname/valid")
                 || uri.equals("/api/v1/auth/users/artist/login")
                 || uri.startsWith("/api/v1/auth/developer/")
-                || uri.equals("/api/v1/auth/users/reader/signup");
+                || uri.equals("/api/v1/auth/users/reader/signup")
+                || uri.equals("/api/v1/auth/tokens/refresh");
     }
 
     @Override
