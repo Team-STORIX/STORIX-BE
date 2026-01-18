@@ -36,6 +36,7 @@ public enum SuccessCode {
     PROFILE_UPDATE_IMAGE_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_005", "프로필 이미지 변경에 성공했습니다."),
     PROFILE_FAVORITE_ARTIST_LIST_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_006", "프로필 관심 작가 리스트 조회에 성공했습니다."),
     PROFILE_FAVORITE_WORKS_LIST_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_007", "프로필 관심 작품 리스트 조회에 성공했습니다."),
+    PROFILE_MY_BOARDS_LIST_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_008", "프로필 내 활동 게시글 리스트 조회에 성공했습니다."),
 
     // Image success
     IMAGE_ISSUE_PRESIGNED_URL_SUCCESS(HttpStatus.OK, "IMAGE_SUCCESS_001", "이미지를 업로드할 Presigned Url 발급에 성공했습니다."),
