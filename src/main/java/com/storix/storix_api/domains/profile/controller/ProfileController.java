@@ -42,8 +42,8 @@ public class ProfileController {
                 .body(profileUseCase.getUserProfile(authUserDetails));
     }
 
-    @Operation(summary = "닉네임 수정", description = "닉네임을 수정하는 api 입니다.")
-    @PostMapping("/nickname")
+    @Operation(summary = "[독자] 닉네임 수정", description = "닉네임을 수정하는 api 입니다.")
+    @PostMapping("/reader/nickname")
     public ResponseEntity<CustomResponse<String>> updateNickName(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @Valid @RequestBody UpdateNicknameRequest req
@@ -52,8 +52,8 @@ public class ProfileController {
                 .body(profileUseCase.changeNickName(req.nickName(), authUserDetails.getUserId()));
     }
 
-    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 여부를 체크하는 api 입니다.")
-    @GetMapping("/nickname/valid")
+    @Operation(summary = "[독자] 닉네임 중복 체크", description = "닉네임 중복 여부를 체크하는 api 입니다.")
+    @GetMapping("/reader/nickname/valid")
     public ResponseEntity<CustomResponse<Void>> nickNameCheck(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @RequestParam("nickname")
