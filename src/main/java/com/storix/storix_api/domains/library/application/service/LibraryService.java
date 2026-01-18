@@ -44,6 +44,10 @@ public class LibraryService {
                 .map(ReviewedWorksIdAndRatingInfo::worksId)
                 .toList();
 
+        if (worksIds.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, reviewInfo.hasNext());
+        }
+
         List<com.storix.storix_api.domains.works.dto.LibraryWorksInfo> worksList = worksPersistenceAdaptor.getLibraryWorksInfo(worksIds);
 
         // 리뷰 정보 순서대로 세팅
@@ -73,6 +77,10 @@ public class LibraryService {
         List<Long> allWorksIds = reviewInfo.stream()
                 .map(ReviewedWorksIdAndRatingInfo::worksId)
                 .toList();
+
+        if (allWorksIds.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, false);
+        }
 
         Slice<com.storix.storix_api.domains.works.dto.LibraryWorksInfo> worksSlice = worksPersistenceAdaptor.searchLibraryWorksInfoByIds(allWorksIds, keyword, pageable);
 

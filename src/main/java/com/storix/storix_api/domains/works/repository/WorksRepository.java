@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.works.repository;
 
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
+import com.storix.storix_api.domains.works.dto.WorksInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,7 +44,7 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
     @Query("SELECT (w.ageClassification = com.storix.storix_api.domains.works.domain.AgeClassification.AGE_18) " +
             "FROM Works w " +
             "WHERE w.id = :worksId")
-    boolean isWorksForAdult(@Param("worksId") Long worksId);
+    Boolean isWorksForAdult(@Param("worksId") Long worksId);
 
     // 리뷰 관련 정보 업데이트
     @Modifying(clearAutomatically = true, flushAutomatically = true)
@@ -98,5 +99,11 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
     Slice<LibraryWorksInfo> searchLibraryWorksInfoByIds(@Param("worksIds") List<Long> worksIds,
                                                         @Param("keyword") String keyword,
                                                         Pageable pageable);
+
+    // 작품 관련 정보 조회
+    @Query("SELECT new com.storix.storix_api.domains.works.dto.WorksInfo(w.id, w.thumbnailUrl, w.worksName, w.artistName, w.worksType, w.genre) " +
+            "FROM Works w " +
+            "WHERE w.id IN :worksIds")
+    List<WorksInfo> findWorksInfoByIds(@Param("worksIds") List<Long> worksIds);
 
 }

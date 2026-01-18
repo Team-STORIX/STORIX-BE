@@ -4,17 +4,18 @@ import com.storix.storix_api.domains.user.domain.OAuthInfo;
 import com.storix.storix_api.domains.user.domain.OAuthProvider;
 import com.storix.storix_api.domains.user.domain.Role;
 import com.storix.storix_api.domains.user.domain.User;
-import com.storix.storix_api.domains.user.dto.CreateReaderUserCommand;
-import com.storix.storix_api.domains.user.dto.LoginInfo;
+import com.storix.storix_api.domains.user.dto.*;
 import com.storix.storix_api.domains.user.repository.UserRepository;
-import com.storix.storix_api.domains.user.dto.CreateArtistUserCommand;
 import com.storix.storix_api.domains.works.repository.WorksRepository;
 import com.storix.storix_api.global.apiPayload.exception.user.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,15 +23,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserAdaptor {
 
+    @Value("${AWS_S3_BASE_URL}") private String baseUrl;
+
     private final UserRepository userRepository;
     private final WorksRepository worksRepository;
 
     public Role findUserRoleByUserId(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get().getRole();
+        Optional<Role> role = userRepository.findRoleByUserId(userId);
+        if (role.isEmpty()) {
+            throw UnknownUserException.EXCEPTION;
+        } else {
+            return role.get();
         }
-        throw UnknownUserException.EXCEPTION;
+    }
+
+    public StandardProfileInfo findStandardProfileInfoByUserId(Long userId) {
+        StandardProfileInfo info = userRepository.findStandardProfileInfoById(userId);
+        return info == null ? null : info.withBaseUrl(baseUrl);
     }
 
     /**
@@ -126,4 +135,16 @@ public class UserAdaptor {
         }
         return user.get();
     }
+
+    public List<FavoriteArtistInfo> findAllFavoriteArtistInfoByArtistIds(List<Long> artistIds) {
+        if (artistIds == null || artistIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return userRepository.findFavoriteArtistInfosByIds(artistIds)
+                .stream()
+                .map(info -> info.withBaseUrl(baseUrl))
+                .toList();
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.adaptor;
 
+import com.storix.storix_api.domains.works.dto.WorksInfo;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
@@ -9,9 +10,14 @@ import com.storix.storix_api.global.apiPayload.exception.works.UnknownWorksExcep
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -51,7 +57,7 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     }
 
     @Override
-    public boolean isWorksForAdult(Long worksId) {
+    public Boolean isWorksForAdult(Long worksId) {
         return worksRepository.isWorksForAdult(worksId);
     }
 
@@ -68,12 +74,36 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     // 서재 도메인 용
     @Override
     public List<LibraryWorksInfo> getLibraryWorksInfo(List<Long> worksIds) {
+        if (worksIds == null || worksIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return worksRepository.findLibraryWorksInfoByIds(worksIds);
     }
 
     @Override
     public Slice<LibraryWorksInfo> searchLibraryWorksInfoByIds(List<Long> worksIds, String keyword, Pageable pageable) {
+        if (worksIds == null || worksIds.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, false);
+        }
+
         return worksRepository.searchLibraryWorksInfoByIds(worksIds, keyword, pageable);
+    }
+
+    // 작품 정보 조회용
+    @Override
+    public Map<Long, WorksInfo> findAllWorksInfoByWorksIds(List<Long> worksIds) {
+        if (worksIds == null || worksIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<WorksInfo> worksInfos = worksRepository.findWorksInfoByIds(worksIds);
+
+        return worksInfos.stream()
+                .collect(Collectors.toMap(
+                        WorksInfo::worksId,
+                        Function.identity()
+                ));
     }
 
 }
