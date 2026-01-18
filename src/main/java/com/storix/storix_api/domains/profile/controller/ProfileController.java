@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.profile.controller;
 
+import com.storix.storix_api.domains.profile.application.usecase.ProfileFavoriteUseCase;
 import com.storix.storix_api.domains.profile.application.usecase.ProfileUseCase;
 import com.storix.storix_api.domains.profile.dto.UpdateDescriptionRequest;
 import com.storix.storix_api.domains.profile.dto.UpdateImageRequest;
@@ -27,6 +28,9 @@ import org.springframework.web.bind.annotation.*;
 public class ProfileController {
 
     private final ProfileUseCase profileUseCase;
+    private final ProfileFavoriteUseCase profileFavoriteUseCase;
+
+    private final ProfileActivityUseCase profileActivityUseCase;
 
     @Operation(summary = "기본 프로필 조회", description = "기본 프로필을 조회하는 api 입니다.")
     @GetMapping("/me")
@@ -79,12 +83,36 @@ public class ProfileController {
     public ResponseEntity<CustomResponse<String>> updateImage(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @Valid @RequestBody UpdateImageRequest req
-            ) {
+    ) {
         return ResponseEntity.ok()
                 .body(profileUseCase.changeImage(req.objectKey(), authUserDetails.getUserId()));
     }
 
+    // 관심 작가 조회
+    @Operation(summary = "[독자] 관심 작가 리스트 조회", description = "프로필 관심 작가 리스트를 조회하는 api 입니다. 무한스크롤 형식입니다.")
+    @GetMapping("/reader/favorite/artist")
+    public ResponseEntity<CustomResponse<ProfileFavoriteArtistWrapperDto<FavoriteArtistInfo>>> getFavoriteArtistList(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @RequestParam(defaultValue = "LATEST") ProfileSortType sort,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
+        return ResponseEntity.ok()
+                .body(profileFavoriteUseCase.getFavoriteArtistList(authUserDetails.getUserId(), pageable));
+    }
+
     // 관심 작품 조회
+    @Operation(summary = "[독자] 관심 작품 리스트 조회", description = "프로필 관심 작품 리스트를 조회하는 api 입니다. 무한스크롤 형식입니다.")
+    @GetMapping("/reader/favorite/works")
+    public ResponseEntity<CustomResponse<ProfileFavoriteWorksWrapperDto<FavoriteWorksWithReviewInfo>>> getFavoriteWorksList(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @RequestParam(defaultValue = "LATEST") ProfileSortType sort,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
+        return ResponseEntity.ok()
+                .body(profileFavoriteUseCase.getFavoriteWorksList(authUserDetails.getUserId(), pageable));
+    }
 
     // 관심 작가 조회
 
