@@ -63,7 +63,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/profile/**").hasAnyRole("READER","ARTIST")
 
                                 // [Plus]
-                                .requestMatchers("/ap1/v1/plus/reader/**").hasRole("READER")
+                                .requestMatchers("/api/v1/plus/reader/**").hasRole("READER")
                                 .requestMatchers("/api/v1/plus/artist/**").hasRole("ARTIST")
 
                                 // [Image]
