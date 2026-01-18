@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.profile.controller;
 
+import com.storix.storix_api.domains.profile.application.usecase.ProfileActivityUseCase;
 import com.storix.storix_api.domains.profile.application.usecase.ProfileFavoriteUseCase;
 import com.storix.storix_api.domains.profile.application.usecase.ProfileUseCase;
 import com.storix.storix_api.domains.profile.dto.*;
@@ -16,6 +17,7 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +32,7 @@ public class ProfileController {
 
     private final ProfileUseCase profileUseCase;
     private final ProfileFavoriteUseCase profileFavoriteUseCase;
+    private final ProfileActivityUseCase profileActivityUseCase;
 
     @Operation(summary = "기본 프로필 조회", description = "기본 프로필을 조회하는 api 입니다.")
     @GetMapping("/me")
@@ -113,7 +116,18 @@ public class ProfileController {
                 .body(profileFavoriteUseCase.getFavoriteWorksList(authUserDetails.getUserId(), pageable));
     }
 
-    // 관심 작가 조회
+    // 내가 쓴 게시글 조회
+    @Operation(summary = "[독자] 내가 쓴 게시글 조회", description = "프로필 내가 쓴 게시글을 조회하는 api 입니다. 무한스크롤 형식입니다.")
+    @GetMapping("/reader/activity/board")
+    public ResponseEntity<CustomResponse<Slice<ReaderBoardWithProfileInfo>>> getReaderBoardList(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @RequestParam(defaultValue = "LATEST") ProfileSortType sort,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
+        return ResponseEntity.ok()
+                .body(profileActivityUseCase.getReaderBoardList(authUserDetails.getUserId(), pageable));
+    }
 
     // [내 활동 조회] -> 게시글, 리뷰, 좋아요 조회
 
