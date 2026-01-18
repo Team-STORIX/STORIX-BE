@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -43,6 +44,10 @@ public class ReviewAdaptor {
     }
 
     public List<ReviewedWorksIdAndRatingInfo> findAllReviewInfoByFavoriteWorks(Long userId, List<Long> worksIds) {
+        if (worksIds == null || worksIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return reviewRepository.findAllReviewInfoByFavoriteWorks(userId, worksIds);
     }
 
