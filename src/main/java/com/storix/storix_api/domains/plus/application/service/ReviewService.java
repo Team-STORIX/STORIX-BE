@@ -8,6 +8,7 @@ import com.storix.storix_api.domains.plus.domain.Review;
 import com.storix.storix_api.domains.plus.dto.CreateReviewCommand;
 import com.storix.storix_api.domains.plus.dto.ReviewInfo;
 import com.storix.storix_api.domains.plus.dto.SliceReviewInfo;
+import com.storix.storix_api.domains.review.adaptor.ReviewLikeAdaptor;
 import com.storix.storix_api.domains.review.dto.DetailedReviewInfoWithProfile;
 import com.storix.storix_api.domains.review.dto.SliceReviewInfoWithProfile;
 import com.storix.storix_api.domains.review.dto.StandardReviewInfo;
@@ -35,6 +36,7 @@ public class ReviewService {
 
     private final UserAdaptor userAdaptor;
     private final ReviewAdaptor reviewAdaptor;
+    private final ReviewLikeAdaptor reviewLikeAdaptor;
     private final LibraryAdaptor libraryAdaptor;
 
     private final LoadWorksPort loadWorksPort;
@@ -128,15 +130,14 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public DetailedReviewInfoWithProfile findReviewDetail(Long reviewId) {
+    public DetailedReviewInfoWithProfile findReviewDetail(Long userId, Long reviewId) {
 
         // 1) 리뷰 정보
         ReviewInfo reviewInfo = reviewAdaptor.findReviewById(reviewId);
-        StandardReviewInfo review = StandardReviewInfo.fromReviewInfo(reviewInfo);
+        boolean isLiked = reviewLikeAdaptor.isAlreadyLiked(userId, reviewId);
+        StandardReviewInfo review = StandardReviewInfo.fromReviewInfo(reviewInfo, isLiked);
 
         // 2) 프로필 정보
-        Long userId = reviewInfo.reviewerId();
-
         StandardProfileInfo profile =
                 userAdaptor.findStandardProfileInfoByUserId(userId);
 
