@@ -1,0 +1,72 @@
+package com.storix.storix_api.domains.chat.service;
+
+import com.storix.storix_api.domains.chat.application.port.*;
+import com.storix.storix_api.domains.chat.application.usecase.ChatUseCase;
+import com.storix.storix_api.domains.chat.domain.ChatMessage;
+import com.storix.storix_api.domains.chat.dto.ChatMessageRequestDto;
+import com.storix.storix_api.domains.chat.dto.ChatMessageResponseDto;
+import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomPort;
+import com.storix.storix_api.domains.topicroom.application.port.UpdateTopicRoomPort;
+import com.storix.storix_api.domains.user.application.port.LoadUserPort;
+import com.storix.storix_api.domains.user.domain.User;
+import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnknownTopicRoomException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+@Slf4j
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class ChatService implements ChatUseCase {
+
+    private final RecordChatPort recordChatPort;
+    private final PublishChatPort publishChatPort;
+    private final LoadUserPort loadUserPort;
+    private final LoadTopicRoomPort loadTopicRoomPort;
+    private final UpdateTopicRoomPort updateTopicRoomPort;
+    private final LoadChatPort loadChatPort;
+    private final ChatAsyncService chatAsyncService;
+
+    @Override
+    @Transactional
+    public void sendMessage(Long userId, ChatMessageRequestDto request) {
+
+
+        log.info(">>>> [ChatService] 메시지 전송 시도 - UserID: {}, RoomID: {}", userId, request.roomId());
+
+        User user = loadUserPort.findById(userId);
+        String nickname = user.getNickName();
+
+        ChatMessage chatMessage = request.toEntity(userId, nickname);
+
+        // Redis 발행
+        publishChatPort.publish(ChatMessageResponseDto.from(chatMessage));
+
+        chatAsyncService.processAfterMessageSent(chatMessage);
+
+        log.info(">>>> [ChatService] 처리 완료 - Sender: {}, Content: {}", nickname, chatMessage.getMessage());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Slice<ChatMessageResponseDto> getChatHistory(Long roomId,  Pageable pageable) {
+
+        log.info(">>>> [ChatService] 과거 내역 조회 요청 - RoomID: {}, Page: {}", roomId, pageable.getPageNumber());
+
+        // 토픽룸 존재 여부 검증
+        if (!loadTopicRoomPort.existsById(roomId)) {
+            throw UnknownTopicRoomException.EXCEPTION;
+        }
+
+        // DB에서 해당 방의 모든 메시지 조회
+        Slice<ChatMessage> messageSlice = loadChatPort.loadMessages(roomId, pageable);
+
+        return messageSlice.map(ChatMessageResponseDto::from);
+    }
+}
