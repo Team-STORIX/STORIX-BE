@@ -47,6 +47,15 @@ public enum SuccessCode {
     PLUS_WORKS_LOAD_SUCCESS(HttpStatus.OK, "PLUS_SUCCESS_003", "작품 정보 조회에 성공했습니다."),
     PLUS_REVIEW_CHECK_SUCCESS(HttpStatus.OK, "PLUS_SUCCESS_004", "리뷰 작성이 가능합니다."),
 
+    // Works success
+    WORKS_DETAIL_MY_REVIEW_LOAD_SUCCESS(HttpStatus.OK, "WORKS_DETAIL_SUCCESS_001", "내 리뷰 조회에 성공했습니다."),
+    WORKS_DETAIL_OTHER_REVIEW_LOAD_SUCCESS(HttpStatus.OK, "WORKS_DETAIL_SUCCESS_002", "다른 유저 리뷰 조회에 성공했습니다."),
+    WORKS_DETAIL_REVIEW_DETAIL_LOAD_SUCCESS(HttpStatus.OK, "WORKS_DETAIL_SUCCESS_003", "리뷰 단건 조회에 성공했습니다."),
+    WORKS_DETAIL_REVIEW_LIKE_SUCCESS(HttpStatus.CREATED, "WORKS_DETAIL_SUCCESS_004", "리뷰 좋아요 토글링에 성공했습니다."),
+    WORKS_DETAIL_REVIEW_UPDATE_SUCCESS(HttpStatus.OK, "WORKS_DETAIL_SUCCESS_005", "내 리뷰 수정에 성공했습니다."),
+    WORKS_DETAIL_REVIEW_DELETE_SUCCESS(HttpStatus.OK, "WORKS_DETAIL_SUCCESS_006", "내 리뷰 삭제에 성공했습니다."),
+    WORKS_DETAIL_REVIEW_REPORT_SUCCESS(HttpStatus.OK, "WORKS_DETAIL_SUCCESS_007", "리뷰 신고에 성공했습니다."),
+
     // Favorite success
     FAVORITE_WORKS_LOAD_SUCCESS(HttpStatus.OK, "FAVORITE_SUCCESS_001", "관심 작품 등록 여부 조회에 성공했습니다."),
     FAVORITE_WORKS_ADD_SUCCESS(HttpStatus.CREATED, "FAVORITE_SUCCESS_002", "관심 작품 등록에 성공했습니다."),

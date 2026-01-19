@@ -57,4 +57,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE u.id = :userId ")
     StandardProfileInfo findStandardProfileInfoById(@Param("userId") Long userId);
 
+    // 단체 프로필 정보 조회
+    @Query("SELECT new com.storix.storix_api.domains.user.dto.StandardProfileInfo(u.id, u.profileImageUrl, u.nickName)" +
+            "FROM User u " +
+            "WHERE u.id IN :userIds ")
+    List<StandardProfileInfo> findStandardProfileInfoByUserIds(@Param("userIds") List<Long> userIds);
+
 }

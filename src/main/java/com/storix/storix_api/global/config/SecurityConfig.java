@@ -78,6 +78,10 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
 
                                 // [Works]
+                                .requestMatchers(HttpMethod.POST,   "/api/v1/works/review/*").hasRole("READER")
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/works/review/*").hasRole("READER")
+                                .requestMatchers("/api/v1/works/review/*/like").hasRole("READER")
+                                .requestMatchers("/api/v1/works/review/*/report").hasRole("READER")
                                 .requestMatchers("/api/v1/works/**").permitAll()
 
                                 // [Favorite]

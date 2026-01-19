@@ -14,9 +14,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -145,6 +145,25 @@ public class UserAdaptor {
                 .stream()
                 .map(info -> info.withBaseUrl(baseUrl))
                 .toList();
+    }
+
+    public Map<Long, StandardProfileInfo> findStandardProfileInfoByUserIds(List<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        // 유저 프로필 정보
+        List<StandardProfileInfo> profiles =
+                userRepository.findStandardProfileInfoByUserIds(userIds);
+
+        return profiles.stream()
+                .map(info -> info.withBaseUrl(baseUrl))
+                .collect(Collectors.toMap(
+                        StandardProfileInfo::userId,
+                        Function.identity(),
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
     }
 
 }
