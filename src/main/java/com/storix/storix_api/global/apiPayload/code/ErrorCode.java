@@ -38,6 +38,7 @@ public enum ErrorCode {
     PROFILE_FORBIDDEN_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_003", "사용할 수 없는 닉네임입니다."),
     PROFILE_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_004", "금칙어가 포함된 닉네임입니다."),
     LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, "USER_ERROR_001", "로그인이 필요합니다."),
+    FORBIDDEN_APPROACH(HttpStatus.FORBIDDEN, "USER_ERROR_002", "해당 요청을 수행할 권한이 없습니다."),
 
     INVALID_ROLE_ERROR(HttpStatus.UNAUTHORIZED, "ROLE_ERROR_001", "잘못된 role값 입니다."),
 
@@ -91,6 +92,10 @@ public enum ErrorCode {
 
     // Works error
     WORKS_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKS_ERROR_001", "해당 작품을 찾을 수 없습니다."),
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKS_ERROR_002", "해당 리뷰 정보를 찾을 수 없습니다."),
+    REVIEW_UPDATE_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "WORKS_ERROR_003", "리뷰 수정 요청 처리 중 문제가 발생하였습니다."),
+    REVIEW_DELETE_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "WORKS_ERROR_004", "리뷰 삭제 요청 처리 중 문제가 발생하였습니다."),
+    DUPLICATE_REVIEW_USER_REPORT(HttpStatus.BAD_REQUEST, "WOKRS_ERROR_005", "이미 신고가 완료된 리뷰입니다."),
 
     // Favorite error
     FAVORITE_WORKS_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "FAVORITE_ERROR_001", "이미 관심 작품 해제가 되었거나, 관심 작품으로 등록한 적 없는 작품입니다."),
