@@ -8,7 +8,6 @@ import com.storix.storix_api.domains.plus.dto.SliceReviewInfo;
 import com.storix.storix_api.domains.plus.repository.ReviewRepository;
 import com.storix.storix_api.domains.review.controller.dto.ModifyReviewRequest;
 import com.storix.storix_api.global.apiPayload.exception.plus.DuplicateReviewUploadException;
-import com.storix.storix_api.global.apiPayload.exception.user.UnknownUserException;
 import com.storix.storix_api.global.apiPayload.exception.works.InvalidReviewDeleteRequestException;
 import com.storix.storix_api.global.apiPayload.exception.works.InvalidReviewUpdateRequestException;
 import com.storix.storix_api.global.apiPayload.exception.works.UnknownReviewException;
@@ -89,7 +88,7 @@ public class ReviewAdaptor {
         if (reviewerId.isPresent()) {
             return reviewerId.get();
         } else {
-            throw UnknownUserException.EXCEPTION;
+            throw UnknownReviewException.EXCEPTION;
         }
     }
 
