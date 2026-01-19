@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.hashtag.controller;
 
 import com.storix.storix_api.domains.hashtag.dto.HashtagRecommendResponseDto;
 import com.storix.storix_api.domains.hashtag.service.HashtagRecommendService;
+import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,11 +26,12 @@ public class HashtagRestController {
     @Operation(summary = "사용자 맞춤 해시태그 추천", description = "로그인 시 선호 장르 기반, 비로그인 시 전체 인기순으로 해시태그를 추천합니다.")
     @GetMapping("/recommendations")
     public CustomResponse<List<HashtagRecommendResponseDto>> getRecommendedHashtags(
-            @AuthenticationPrincipal Long userId // SecurityConfig에서 permitAll 필요
-    ) {
+            @AuthenticationPrincipal AuthUserDetails authUserDetails
+            ) {
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
-                hashtagRecommendationService.getRecommendedHashtags(userId)
+                hashtagRecommendationService.getRecommendedHashtags(authUserDetails.getUserId())
         );
     }
+
 }
