@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProfileActivityService {
 
     private final UserAdaptor userAdaptor;
-    private final BoardAdaptor boardAdaptor;
 
     private final ReaderBoardHelper readerBoardHelper;
 
@@ -34,7 +33,7 @@ public class ProfileActivityService {
 
         // 2) 내 게시글 정보
         Slice<ReaderBoardInfo> boards =
-                boardAdaptor.findAllReaderBoardList(userId, pageable);
+                readerBoardHelper.findReaderBoardInfo(userId, null, pageable);
 
         return readerBoardHelper.map(boards, boardInfo -> profileInfo);
     }
