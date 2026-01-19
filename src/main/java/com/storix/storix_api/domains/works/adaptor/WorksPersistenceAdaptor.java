@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -109,7 +110,11 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     // 작품 상세 리뷰용
     @Override
     public WorksInfo findWorksInfoById(Long worksId) {
-        return worksRepository.findWorksInfoById(worksId);
+        Optional<WorksInfo> worksInfo = worksRepository.findWorksInfoById(worksId);
+        if (worksInfo.isEmpty()) {
+            throw UnknownWorksException.EXCEPTION;
+        }
+        return worksInfo.get();
     }
 
 }
