@@ -111,10 +111,20 @@ public class ReviewService {
         Map<Long, StandardProfileInfo> profileMap =
                 userAdaptor.findStandardProfileInfoByUserIds(userIds);
 
-        return reviews.map(review -> {
-            StandardProfileInfo profile = profileMap.get(review.userId());
-            return SliceReviewInfoWithProfile.of(StandardSliceReviewInfo.from(review), profile);
-        });
+        // 프로필 조회에 실패할 경우 필터링
+        List<SliceReviewInfoWithProfile> content = reviews.getContent().stream()
+                .map(review -> {
+                    StandardProfileInfo profile = profileMap.get(review.userId());
+                    if (profile == null) return null;
+                    return SliceReviewInfoWithProfile.of(
+                            StandardSliceReviewInfo.from(review),
+                            profile
+                    );
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        return new SliceImpl<>(content, reviews.getPageable(), reviews.hasNext());
     }
 
     @Transactional(readOnly = true)
