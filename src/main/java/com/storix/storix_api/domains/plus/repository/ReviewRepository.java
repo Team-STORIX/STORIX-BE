@@ -75,13 +75,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("UPDATE Review r " +
             "SET r.likeCount = r.likeCount + 1 " +
             "WHERE r.id = :reviewId")
-    int incrementLikeCount(@Param("reviewId") Long reviewId);
+    void incrementLikeCount(@Param("reviewId") Long reviewId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Review r " +
             "SET r.likeCount = CASE WHEN r.likeCount > 0 THEN r.likeCount - 1 ELSE 0 END " +
             "WHERE r.id = :reviewId ")
-    int decrementLikeCount(@Param("reviewId") Long reviewId);
+    void decrementLikeCount(@Param("reviewId") Long reviewId);
 
     @Query("SELECT r.likeCount " +
             "FROM Review r " +
