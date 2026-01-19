@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class HashTagAdaptor {
+public class HashtagAdaptor {
 
     private final HashtagRepository hashtagRepository;
 
