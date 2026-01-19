@@ -51,9 +51,6 @@ public class Review extends BaseTimeEntity {
 
     private int likeCount = 0;
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewLike> reviewLikes = new ArrayList<>();
-
     /** 생성자 로직 **/
     @Builder
     public Review (Long libraryUserId, Long worksId, boolean isSpoiler, Rating rating, String content) {
