@@ -1,20 +1,28 @@
 package com.storix.storix_api.domains.chat.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.storix.storix_api.global.model.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
 @Getter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class ChatMessage {
 
-    private MessageType messageType;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private Long roomId;
     private Long senderId;
     private String senderName;
+
+    @Column(columnDefinition = "TEXT")
     private String message;
+
+    @Enumerated(EnumType.STRING)
+    private MessageType messageType;
 
 }
