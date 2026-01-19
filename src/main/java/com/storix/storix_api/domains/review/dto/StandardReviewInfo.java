@@ -12,15 +12,17 @@ public record StandardReviewInfo(
         String rating,
         String content,
         int likeCount,
+        boolean isLiked,
         String lastCreatedTime
 ) {
-    public static StandardReviewInfo fromReviewInfo(ReviewInfo reviewInfo) {
+    public static StandardReviewInfo fromReviewInfo(ReviewInfo reviewInfo, boolean isLiked) {
         return new StandardReviewInfo(
                 reviewInfo.reviewId(),
                 reviewInfo.isSpoiler(),
                 reviewInfo.rating().getDbValue(),
                 reviewInfo.content(),
                 reviewInfo.likeCount(),
+                isLiked,
                 formatDate(reviewInfo.createdAt())
         );
     }
