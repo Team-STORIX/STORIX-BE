@@ -28,6 +28,10 @@ public class ReaderBoard extends Board {
     private boolean isSpoiler;
 
     @ToString.Exclude
+    @OneToMany(mappedBy = "readerBoard", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReaderBoardImage> images = new ArrayList<>();
+
+    @ToString.Exclude
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReaderBoardReply> replies = new ArrayList<>();
 
