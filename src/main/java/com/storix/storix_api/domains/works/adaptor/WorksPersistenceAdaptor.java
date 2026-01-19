@@ -106,4 +106,10 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
                 ));
     }
 
+    // 작품 상세 리뷰용
+    @Override
+    public WorksInfo findWorksInfoById(Long worksId) {
+        return worksRepository.findWorksInfoById(worksId);
+    }
+
 }
