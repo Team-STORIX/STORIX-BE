@@ -8,6 +8,7 @@ import com.storix.storix_api.domains.review.controller.dto.ReviewReportRequest;
 import com.storix.storix_api.domains.review.dto.CreateWorksDetailReportCommand;
 import com.storix.storix_api.global.apiPayload.exception.topicRoom.SelfReportException;
 import com.storix.storix_api.global.apiPayload.exception.user.ForbiddenApproachException;
+import com.storix.storix_api.global.apiPayload.exception.works.InvalidReviewReportException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,13 +47,18 @@ public class WorksDetailKebabService {
     @Transactional
     public void reportReview(Long userId, Long reviewId, ReviewReportRequest req) {
 
-        if (userId.equals(req.reportedUserId())) {
+        Long reportedUserId = reviewAdaptor.findReviewerIdById(reviewId);
+        if (!reportedUserId.equals(req.reportedUserId())) {
+            throw InvalidReviewReportException.EXCEPTION;
+        }
+
+        if (userId.equals(reportedUserId)) {
             throw SelfReportException.EXCEPTION;
         }
 
         CreateWorksDetailReportCommand cmd = new CreateWorksDetailReportCommand(
                 userId,
-                req.reportedUserId(),
+                reportedUserId,
                 reviewId,
                 req.reason(),
                 req.otherReason()
