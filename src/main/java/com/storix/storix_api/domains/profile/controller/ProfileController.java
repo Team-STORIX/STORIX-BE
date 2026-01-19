@@ -122,7 +122,7 @@ public class ProfileController {
     public ResponseEntity<CustomResponse<Slice<ReaderBoardWithProfileInfo>>> getReaderBoardList(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @RequestParam(defaultValue = "LATEST") ProfileSortType sort,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") @Min(0) int page
     ) {
         Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
         return ResponseEntity.ok()
