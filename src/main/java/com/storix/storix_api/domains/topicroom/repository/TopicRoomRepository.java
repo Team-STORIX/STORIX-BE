@@ -55,9 +55,18 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
             "WHERE t.id = :id AND t.activeUserNumber > 0")
     int decrementActiveUserNumber(@Param("id") Long id);
 
+    // 마지막 채팅 시간 갱신
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE TopicRoom t SET t.lastChatTime = :now WHERE t.id = :id")
-    void updateLastChatTime(@Param("id") Long id, @Param("now") LocalDateTime now);
+    @Query("UPDATE TopicRoom t SET t.lastChatTime = :lastChatTime WHERE t.id = :roomId")
+    void updateLastChatTime(@Param("roomId") Long roomId, @Param("lastChatTime") LocalDateTime lastChatTime);
+
+    // 인기도 점수 갱신 (스케줄러용)
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE TopicRoom t SET t.popularityScore = :score WHERE t.id = :roomId")
+    void updatePopularityScore(@Param("roomId") Long roomId, @Param("score") Double score);
+
+    // 인기도 순으로 조회
+    List<TopicRoom> findTop5ByOrderByPopularityScoreDescLastChatTimeDesc();
 
     boolean existsByWorksId(Long worksId);
 }
