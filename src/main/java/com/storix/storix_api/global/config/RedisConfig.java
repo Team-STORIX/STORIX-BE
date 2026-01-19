@@ -42,4 +42,17 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+
+    @Bean
+    public RedisTemplate<String, Object> jsonRedisTemplate(RedisConnectionFactory factory, ObjectMapper objectMapper) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+        template.setKeySerializer(new StringRedisSerializer());
+
+        // value -> json으로 직렬화
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
+        template.setValueSerializer(serializer);
+        template.setHashValueSerializer(serializer);
+        return template;
+    }
 }
