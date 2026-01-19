@@ -112,8 +112,14 @@ public enum ErrorCode {
     PLUS_DUPLICATE_REVIEW_UPLOAD(HttpStatus.BAD_REQUEST, "PLUS_ERROR_004", "해당 작품에 대한 리뷰가 이미 존재합니다."),
     PLUS_WORKS_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_005", "존재하지 않는 작품입니다."),
     PLUS_WORKS_ID_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_006", "작품 id값을 보내주세요."),
-    PLUS_IMAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_007", "게시물 이미지 objectKey 값이 잘못되었습니다.");
-  
+    PLUS_IMAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "PLUS_ERROR_007", "게시물 이미지 objectKey 값이 잘못되었습니다."),
+
+    // Feed error
+    BOARD_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "BOARD_ERROR_001", "이미 삭제된 게시물이거나 정보를 찾을 수 없습니다."),
+    REVIEW_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "REVIEW_ERROR_001", "이미 삭제된 리뷰이거나 정보를 찾을 수 없습니다."),
+    DUPLICATE_FEED_USER_REPORT(HttpStatus.BAD_REQUEST, "FEED_ERROR_001", "이미 신고가 완료된 게시물입니다."),
+    BOARD_REPlY_NOT_FOUND(HttpStatus.NOT_FOUND, "REPLY_ERROR_001", "해당 게시글에 대한 댓글 정보를 찾을 수 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final String code;
