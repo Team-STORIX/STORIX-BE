@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.search.service;
 
 import com.storix.storix_api.domains.search.application.usecase.SearchUseCase;
 import com.storix.storix_api.domains.search.dto.ArtistSearchResponseDto;
+import com.storix.storix_api.domains.search.dto.PlusSearchResponseWrapperDto;
 import com.storix.storix_api.domains.search.dto.SearchResponseWrapperDto;
 import com.storix.storix_api.domains.search.dto.WorksSearchResponseDto;
 import com.storix.storix_api.domains.user.application.port.LoadUserPort;
@@ -9,6 +10,7 @@ import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.domains.works.domain.Works;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class SearchService implements SearchUseCase {
+
+    @Value("AWS_S3_BASE_URL") String baseUrl;
 
     private final LoadWorksPort loadWorksPort;
     private final LoadUserPort loadUserPort;
@@ -63,6 +67,18 @@ public class SearchService implements SearchUseCase {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public PlusSearchResponseWrapperDto<WorksSearchResponseDto> searchWorksForWriting(String keyword, Pageable pageable) {
+
+        // 작품 검색
+        Slice<Works> worksSlice = loadWorksPort.searchWorks(keyword, pageable);
+
+        return PlusSearchResponseWrapperDto.<WorksSearchResponseDto>builder()
+                .result(worksSlice.map(this::toWorkDto))
+                .build();
+    }
+
     private WorksSearchResponseDto toWorkDto(Works works) {
         return WorksSearchResponseDto.builder()
                 .worksId(works.getId())
@@ -79,7 +95,7 @@ public class SearchService implements SearchUseCase {
         return ArtistSearchResponseDto.builder()
                 .artistId(user.getId())
                 .artistName(user.getNickName())
-                //.profileImageUrl(user.getProfile())
+                .profileUrl(user.getProfileImageUrl() == null ? null : baseUrl + "/" +user.getProfileImageUrl())
                 .build();
     }
 }

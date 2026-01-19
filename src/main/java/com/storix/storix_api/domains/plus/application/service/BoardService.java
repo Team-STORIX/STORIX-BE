@@ -10,11 +10,10 @@ import com.storix.storix_api.domains.plus.domain.ArtistBoard;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.dto.CreateArtistBoardCommand;
 import com.storix.storix_api.domains.plus.dto.CreateReaderBoardCommand;
-import com.storix.storix_api.domains.user.application.port.LoadUserPort;
+import com.storix.storix_api.domains.works.application.helper.AdultWorksHelper;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.global.apiPayload.exception.plus.PlusImageNotExistException;
 import com.storix.storix_api.global.apiPayload.exception.plus.WorksIdNotExistException;
-import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnverifiedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,10 +27,11 @@ public class BoardService {
     private final LibraryAdaptor libraryAdaptor;
 
     private final LoadWorksPort loadWorksPort;
-    private final LoadUserPort loadUserPort;
 
+    private final AdultWorksHelper adultWorksHelper;
     private final S3CacheHelper s3CacheHelper;
 
+    // 독자 게시물 생성
     @Transactional
     public void createReaderBoard(Long userId, ReaderBoardUploadRequest req) {
 
@@ -41,17 +41,10 @@ public class BoardService {
             if (req.worksId() == null) {
                 throw WorksIdNotExistException.EXCEPTION;
             }
-            loadWorksPort.checkWorksExistById(req.worksId());
 
+            // 성인 작품 여부 확인 및 핸들링
+            adultWorksHelper.CheckUserAuthorityWithWorks(userId, req.worksId());
             worksId = req.worksId();
-            if (loadWorksPort.isWorksForAdult(worksId)) {
-
-                Boolean isAdult = loadUserPort.findIsAdultVerifiedById(userId);
-
-                if (!Boolean.TRUE.equals(isAdult)) {
-                    throw UnverifiedException.EXCEPTION;
-                }
-            }
         }
 
         if (!req.objectKeys().isEmpty()) {

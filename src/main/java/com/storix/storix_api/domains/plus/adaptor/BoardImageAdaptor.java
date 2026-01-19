@@ -4,21 +4,26 @@ import com.storix.storix_api.domains.plus.domain.ArtistBoard;
 import com.storix.storix_api.domains.plus.domain.ArtistBoardImage;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.domain.ReaderBoardImage;
+import com.storix.storix_api.domains.plus.dto.ReaderBoardImageInfo;
 import com.storix.storix_api.domains.plus.repository.ArtistBoardImageRepository;
 import com.storix.storix_api.domains.plus.repository.ReaderBoardImageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class BoardImageAdaptor {
 
+    @Value("${AWS_S3_BASE_URL}") private String baseUrl;
+
     private final ReaderBoardImageRepository readerBoardImageRepository;
     private final ArtistBoardImageRepository artistBoardImageRepository;
 
+    // 게시글 이미지 저장
     public void saveReaderBoardImages(ReaderBoard readerBoard, List<String> objectKeys) {
         List<ReaderBoardImage> images = buildImages(objectKeys,
                 (objectKey, sortOrder) -> ReaderBoardImage.of(readerBoard, objectKey, sortOrder)
@@ -50,4 +55,24 @@ public class BoardImageAdaptor {
     private interface ImageFactory<T> {
         T create(String objectKey, int sortOrder);
     }
+
+    // 게시글 이미지 조회
+    public Map<Long, List<ReaderBoardImageInfo>> findReaderBoardImagesByBoardIds( List<Long> boardIds) {
+
+        if (boardIds == null || boardIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<ReaderBoardImage> images =
+                readerBoardImageRepository.findAllByBoardIds(boardIds);
+
+        return images.stream()
+                .map(img -> ReaderBoardImageInfo.from(img, baseUrl))
+                .collect(Collectors.groupingBy(
+                        ReaderBoardImageInfo::boardId,
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+    }
+
 }
