@@ -84,7 +84,6 @@ public class BoardAdaptor {
     // 작가 게시글 생성
     public ArtistBoard saveArtistBoard(CreateArtistBoardCommand cmd) {
         try {
-            ArtistBoard artistBoard = cmd.toEntity();
             return artistBoardRepository.save(cmd.toEntity());
         } catch (DataIntegrityViolationException e) {
             throw DuplicateBoardUploadException.EXCEPTION;

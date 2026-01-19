@@ -28,7 +28,7 @@ public interface ReaderBoardReplyRepository extends JpaRepository<ReaderBoardRep
     @Query("UPDATE ReaderBoardReply r " +
             "SET r.likeCount = r.likeCount - 1 " +
             "WHERE r.id = :id AND r.likeCount > 0")
-    int decrementLikeCount(@Param("id") Long id);
+    void decrementLikeCount(@Param("id") Long id);
 
     // 피드 댓글 - 조회
     Slice<ReaderBoardReply> findAllByBoard_Id(Long boardId, Pageable pageable);

@@ -3,7 +3,6 @@ package com.storix.storix_api.domains.feed.service;
 import com.storix.storix_api.domains.feed.adaptor.ReaderFeedAdaptor;
 import com.storix.storix_api.domains.feed.domain.ReaderBoardReply;
 import com.storix.storix_api.domains.feed.dto.BoardWrapperDto;
-import com.storix.storix_api.domains.feed.dto.ReaderBoardReplyInfo;
 import com.storix.storix_api.domains.feed.dto.ReaderBoardReplyInfoWithProfile;
 import com.storix.storix_api.domains.plus.application.helper.ReaderBoardHelper;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;

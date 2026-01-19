@@ -1,16 +1,12 @@
 package com.storix.storix_api.domains.plus.domain;
 
 import com.storix.storix_api.domains.plus.adaptor.RatingConverter;
-import com.storix.storix_api.domains.review.domain.ReviewLike;
 import com.storix.storix_api.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter

@@ -24,8 +24,5 @@ public interface ReaderBoardLikeRepository extends JpaRepository<ReaderBoardLike
             "WHERE rl.userId = :userId AND rl.board.id = :boardId ")
     int deleteLike(@Param("userId") Long userId, @Param("boardId") Long boardId);
 
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("DELETE FROM ReaderBoardLike rl WHERE rl.board.id = :boardId")
-    void deleteAllByBoardId(@Param("boardId") Long boardId);
 
 }

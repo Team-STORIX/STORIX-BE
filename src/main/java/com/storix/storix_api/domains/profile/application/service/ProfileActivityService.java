@@ -1,6 +1,5 @@
 package com.storix.storix_api.domains.profile.application.service;
 
-import com.storix.storix_api.domains.plus.adaptor.BoardAdaptor;
 import com.storix.storix_api.domains.plus.application.helper.ReaderBoardHelper;
 import com.storix.storix_api.domains.plus.dto.ReaderBoardInfo;
 import com.storix.storix_api.domains.profile.dto.ReaderBoardWithProfileInfo;

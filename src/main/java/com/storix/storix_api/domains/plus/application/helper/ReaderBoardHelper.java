@@ -39,7 +39,7 @@ public class ReaderBoardHelper {
     // 게시글 리스트 조회
     public Slice<ReaderBoardInfo> findReaderBoardInfo(Long userId, Long worksId, Pageable pageable) {
 
-        Slice<ReaderBoard> boards = null;
+        Slice<ReaderBoard> boards;
 
         // 작품 관련 게시글 조회
         if (worksId != null) {

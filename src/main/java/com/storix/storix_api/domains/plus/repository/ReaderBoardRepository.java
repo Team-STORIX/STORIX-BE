@@ -35,7 +35,7 @@ public interface ReaderBoardRepository extends JpaRepository<ReaderBoard, Long> 
     @Query("UPDATE ReaderBoard r " +
             "SET r.replyCount = r.replyCount - 1 " +
             "WHERE r.id = :id AND r.replyCount > 0")
-    int decrementReplyCount(@Param("id") Long id);
+    void decrementReplyCount(@Param("id") Long id);
 
     // 피드 - 좋아요
     @Query("SELECT r.likeCount " +
