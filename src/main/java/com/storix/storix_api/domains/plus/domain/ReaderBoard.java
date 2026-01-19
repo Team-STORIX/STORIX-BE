@@ -1,10 +1,12 @@
 package com.storix.storix_api.domains.plus.domain;
 
+import com.storix.storix_api.domains.feed.domain.ReaderBoardLike;
+import com.storix.storix_api.domains.feed.domain.ReaderBoardReply;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -24,6 +26,14 @@ public class ReaderBoard extends Board {
 
     @Column(name = "is_spoiler")
     private boolean isSpoiler;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReaderBoardReply> replies = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReaderBoardLike> likes = new ArrayList<>();
 
 
     @Builder
