@@ -1,7 +1,9 @@
 package com.storix.storix_api.domains.topicroom.adaptor;
 
+import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomUserPort;
 import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomPort;
 import com.storix.storix_api.domains.topicroom.application.port.RecordTopicRoomPort;
+import com.storix.storix_api.domains.topicroom.application.port.UpdateTopicRoomPort;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomReport;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomUser;
@@ -17,10 +19,11 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTopicRoomPort {
+public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTopicRoomPort, UpdateTopicRoomPort, LoadTopicRoomUserPort {
 
     private final TopicRoomRepository topicRoomRepository;
     private final TopicRoomUserRepository topicRoomUserRepository;
@@ -83,12 +86,22 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     }
 
     @Override
-    public void updateLastChatTime(Long roomId, LocalDateTime now) {
-        topicRoomRepository.updateLastChatTime(roomId, now);
+    public void updateLastChatTime(Long roomId, LocalDateTime lastChatTime) {
+        topicRoomRepository.updateLastChatTime(roomId, lastChatTime);
     }
 
-    // 참여 중인 방 ID 리스트 조회 (참여 여부 매핑용)
-    @Override public List<Long> findAllJoinedRoomIdsByUserId(Long userId) {
+    @Override
+    public List<TopicRoom> loadTop5PopularRooms() {
+        return topicRoomRepository.findTop5ByOrderByPopularityScoreDescLastChatTimeDesc();
+    }
+
+    @Override
+    public Set<Long> loadJoinedRoomIds(Long userId, List<Long> roomIds) {
+        return topicRoomUserRepository.findJoinedRoomIdsByUserIdAndRoomIds(userId, roomIds);
+    }
+
+    @Override
+    public List<Long> findAllJoinedRoomIdsByUserId(Long userId) {
         return topicRoomUserRepository.findAllJoinedRoomIdsByUserId(userId);
     }
 
@@ -98,5 +111,10 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     @Override
     public boolean existsByWorksId(Long worksId) {
         return topicRoomRepository.existsByWorksId(worksId);
+    }
+
+    @Override
+    public boolean existsById(Long roomId) {
+        return topicRoomRepository.existsById(roomId);
     }
 }
