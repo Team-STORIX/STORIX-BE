@@ -1,11 +1,20 @@
 package com.storix.storix_api.domains.chat.controller;
 
+import com.storix.storix_api.domains.chat.application.usecase.ChatUseCase;
 import com.storix.storix_api.domains.chat.domain.ChatMessage;
 import com.storix.storix_api.domains.chat.domain.MessageType;
+import com.storix.storix_api.domains.chat.dto.ChatMessageRequestDto;
+import com.storix.storix_api.domains.chat.dto.ChatMessageResponseDto;
+import com.storix.storix_api.domains.topicroom.application.usecase.TopicRoomUseCase;
+import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
+import com.storix.storix_api.domains.user.application.port.LoadUserPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
@@ -13,33 +22,18 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final ChatUseCase chatUseCase;
 
-    /**
-     * [Message flow]
-     * 1. 클라이언트가 "/pub/chat/message"로 메시지를 보냄
-     * 2. 이 메서드가 받아서 처리
-     * 3. "/sub/chat/room/{roomId}"를 구독 중인 사람들에게 메시지 전송
-     */
     @MessageMapping("/chat/message")
-    public void message(ChatMessage message) {
+    public void message(@Payload ChatMessageRequestDto request, SimpMessageHeaderAccessor accessor) {
+        Authentication auth = (Authentication) accessor.getUser();
 
-        // 추후 DB 저장 로직 추가 예정
-
-        // 입장 메시지 처리
-        if (MessageType.ENTER.equals(message.getMessageType())) {
-
-            // senderName은 추후 토큰에서 가져오거나 클라이언트가 보내준 값 사용
-            message = ChatMessage.builder()
-                    .messageType(MessageType.ENTER)
-                    .roomId(message.getRoomId())
-                    .senderName("알림")
-                    .message(message.getSenderName() + "님이 입장하셨습니다.")
-                    .build();
+        if (auth == null) {
+            log.error(">>>> [채팅 에러] 인증되지 않은 세션입니다.");
+            return;
         }
 
-        // 해당 방(Topic)을 구독 중인 클라이언트들에게 메시지 발송
-        messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
+        AuthUserDetails user = (AuthUserDetails) auth.getPrincipal();
+        chatUseCase.sendMessage(user.getUserId(), request);
     }
-
 }
