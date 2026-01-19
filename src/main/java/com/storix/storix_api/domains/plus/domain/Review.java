@@ -1,12 +1,16 @@
 package com.storix.storix_api.domains.plus.domain;
 
 import com.storix.storix_api.domains.plus.adaptor.RatingConverter;
+import com.storix.storix_api.domains.review.domain.ReviewLike;
 import com.storix.storix_api.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -47,6 +51,9 @@ public class Review extends BaseTimeEntity {
 
     private int likeCount = 0;
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
+
     /** 생성자 로직 **/
     @Builder
     public Review (Long libraryUserId, Long worksId, boolean isSpoiler, Rating rating, String content) {
@@ -55,11 +62,6 @@ public class Review extends BaseTimeEntity {
         this.isSpoiler = isSpoiler;
         this.rating = rating;
         this.content = content;
-    }
-
-    /** 비즈니스 로직 **/
-    public void updateLikeCount() {
-        this.likeCount ++;
     }
 
 }
