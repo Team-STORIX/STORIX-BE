@@ -89,6 +89,9 @@ public class SecurityConfig {
                                 .access(new WebExpressionAuthorizationManager("!hasRole('ARTIST')"))
                                 .requestMatchers("/api/v1/favorite/**").hasRole("READER")
 
+                                // [Feed]
+                                .requestMatchers("/api/v1/feed/**").hasRole("READER")
+
                                 .anyRequest().authenticated()
                 )
 
