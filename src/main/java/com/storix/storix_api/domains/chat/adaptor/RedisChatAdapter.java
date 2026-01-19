@@ -2,7 +2,6 @@ package com.storix.storix_api.domains.chat.adaptor;
 
 import com.storix.storix_api.domains.chat.application.port.PublishChatPort;
 import com.storix.storix_api.domains.chat.dto.ChatMessageResponseDto;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
