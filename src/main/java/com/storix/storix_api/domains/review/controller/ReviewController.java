@@ -61,10 +61,11 @@ public class ReviewController {
     @Operation(summary = "리뷰 단건 조회", description = "리뷰 id로 리뷰 상세정보를 조회하는 api 입니다.")
     @GetMapping("/review/{reviewId}")
     public ResponseEntity<CustomResponse<DetailedReviewInfoWithProfile>> getReviewDetail(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @PathVariable @NotNull Long reviewId
     ) {
         return ResponseEntity.ok()
-                .body(worksDetailReviewUseCase.getReviewDetail(reviewId));
+                .body(worksDetailReviewUseCase.getReviewDetail(authUserDetails.getUserId(), reviewId));
     }
 
     @Operation(summary = "리뷰 좋아요", description = "리뷰 id로 좋아요를 토글링하는 api 입니다. 좋아요 여부와 최신 좋아요 수가 반환됩니다.")
