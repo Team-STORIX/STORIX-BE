@@ -55,15 +55,6 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
         return topicRoomUserRepository.countByUserId(userId);
     }
 
-    @Override public boolean existsByUserIdAndRoomId(Long userId, Long roomId) {
-        return topicRoomUserRepository.existsByUserIdAndTopicRoomId(userId, roomId);
-    }
-
-    @Override public LocalDateTime getLastMessageTime(Long roomId) {
-        // TODO: 채팅 서버 연동 시 구현
-        return LocalDateTime.now().minusMinutes(5);
-    }
-
     @Override public TopicRoom saveRoom(TopicRoom room) {
         return topicRoomRepository.save(room);
     }
