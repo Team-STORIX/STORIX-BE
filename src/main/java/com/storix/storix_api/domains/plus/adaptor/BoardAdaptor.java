@@ -4,15 +4,18 @@ import com.storix.storix_api.domains.plus.domain.ArtistBoard;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.dto.CreateArtistBoardCommand;
 import com.storix.storix_api.domains.plus.dto.CreateReaderBoardCommand;
-import com.storix.storix_api.domains.plus.dto.ReaderBoardInfo;
 import com.storix.storix_api.domains.plus.repository.ArtistBoardRepository;
 import com.storix.storix_api.domains.plus.repository.ReaderBoardRepository;
+import com.storix.storix_api.global.apiPayload.exception.feed.InvalidBoardRequestException;
 import com.storix.storix_api.global.apiPayload.exception.plus.DuplicateBoardUploadException;
+import com.storix.storix_api.global.apiPayload.exception.user.ForbiddenApproachException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -35,10 +38,44 @@ public class BoardAdaptor {
     }
 
     // 독자 내 게시글 조회
-    public Slice<ReaderBoardInfo> findAllReaderBoardList(Long userId, Pageable pageable) {
-        Slice<ReaderBoard> result =
-                readerBoardRepository.findAllReaderBoardByUserId(userId, pageable);
-        return result.map(ReaderBoardInfo::ofMyBoard);
+    public Slice<ReaderBoard> findAllReaderBoardList(Long userId, Pageable pageable) {
+        return readerBoardRepository.findAllReaderBoardByUserId(userId, pageable);
+    }
+
+    // 독자 게시글 삭제
+    public void deleteSingleReaderBoard(Long userId, Long boardId) {
+
+        Optional<ReaderBoard> readerBoard = readerBoardRepository.findById(boardId);
+        if (readerBoard.isPresent()) {
+            if (readerBoard.get().getUserId().equals(userId)) {
+                readerBoardRepository.deleteById(boardId);
+                readerBoardRepository.flush();
+            } else {
+                throw ForbiddenApproachException.EXCEPTION;
+            }
+        } else {
+            throw InvalidBoardRequestException.EXCEPTION;
+        }
+
+    }
+
+    // 피드 작품 관련 게시글 조회
+    public Slice<ReaderBoard> findAllReaderBoardListByWorksId(Long worksId, Pageable pageable) {
+        if (worksId == null) {
+            return null;
+        }
+
+        return readerBoardRepository.findAllReaderBoardByWorksId(worksId, pageable);
+    }
+
+    // 피드 게시글 단건 조회
+    public ReaderBoard findReaderBoard(Long boardId) {
+        Optional<ReaderBoard> readerBoard = readerBoardRepository.findById(boardId);
+        if (readerBoard.isPresent()) {
+            return readerBoard.get();
+        } else {
+            throw InvalidBoardRequestException.EXCEPTION;
+        }
     }
 
     /**
@@ -53,6 +90,5 @@ public class BoardAdaptor {
             throw DuplicateBoardUploadException.EXCEPTION;
         }
     }
-
 
 }
