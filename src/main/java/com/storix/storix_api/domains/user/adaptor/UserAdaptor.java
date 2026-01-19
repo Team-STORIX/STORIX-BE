@@ -157,6 +157,7 @@ public class UserAdaptor {
                 userRepository.findStandardProfileInfoByUserIds(userIds);
 
         return profiles.stream()
+                .map(info -> info.withBaseUrl(baseUrl))
                 .collect(Collectors.toMap(
                         StandardProfileInfo::userId,
                         Function.identity(),
