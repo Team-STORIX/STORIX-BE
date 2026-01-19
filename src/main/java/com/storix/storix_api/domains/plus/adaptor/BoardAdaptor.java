@@ -4,11 +4,14 @@ import com.storix.storix_api.domains.plus.domain.ArtistBoard;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.dto.CreateArtistBoardCommand;
 import com.storix.storix_api.domains.plus.dto.CreateReaderBoardCommand;
+import com.storix.storix_api.domains.plus.dto.ReaderBoardInfo;
 import com.storix.storix_api.domains.plus.repository.ArtistBoardRepository;
 import com.storix.storix_api.domains.plus.repository.ReaderBoardRepository;
 import com.storix.storix_api.global.apiPayload.exception.plus.DuplicateBoardUploadException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,6 +32,13 @@ public class BoardAdaptor {
         } catch (DataIntegrityViolationException e) {
             throw DuplicateBoardUploadException.EXCEPTION;
         }
+    }
+
+    // 독자 내 게시글 조회
+    public Slice<ReaderBoardInfo> findAllReaderBoardList(Long userId, Pageable pageable) {
+        Slice<ReaderBoard> result =
+                readerBoardRepository.findAllReaderBoardByUserId(userId, pageable);
+        return result.map(ReaderBoardInfo::ofMyBoard);
     }
 
     /**
