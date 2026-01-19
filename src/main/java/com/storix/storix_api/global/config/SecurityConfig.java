@@ -105,6 +105,7 @@ public class SecurityConfig {
                 "https://www.storix.kr",
                 "https://api.storix.kr",
                 "http://localhost:3000",
+                "http://localhost:5173",
                 "https://storix-fe-git-develop-kim-yunseongs-projects.vercel.app",
                 "https://storix-fe-git-main-kim-yunseongs-projects.vercel.app"
         ));
