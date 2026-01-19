@@ -11,6 +11,7 @@ public record ModifyReviewRequest(
 
         boolean isSpoiler,
 
+        @NotNull(message = "리뷰 내용을 입력해주세요.")
         @Size(max = 500, message = "리뷰는 500자까지 가능합니다.")
         String content
 
