@@ -164,7 +164,7 @@ public class ReaderFeedAdaptor {
                 throw ForbiddenApproachException.EXCEPTION;
             }
         } else {
-            throw InvalidBoardRequestException.EXCEPTION;
+            throw BoardReplyNotFoundException.EXCEPTION;
         }
 
     }

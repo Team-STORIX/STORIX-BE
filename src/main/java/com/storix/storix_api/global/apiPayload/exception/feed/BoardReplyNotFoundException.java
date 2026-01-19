@@ -7,5 +7,5 @@ public class BoardReplyNotFoundException extends STORIXCodeException {
 
   public static final STORIXCodeException EXCEPTION = new BoardReplyNotFoundException();
 
-  private BoardReplyNotFoundException() { super(ErrorCode.BOARD_REPlY_NOT_FOUND);}
+  private BoardReplyNotFoundException() { super(ErrorCode.BOARD_REPLY_NOT_FOUND);}
 }
