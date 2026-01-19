@@ -73,6 +73,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/topic-rooms/today").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/search").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
+                                .requestMatchers("/ws-stomp/**").permitAll()
 
                                 // [Works]
                                 .requestMatchers("/api/v1/works/**").permitAll()
