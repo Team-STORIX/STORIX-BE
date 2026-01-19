@@ -25,8 +25,7 @@ public class LibraryAdaptor {
         libraryRepository.incrementBoardCount(libraryUserId);
     }
 
-    public int decrementBoardCount(Long libraryUserId) {
-        return libraryRepository.decrementBoardCount(libraryUserId);
+    public void decrementBoardCount(Long libraryUserId) { libraryRepository.decrementBoardCount(libraryUserId);
     }
 
     // 서재 업데이트

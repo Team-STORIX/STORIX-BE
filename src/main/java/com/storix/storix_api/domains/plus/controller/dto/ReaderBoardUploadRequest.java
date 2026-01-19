@@ -10,8 +10,10 @@ public record ReaderBoardUploadRequest(
         boolean isWorksSelected,
         Long worksId,
 
+        @NotBlank(message = "스포일러 여부를 선택해주세요.")
         boolean isSpoiler,
 
+        @NotBlank(message = "게시글 내용을 입력해주세요.")
         @Size(max = 300, message = "게시글은 300자까지 가능합니다.")
         String content,
 

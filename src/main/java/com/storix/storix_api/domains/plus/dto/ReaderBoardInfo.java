@@ -19,10 +19,13 @@ public record ReaderBoardInfo(
         String lastCreatedTime,
         String content,
         int likeCount,
-        int replyCount
+        int replyCount,
+
+        // 좋아요 여부
+        boolean isLiked
 ) {
     // 내 게시글 조회
-    public static ReaderBoardInfo ofMyBoard(ReaderBoard board) {
+    public static ReaderBoardInfo ofMyBoard(ReaderBoard board, boolean isLiked) {
         return new ReaderBoardInfo(
                 null,
                 board.getId(),
@@ -31,12 +34,13 @@ public record ReaderBoardInfo(
                 formatTimeAgo(board.getCreatedAt()),
                 board.getContent(),
                 board.getLikeCount(),
-                board.getReplyCount()
+                board.getReplyCount(),
+                isLiked
         );
     }
 
-    // 피드 게사굴 조회
-    public static ReaderBoardInfo ofFeedBoard(ReaderBoard board) {
+    // 피드 게시글 조회
+    public static ReaderBoardInfo ofFeedBoard(ReaderBoard board, boolean isLiked) {
         return new ReaderBoardInfo(
                 board.getUserId(),
                 board.getId(),
@@ -45,7 +49,8 @@ public record ReaderBoardInfo(
                 formatTimeAgo(board.getCreatedAt()),
                 board.getContent(),
                 board.getLikeCount(),
-                board.getReplyCount()
+                board.getReplyCount(),
+                isLiked
         );
     }
 

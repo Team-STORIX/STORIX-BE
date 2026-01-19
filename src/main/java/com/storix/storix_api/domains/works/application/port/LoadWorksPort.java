@@ -36,4 +36,7 @@ public interface LoadWorksPort {
 
     Map<Long, WorksInfo> findAllWorksInfoByWorksIds(List<Long> worksIds);
 
+    // 작품 상세 리뷰 용
+    WorksInfo findWorksInfoById(Long worksId);
+
 }
