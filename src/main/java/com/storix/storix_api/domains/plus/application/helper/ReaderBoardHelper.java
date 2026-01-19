@@ -1,6 +1,6 @@
 package com.storix.storix_api.domains.plus.application.helper;
 
-import com.storix.storix_api.domains.hashtag.adaptor.HashTagAdaptor;
+import com.storix.storix_api.domains.hashtag.adaptor.HashtagAdaptor;
 import com.storix.storix_api.domains.plus.adaptor.BoardImageAdaptor;
 import com.storix.storix_api.domains.plus.dto.ReaderBoardImageInfo;
 import com.storix.storix_api.domains.plus.dto.ReaderBoardInfo;
@@ -23,7 +23,7 @@ import java.util.function.Function;
 public class ReaderBoardHelper {
 
     private final BoardImageAdaptor boardImageAdaptor;
-    private final HashTagAdaptor hashTagAdaptor;
+    private final HashtagAdaptor hashTagAdaptor;
 
     private final LoadWorksPort loadWorksPort;
 
