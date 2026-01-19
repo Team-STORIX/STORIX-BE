@@ -38,9 +38,7 @@ public class FeedKebabService {
         CreateFeedReportCommand cmd = new CreateFeedReportCommand(
                 userId,
                 req.reportedUserId(),
-                boardId,
-                req.reason(),
-                req.otherReason()
+                boardId
         );
 
         feedReportAdaptor.saveReport(cmd);

@@ -30,18 +30,10 @@ public class FeedReport extends BaseTimeEntity {
     private Long reportedUserId;
     private Long boardId;
 
-    @Enumerated(EnumType.STRING)
-    private ReportReason reason;
-
-    @Column(length = 100)
-    private String otherReason;
-
     @Builder
-    public FeedReport(Long reporterId, Long reportedUserId, Long boardId, ReportReason reason, String otherReason) {
+    public FeedReport(Long reporterId, Long reportedUserId, Long boardId) {
         this.reporterId = reporterId;
         this.reportedUserId = reportedUserId;
         this.boardId = boardId;
-        this.reason = reason;
-        this.otherReason = otherReason;
     }
 }
