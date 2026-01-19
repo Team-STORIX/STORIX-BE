@@ -9,7 +9,16 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ChatMessage {
+@Table(
+        name = "chat_message",
+        indexes = {
+                @Index(
+                        name = "idx_room_created",
+                        columnList = "roomId, createdAt"
+                )
+        }
+)
+public class ChatMessage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
