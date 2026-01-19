@@ -70,6 +70,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/image/fan-board").hasRole("ARTIST")
 
                                 // [TopicRoom]
+                                .requestMatchers("/api/v1/topic-rooms/popular").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/today").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/search").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
