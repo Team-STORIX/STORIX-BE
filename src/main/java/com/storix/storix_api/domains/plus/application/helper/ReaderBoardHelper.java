@@ -113,19 +113,36 @@ public class ReaderBoardHelper {
         // 1) 오늘의 피드 (최대 3개)
         List<StandardReaderBoardInfo> boards = readerFeedAdaptor.findTop3TrendingFeed(threshold);
 
-        // 게시글 ids
-        List<Long> boardIds = boards.stream()
-                .map(StandardReaderBoardInfo::boardId)
-                .toList();
-
         if (boards.size() < 3) {
             int needed = 3 - boards.size();
 
-            // 부족한 개수만큼만 전체 인기순 적용
-            List<StandardReaderBoardInfo> fallbackBoards = readerFeedAdaptor.findSteadyTrendingFeedNotToday(boardIds, needed);
+            // 오늘의 피드 게시글 Ids
+            List<Long> excludeIds = boards.stream()
+                    .map(StandardReaderBoardInfo::boardId)
+                    .toList();
+
+            // 부족한 개수만큼만 전체 인기순 적용 (최근 7일까지)
+            List<StandardReaderBoardInfo> fallbackBoards = readerFeedAdaptor.findSteadyTrendingFeedNotToday(excludeIds, needed);
 
             boards.addAll(fallbackBoards);
         }
+
+        // 인기 점수 기준 재정렬
+        boards.sort(
+                Comparator
+                        .comparing(StandardReaderBoardInfo::popularityScore)
+                        .reversed()
+        );
+
+        // 상위 3개 유지
+        boards = boards.stream()
+                .limit(3)
+                .toList();
+
+        // 게시물 ids
+        List<Long> boardIds = boards.stream()
+                .map(StandardReaderBoardInfo::boardId)
+                .toList();
 
         // 2) 좋아요 여부 조회 - 비로그인 유저의 경우 empty
         Set<Long> likedBoardIds = (userId != null && !boardIds.isEmpty())
