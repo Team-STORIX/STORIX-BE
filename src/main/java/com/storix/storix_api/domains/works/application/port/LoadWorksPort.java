@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.application.port;
 
+import com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo;
 import com.storix.storix_api.domains.works.dto.WorksInfo;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
@@ -39,4 +40,5 @@ public interface LoadWorksPort {
     // 작품 상세 리뷰 용
     WorksInfo findWorksInfoById(Long worksId);
 
+    Map<Long, TopicRoomWorksInfo> loadWorksMapByIds(List<Long> worksIds);
 }
