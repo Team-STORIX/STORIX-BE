@@ -22,6 +22,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
@@ -105,6 +106,40 @@ public class ReaderBoardHelper {
         );
     }
 
+    // 오늘의 피드 조회
+    public List<ReaderBoardInfo> findTop3TrendingFeedInfo(Long userId, LocalDateTime threshold) {
+
+        List<ReaderBoard> boards = readerFeedAdaptor.findTop3TrendingFeed(threshold);
+
+        if (boards.size() < 3) {
+            int needed = 3 - boards.size();
+
+            // 중복 피드 방지
+            List<Long> excludeIds = boards.stream()
+                    .map(ReaderBoard::getId)
+                    .toList();
+
+            // 부족한 개수만큼만 전체 인기순 적용
+            List<ReaderBoard> fallbackBoards = readerFeedAdaptor.findSteadyTrendingFeedNotToday(excludeIds, needed);
+
+            boards.addAll(fallbackBoards );
+        }
+
+        // 좋아요 여부 조회 - 비로그인 유저의 경우 false
+        Set<Long> likedBoardIds = (userId != null && !boards.isEmpty())
+                ? readerFeedAdaptor.findLikedBoardIds(
+                userId,
+                boards.stream().map(ReaderBoard::getId).toList()
+        )
+                : Collections.emptySet();
+
+        return boards.stream()
+                .map(board -> ReaderBoardInfo.ofHomeBoard(
+                        board,
+                        likedBoardIds.contains(board.getId())
+                ))
+                .toList();
+    }
 
     public Slice<ReaderBoardWithProfileInfo> map(
             Slice<ReaderBoardInfo> boards,
