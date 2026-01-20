@@ -2,7 +2,6 @@ package com.storix.storix_api.domains.onboarding.controller;
 
 import com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo;
 import com.storix.storix_api.domains.onboarding.usecase.OnboardingWorksUseCase;
-import com.storix.storix_api.domains.onboarding.domain.OnboardingWorks;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

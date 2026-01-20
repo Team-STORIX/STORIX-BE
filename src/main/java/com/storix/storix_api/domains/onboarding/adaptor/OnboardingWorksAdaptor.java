@@ -2,7 +2,6 @@ package com.storix.storix_api.domains.onboarding.adaptor;
 
 import com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo;
 import com.storix.storix_api.domains.onboarding.repository.OnboardingWorksRepository;
-import com.storix.storix_api.domains.onboarding.domain.OnboardingWorks;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidOnboardingWorksException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
