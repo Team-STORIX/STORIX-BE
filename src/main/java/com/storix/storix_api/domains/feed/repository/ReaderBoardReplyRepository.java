@@ -33,4 +33,7 @@ public interface ReaderBoardReplyRepository extends JpaRepository<ReaderBoardRep
     // 피드 댓글 - 조회
     Slice<ReaderBoardReply> findAllByBoard_Id(Long boardId, Pageable pageable);
 
+    // 프로필 댓글 - 조회
+    Slice<ReaderBoardReply> findAllByUserId(Long userId, Pageable pageable);
+
 }

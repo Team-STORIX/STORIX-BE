@@ -3,6 +3,7 @@ package com.storix.storix_api.domains.feed.dto;
 public record StandardReplyInfoWithLike(
         Long replyId,
         Long userId,
+        Long boardId,
         String comment,
         String lastCreatedTime,
         int likeCount,
@@ -12,6 +13,7 @@ public record StandardReplyInfoWithLike(
         return new StandardReplyInfoWithLike(
                 reply.replyId(),
                 reply.userId(),
+                reply.boardId(),
                 reply.comment(),
                 reply.lastCreatedTime(),
                 reply.likeCount(),
