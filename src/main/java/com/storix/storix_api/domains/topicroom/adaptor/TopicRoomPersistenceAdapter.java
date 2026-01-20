@@ -136,4 +136,8 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
         return topicRoomUserRepository.findMembersByRoomId(roomId);
     }
 
+    @Override
+    public List<TopicRoom> findAllActiveRooms() {
+        return topicRoomRepository.findAllActiveRooms();
+    }
 }
