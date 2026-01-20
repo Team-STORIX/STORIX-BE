@@ -51,7 +51,7 @@ public class ChatService implements ChatUseCase {
         User user = loadUserPort.findById(userId);
         String nickname = user.getNickName();
 
-        ChatMessage chatMessage = request.toEntity(userId, nickname);
+        ChatMessage chatMessage = request.toEntity(userId);
 
         // Redis 발행
         publishChatPort.publish(ChatMessageResponseDto.of(chatMessage, nickname));
