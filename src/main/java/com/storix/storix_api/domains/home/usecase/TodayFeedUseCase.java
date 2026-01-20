@@ -12,7 +12,7 @@ import java.util.List;
 
 @UseCase
 @RequiredArgsConstructor
-public class TodayFeedUscCase {
+public class TodayFeedUseCase {
 
     private final FeedService feedService;
 
