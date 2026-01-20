@@ -8,7 +8,7 @@ public record ChatMessageRequestDto(
         String message,
         MessageType messageType
 ) {
-    public ChatMessage toEntity(Long senderId, String senderName) {
+    public ChatMessage toEntity(Long senderId) {
         return ChatMessage.builder()
                 .roomId(this.roomId)
                 .senderId(senderId)
