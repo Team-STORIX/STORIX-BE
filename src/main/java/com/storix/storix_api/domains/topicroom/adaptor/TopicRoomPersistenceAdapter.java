@@ -117,4 +117,9 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     public boolean existsById(Long roomId) {
         return topicRoomRepository.existsById(roomId);
     }
+
+    @Override
+    public boolean existsByUserIdAndRoomId(Long userId, Long roomId) {
+        return topicRoomUserRepository.existsByUserIdAndTopicRoomId(userId, roomId);
+    }
 }
