@@ -66,6 +66,7 @@ public enum SuccessCode {
     FEED_READER_BOARD_DELETE_SUCCESS(HttpStatus.OK, "FEED_SUCCESS_007", "관심 작품 피드 내 게시물 삭제에 성공했습니다."),
     FEED_READER_BOARD_REPORT_SUCCESS(HttpStatus.CREATED, "FEED_SUCCESS_008", "관심 작품 피드 게시글 신고에 성공했습니다."),
     FEED_READER_BOARD_REPLY_DELETE_SUCCESS(HttpStatus.OK, "FEED_SUCCESS_009", "관심 작품 피드 내 댓글 삭제에 성공했습니다."),
+    FEED_READER_BOARD_REPLY_REPORT_SUCCESS(HttpStatus.CREATED, "FEED_SUCCESS_010", "관심 작품 피드 댓글 신고에 성공했습니다."),
 
     // Favorite success
     FAVORITE_WORKS_LOAD_SUCCESS(HttpStatus.OK, "FAVORITE_SUCCESS_001", "관심 작품 등록 여부 조회에 성공했습니다."),
