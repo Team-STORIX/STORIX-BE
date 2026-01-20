@@ -56,4 +56,9 @@ public class TopicRoom extends BaseTimeEntity {
         this.popularityScore = 0.0;
     }
 
+
+    // 인기도 점수 업데이트 메서드
+    public void updatePopularityScore(double score) {
+        this.popularityScore = score;
+    }
 }
