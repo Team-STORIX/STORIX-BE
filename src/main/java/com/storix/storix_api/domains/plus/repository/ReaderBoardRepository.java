@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 public interface ReaderBoardRepository extends JpaRepository<ReaderBoard, Long> {
 
     // 프로필 관련
@@ -22,6 +25,24 @@ public interface ReaderBoardRepository extends JpaRepository<ReaderBoard, Long> 
             "WHERE rl.userId = :userId " +
             "ORDER BY rl.id DESC ")
     Slice<ReaderBoard> findAllLikedReaderBoards(@Param("userId") Long userId, Pageable pageable);
+
+    // 홈 관련
+    @Query("SELECT rb " +
+            "FROM ReaderBoard rb " +
+            "WHERE rb.createdAt > :threshold " +
+            "ORDER BY (rb.likeCount * 3 + rb.replyCount * 4) DESC, rb.createdAt DESC, rb.id DESC ")
+    List<ReaderBoard> findTop3TrendingFeed(@Param("threshold") LocalDateTime threshold, Pageable pageable);
+
+    @Query("SELECT rb " +
+            "FROM ReaderBoard rb " +
+            "ORDER BY (rb.likeCount * 3 + rb.replyCount * 4) DESC, rb.id DESC ")
+    List<ReaderBoard> findSteadyTrendingFeed(Pageable pageable);
+
+    @Query("SELECT rb " +
+            "FROM ReaderBoard rb " +
+            "WHERE rb.id NOT IN :excludeIds " +
+            "ORDER BY (rb.likeCount * 3 + rb.replyCount * 4) DESC, rb.id DESC ")
+    List<ReaderBoard> findSteadyTrendingFeedNotToday(@Param("excludeIds") List<Long> excludeIds, Pageable pageable);
 
     // 피드 관련
     @Query("SELECT rb " +
