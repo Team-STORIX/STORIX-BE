@@ -8,6 +8,9 @@ public record StandardReaderBoardInfo(
         Long boardId,
         String content,
         int likeCount,
-        int replyCount
+        int replyCount,
+
+        // 인기 점수
+        int popularityScore
 ) {
 }
