@@ -89,6 +89,9 @@ public class SecurityConfig {
                                 .access(new WebExpressionAuthorizationManager("!hasRole('ARTIST')"))
                                 .requestMatchers("/api/v1/favorite/**").hasRole("READER")
 
+                                // [Hashtag]
+                                .requestMatchers("/api/v1/hashtags/recommendations").permitAll()
+
                                 // [Feed]
                                 .requestMatchers("/api/v1/feed/**").hasRole("READER")
 
