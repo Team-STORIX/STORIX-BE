@@ -10,6 +10,7 @@ import com.storix.storix_api.domains.user.dto.StandardProfileInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,6 +67,11 @@ public class ProfileActivityService {
         Slice<ReaderBoardInfo> boards =
                 readerBoardHelper.findLikedReaderBoardInfo(userId, pageable);
 
+        List<ReaderBoardInfo> content = boards.getContent();
+        if (content.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, boards.hasNext());
+        }
+
         // 2) 유저 id 리스트
         List<Long> userIds = boards.getContent().stream()
                 .map(ReaderBoardInfo::userId)
@@ -73,13 +79,21 @@ public class ProfileActivityService {
                 .distinct()
                 .toList();
 
-        // 3) 프로필 조회
+        // 3) 프로필 정보
         Map<Long, StandardProfileInfo> profileMap =
                 userAdaptor.findStandardProfileInfoByUserIds(userIds);
 
+        // 3-1) 프로필이 없을 경우 필터링
+        List<ReaderBoardInfo> filtered = content.stream()
+                .filter(b -> profileMap.get(b.userId()) != null)
+                .toList();
+
+        Slice<ReaderBoardInfo> filteredBoards =
+                new SliceImpl<>(filtered, pageable, boards.hasNext());
+
         // 4) 최종 매핑
         return readerBoardHelper.map(
-                boards,
+                filteredBoards,
                 boardInfo -> profileMap.get(boardInfo.userId())
         );
     }
