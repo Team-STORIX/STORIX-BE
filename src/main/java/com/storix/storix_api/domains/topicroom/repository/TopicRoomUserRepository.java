@@ -1,6 +1,7 @@
 package com.storix.storix_api.domains.topicroom.repository;
 
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomUser;
+import com.storix.storix_api.domains.topicroom.dto.TopicRoomUserResponseDto;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -33,4 +34,12 @@ public interface TopicRoomUserRepository extends JpaRepository<TopicRoomUser, Lo
 
     @Query("SELECT tu.topicRoom.id FROM TopicRoomUser tu WHERE tu.userId = :userId")
     List<Long> findAllJoinedRoomIdsByUserId(@Param("userId") Long userId);
+
+    // 특정 방의 멤버 프로필 조회
+    @Query("SELECT new com.storix.storix_api.domains.topicroom.dto.TopicRoomUserResponseDto(" +
+            "u.id, u.nickName, u.profileImageUrl) " +
+            "FROM TopicRoomUser tu " +
+            "JOIN tu.user u " +
+            "WHERE tu.topicRoom.id = :roomId")
+    List<TopicRoomUserResponseDto> findMembersByRoomId(@Param("roomId") Long roomId);
 }
