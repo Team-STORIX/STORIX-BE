@@ -59,12 +59,21 @@ public class RedisConfig {
     public RedisTemplate<String, Object> jsonRedisTemplate(RedisConnectionFactory factory, ObjectMapper objectMapper) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
-        template.setKeySerializer(new StringRedisSerializer());
 
-        // value -> json으로 직렬화
-        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
-        template.setValueSerializer(serializer);
-        template.setHashValueSerializer(serializer);
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        Jackson2JsonRedisSerializer<Object> jsonSerializer = new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
+
+        // Key 설정 -> String으로 처리
+        template.setKeySerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
+
+        // Value 설정 -> JSON으로 처리
+        template.setValueSerializer(jsonSerializer);
+        template.setHashValueSerializer(jsonSerializer);
+
+        // 기본 -> JSON으로 처리
+        template.setDefaultSerializer(jsonSerializer);
+
         return template;
     }
 }
