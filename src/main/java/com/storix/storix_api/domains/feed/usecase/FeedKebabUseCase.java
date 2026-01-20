@@ -30,4 +30,10 @@ public class FeedKebabUseCase {
         feedKebabService.deleteReaderBoardReply(userId, boardId, replyId);
         return CustomResponse.onSuccess(SuccessCode.FEED_READER_BOARD_REPLY_DELETE_SUCCESS);
     }
+
+    // 댓글 신고
+    public CustomResponse<Void> reportFeedReply(Long userId, Long boardId, Long replyId, FeedReportRequest req) {
+        feedKebabService.reportFeedReply(userId, boardId, replyId, req);
+        return CustomResponse.onSuccess(SuccessCode.SUCCESS);
+    }
 }
