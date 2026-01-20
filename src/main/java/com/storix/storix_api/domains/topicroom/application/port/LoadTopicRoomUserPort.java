@@ -1,5 +1,7 @@
 package com.storix.storix_api.domains.topicroom.application.port;
 
+import com.storix.storix_api.domains.topicroom.dto.TopicRoomUserResponseDto;
+
 import java.util.List;
 import java.util.Set;
 
@@ -9,4 +11,7 @@ public interface LoadTopicRoomUserPort {
 
     // 특정 유저가 특정 방에 참여 중인지 확인
     boolean existsByUserIdAndRoomId(Long userId, Long roomId);
+
+    // 유저 프로필 조회용
+    List<TopicRoomUserResponseDto> loadMembersByRoomId(Long roomId);
 }
