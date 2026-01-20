@@ -31,6 +31,7 @@ public enum ErrorCode {
     // Auth error
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "LOGIN_ERROR_001", "아이디 또는 비밀번호가 일치하지 않습니다"),
     DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "SIGNUP_ERROR_001", "중복 가입 요청입니다."),
+    ONBOARDING_INVALID_WORKS(HttpStatus.BAD_REQUEST, "SIGNUP_ERROR_002", "서버 DB에 적재된 온보딩 작품 리스트와 관심 작품 리스트 정보가 다릅니다."),
     INVALID_USER_LOGOUT(HttpStatus.BAD_REQUEST, "LOGOUT_ERROR_001", "이미 로그아웃 처리가 되었거나, 다른 소셜 계정에 대한 로그아웃 요청입니다."),
     INVALID_USER_WITHDRAW(HttpStatus.BAD_REQUEST, "WITHDRAW_ERROR_001", "이미 탈퇴 처리된 사용자입니다."),
     ONBOARDING_DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_001", "이미 사용 중인 닉네임입니다."),
