@@ -2,12 +2,14 @@ package com.storix.storix_api.domains.plus.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
+import lombok.Builder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public record ReaderBoardInfo(
         // 유저 정보
         Long userId,
@@ -26,47 +28,47 @@ public record ReaderBoardInfo(
 ) {
     // 내 게시글 조회
     public static ReaderBoardInfo ofMyBoard(ReaderBoard board, boolean isLiked) {
-        return new ReaderBoardInfo(
-                null,
-                board.getId(),
-                board.isWorksSelected(),
-                board.getWorksId(),
-                formatTimeAgo(board.getCreatedAt()),
-                board.getContent(),
-                board.getLikeCount(),
-                board.getReplyCount(),
-                isLiked
-        );
+        return ReaderBoardInfo.builder()
+                .userId(null)
+                .boardId(board.getId())
+                .isWorksSelected(board.isWorksSelected())
+                .worksId(board.getWorksId())
+                .lastCreatedTime(formatTimeAgo(board.getCreatedAt()))
+                .content(board.getContent())
+                .likeCount(board.getLikeCount())
+                .replyCount(board.getReplyCount())
+                .isLiked(isLiked)
+                .build();
     }
 
     // 피드 게시글 조회
     public static ReaderBoardInfo ofFeedBoard(ReaderBoard board, boolean isLiked) {
-        return new ReaderBoardInfo(
-                board.getUserId(),
-                board.getId(),
-                board.isWorksSelected(),
-                board.getWorksId(),
-                formatTimeAgo(board.getCreatedAt()),
-                board.getContent(),
-                board.getLikeCount(),
-                board.getReplyCount(),
-                isLiked
-        );
+        return ReaderBoardInfo.builder()
+                .userId(board.getUserId())
+                .boardId(board.getId())
+                .isWorksSelected(board.isWorksSelected())
+                .worksId(board.getWorksId())
+                .lastCreatedTime(formatTimeAgo(board.getCreatedAt()))
+                .content(board.getContent())
+                .likeCount(board.getLikeCount())
+                .replyCount(board.getReplyCount())
+                .isLiked(isLiked)
+                .build();
     }
 
     // 오늘의 피드 게시글 조회
-    public static ReaderBoardInfo ofHomeBoard(ReaderBoard board, boolean isLiked) {
-        return new ReaderBoardInfo(
-                board.getUserId(),
-                board.getId(),
-                null,
-                null,
-                null,
-                board.getContent(),
-                board.getLikeCount(),
-                board.getReplyCount(),
-                isLiked
-        );
+    public static ReaderBoardInfo ofHomeBoard(StandardReaderBoardInfo board, boolean isLiked) {
+        return ReaderBoardInfo.builder()
+                .userId(board.userId())
+                .boardId(board.boardId())
+                .isWorksSelected(null)
+                .worksId(null)
+                .lastCreatedTime(null)
+                .content(board.content())
+                .likeCount(board.likeCount())
+                .replyCount(board.replyCount())
+                .isLiked(isLiked)
+                .build();
     }
 
 
