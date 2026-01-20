@@ -120,7 +120,7 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
 
     @Override
     public Map<Long, TopicRoomWorksInfo> loadWorksMapByIds(List<Long> worksIds) {
-        if (worksIds.isEmpty()) {
+        if (worksIds == null || worksIds.isEmpty()) {
             return Collections.emptyMap();
         }
 
