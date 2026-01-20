@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.works.repository;
 
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
+import com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo;
 import com.storix.storix_api.domains.works.dto.WorksInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -112,4 +113,9 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "WHERE w.id = :worksId")
     Optional<WorksInfo> findWorksInfoById(@Param("worksId") Long worksId);
 
+    @Query("SELECT new com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo(" +
+            "w.id, w.thumbnailUrl, w.worksName, w.worksType) " +
+            "FROM Works w " +
+            "WHERE w.id IN :ids")
+    List<TopicRoomWorksInfo> findSimpleInfoByIdIn(@Param("ids") List<Long> ids);
 }
