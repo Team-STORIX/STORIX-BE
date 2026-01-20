@@ -114,7 +114,7 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
     Optional<WorksInfo> findWorksInfoById(@Param("worksId") Long worksId);
 
     @Query("SELECT new com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo(" +
-            "w.id, w.thumbnailUrl, w.worksName, w.worksType) " +
+            "w.id, w.worksName, w.thumbnailUrl, w.worksType) " +
             "FROM Works w " +
             "WHERE w.id IN :ids")
     List<TopicRoomWorksInfo> findSimpleInfoByIdIn(@Param("ids") List<Long> ids);
