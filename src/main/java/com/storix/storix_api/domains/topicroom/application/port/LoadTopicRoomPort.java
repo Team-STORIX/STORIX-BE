@@ -28,4 +28,6 @@ public interface LoadTopicRoomPort {
     boolean existsById(Long roomId);
 
     List<TopicRoom> loadTop5PopularRooms();
+
+    List<TopicRoom> findAllActiveRooms();
 }
