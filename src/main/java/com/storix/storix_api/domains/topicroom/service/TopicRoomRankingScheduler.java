@@ -19,7 +19,7 @@ public class TopicRoomRankingScheduler {
 
     private final TopicRoomRepository topicRoomRepository;
 
-    @Scheduled(fixedRate = 600000) // 10분마다 실행
+    @Scheduled(cron = "0 0 * * * *") // 정각에 스케줄러 실행
     @Transactional
     public void calculatePopularity() {
         log.info(">>>> [Scheduler] 인기도 점수 계산 시작");
