@@ -26,7 +26,6 @@ public class ChatMessage extends BaseTimeEntity {
 
     private Long roomId;
     private Long senderId;
-    private String senderName;
 
     @Column(columnDefinition = "TEXT")
     private String message;
