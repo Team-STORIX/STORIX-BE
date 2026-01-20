@@ -57,9 +57,4 @@ public class Review extends BaseTimeEntity {
         this.content = content;
     }
 
-    /** 비즈니스 로직 **/
-    public void updateLikeCount() {
-        this.likeCount ++;
-    }
-
 }

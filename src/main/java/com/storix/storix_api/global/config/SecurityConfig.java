@@ -80,12 +80,22 @@ public class SecurityConfig {
                                 .requestMatchers("/ws-stomp/**").permitAll()
 
                                 // [Works]
+                                .requestMatchers(HttpMethod.POST,   "/api/v1/works/review/*").hasRole("READER")
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/works/review/*").hasRole("READER")
+                                .requestMatchers("/api/v1/works/review/*/like").hasRole("READER")
+                                .requestMatchers("/api/v1/works/review/*/report").hasRole("READER")
                                 .requestMatchers("/api/v1/works/**").permitAll()
 
                                 // [Favorite]
                                 .requestMatchers(HttpMethod.GET, "/api/v1/favorite/**")
                                 .access(new WebExpressionAuthorizationManager("!hasRole('ARTIST')"))
                                 .requestMatchers("/api/v1/favorite/**").hasRole("READER")
+
+                                // [Hashtag]
+                                .requestMatchers("/api/v1/hashtags/recommendations").permitAll()
+
+                                // [Feed]
+                                .requestMatchers("/api/v1/feed/**").hasRole("READER")
 
                                 .anyRequest().authenticated()
                 )

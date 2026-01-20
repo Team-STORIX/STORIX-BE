@@ -10,9 +10,7 @@ import java.util.List;
 
 public record ReaderBoardWithProfileInfo(
         // 게시글 작성 유저
-        Long userId,
-        String nickName,
-        String profileImageUrl,
+        StandardProfileInfo profile,
 
         // 게시글 정보
         ReaderBoardInfo board,
@@ -23,16 +21,14 @@ public record ReaderBoardWithProfileInfo(
 ) {
     public static ReaderBoardWithProfileInfo of(
             StandardProfileInfo profile,
-            ReaderBoardInfo boardInfo,
+            ReaderBoardInfo board,
             List<ReaderBoardImageInfo> images,
             WorksInfo works,
             List<String> hashtags
     ) {
         return new ReaderBoardWithProfileInfo(
-                profile.userId(),
-                profile.nickName(),
-                profile.profileImageUrl(),
-                boardInfo,
+                profile,
+                board,
                 images,
                 BoardWorksInfo.from(works, hashtags)
         );

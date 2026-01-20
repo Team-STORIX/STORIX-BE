@@ -106,4 +106,10 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "WHERE w.id IN :worksIds")
     List<WorksInfo> findWorksInfoByIds(@Param("worksIds") List<Long> worksIds);
 
+    // 작품 상세 리뷰용
+    @Query("SELECT new com.storix.storix_api.domains.works.dto.WorksInfo(w.id, w.thumbnailUrl, w.worksName, w.artistName, w.worksType, w.genre) " +
+            "FROM Works w " +
+            "WHERE w.id = :worksId")
+    Optional<WorksInfo> findWorksInfoById(@Param("worksId") Long worksId);
+
 }
