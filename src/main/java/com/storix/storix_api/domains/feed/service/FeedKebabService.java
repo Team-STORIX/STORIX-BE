@@ -31,6 +31,8 @@ public class FeedKebabService {
     @Transactional
     public void reportFeed (Long userId, Long boardId, FeedReportRequest req) {
 
+        readerFeedAdaptor.checkReaderBoardExist(boardId);
+
         if (userId.equals(req.reportedUserId())) {
             throw SelfReportException.EXCEPTION;
         }
@@ -48,5 +50,24 @@ public class FeedKebabService {
     @Transactional
     public void deleteReaderBoardReply(Long userId, Long boardId, Long replyId) {
         readerFeedAdaptor.deleteReaderBoardReply(userId, boardId, replyId);
+    }
+
+    // 댓글 신고
+    @Transactional
+    public void reportFeedReply (Long userId, Long boardId, Long replyId, FeedReportRequest req) {
+
+        readerFeedAdaptor.checkReplyExist(boardId, replyId);
+
+        if (userId.equals(req.reportedUserId())) {
+            throw SelfReportException.EXCEPTION;
+        }
+
+        CreateFeedReportCommand cmd = new CreateFeedReportCommand(
+                userId,
+                req.reportedUserId(),
+                replyId
+        );
+
+        feedReportAdaptor.saveReplyReport(cmd);
     }
 }

@@ -114,13 +114,14 @@ public class ReaderFeedAdaptor {
         return StandardReplyInfo.from(reply);
     }
 
-    // 댓글 좋아요 관련
+    // 댓글 존재 여부 확인
     public void checkReplyExist(Long boardId, Long replyId) {
         if (!readerBoardReplyRepository.existsByIdAndBoard_Id(replyId, boardId)) {
             throw BoardReplyNotFoundException.EXCEPTION;
         }
     }
 
+    // 댓글 좋아요 관련
     public int isReplyLikeDeleted(Long userId, Long replyId) {
         return readerBoardReplyLikeRepository.deleteLike(userId, replyId);
     }
