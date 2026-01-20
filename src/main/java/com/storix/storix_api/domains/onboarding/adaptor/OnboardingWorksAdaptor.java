@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.onboarding.adaptor;
 
+import com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo;
 import com.storix.storix_api.domains.onboarding.repository.OnboardingWorksRepository;
 import com.storix.storix_api.domains.onboarding.domain.OnboardingWorks;
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidOnboardingWorksException;
@@ -15,8 +16,8 @@ public class OnboardingWorksAdaptor {
 
     private final OnboardingWorksRepository onboardingWorksRepository;
 
-    public List<OnboardingWorks> findAllOnboardingWorksList() {
-        return onboardingWorksRepository.findAll();
+    public List<OnboardingWorksInfo> findAllOnboardingWorksList() {
+        return onboardingWorksRepository.findAllOnboardingWorksInfoList();
     }
 
     public void checkReaderSignUpWithOnboardingWorksList(Set<Long> worksIds) {
