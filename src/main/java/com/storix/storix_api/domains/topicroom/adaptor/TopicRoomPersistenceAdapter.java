@@ -9,6 +9,7 @@ import com.storix.storix_api.domains.topicroom.domain.TopicRoomReport;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomUser;
 import com.storix.storix_api.domains.topicroom.domain.enums.TopicRoomRole;
 import com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto;
+import com.storix.storix_api.domains.topicroom.dto.TopicRoomUserResponseDto;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomReportRepository;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomRepository;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomUserRepository;
@@ -129,4 +130,10 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     public boolean existsByUserIdAndRoomId(Long userId, Long roomId) {
         return topicRoomUserRepository.existsByUserIdAndTopicRoomId(userId, roomId);
     }
+
+    @Override
+    public List<TopicRoomUserResponseDto> loadMembersByRoomId(Long roomId) {
+        return topicRoomUserRepository.findMembersByRoomId(roomId);
+    }
+
 }
