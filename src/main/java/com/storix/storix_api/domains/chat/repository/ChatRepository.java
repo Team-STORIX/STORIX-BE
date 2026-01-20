@@ -10,5 +10,5 @@ import java.util.List;
 public interface ChatRepository extends JpaRepository<ChatMessage, Long> {
 
     // 특정 방의 메시지를 생성 시간순으로 조회
-    Slice<ChatMessage> findAllByRoomId(Long roomId, Pageable pageable);
+    Slice<ChatMessage> findAllByRoomIdOrderByCreatedAtDesc(Long roomId, Pageable pageable);
 }
