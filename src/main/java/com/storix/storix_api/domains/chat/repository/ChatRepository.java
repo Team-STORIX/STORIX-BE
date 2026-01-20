@@ -24,7 +24,7 @@ public interface ChatRepository extends JpaRepository<ChatMessage, Long> {
             "FROM ChatMessage m " +
             "LEFT JOIN User u ON m.senderId = u.id " +
             "WHERE m.roomId = :roomId " +
-            "ORDER BY m.createdAt DESC")
+            "ORDER BY m.createdAt DESC, m.id DESC")
     Slice<ChatMessageResponseDto> findAllByRoomIdOrderByCreatedAtDesc(
             @Param("roomId") Long roomId,
             Pageable pageable
