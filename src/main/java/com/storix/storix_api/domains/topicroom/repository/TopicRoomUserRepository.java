@@ -39,7 +39,7 @@ public interface TopicRoomUserRepository extends JpaRepository<TopicRoomUser, Lo
     @Query("SELECT new com.storix.storix_api.domains.topicroom.dto.TopicRoomUserResponseDto(" +
             "u.id, u.nickName, u.profileImageUrl) " +
             "FROM TopicRoomUser tu " +
-            "JOIN tu.user u " +
+            "JOIN User u ON tu.userId = u.id " + // tu.userId 값과 User 엔티티의 id를 매칭
             "WHERE tu.topicRoom.id = :roomId")
     List<TopicRoomUserResponseDto> findMembersByRoomId(@Param("roomId") Long roomId);
 }
