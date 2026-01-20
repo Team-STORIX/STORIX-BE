@@ -1,6 +1,7 @@
 package com.storix.storix_api.domains.plus.repository;
 
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
+import com.storix.storix_api.domains.plus.dto.StandardReaderBoardInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface ReaderBoardRepository extends JpaRepository<ReaderBoard, Long> {
+public interface ReaderBoardRepository extends JpaRepository<ReaderBoard, Long>, ReaderBoardRankingRepository {
 
     // 프로필 관련
     @Query("SELECT rb " +
@@ -27,22 +28,22 @@ public interface ReaderBoardRepository extends JpaRepository<ReaderBoard, Long> 
     Slice<ReaderBoard> findAllLikedReaderBoards(@Param("userId") Long userId, Pageable pageable);
 
     // 홈 관련
-    @Query("SELECT rb " +
+    @Query("SELECT new com.storix.storix_api.domains.plus.dto.StandardReaderBoardInfo(rb.userId, rb.id, rb.content, rb.likeCount, rb.replyCount) " +
             "FROM ReaderBoard rb " +
             "WHERE rb.createdAt > :threshold " +
-            "ORDER BY (rb.likeCount * 3 + rb.replyCount * 4) DESC, rb.createdAt DESC, rb.id DESC ")
-    List<ReaderBoard> findTop3TrendingFeed(@Param("threshold") LocalDateTime threshold, Pageable pageable);
+            "ORDER BY rb.popularityScore DESC, rb.createdAt DESC, rb.id DESC ")
+    List<StandardReaderBoardInfo> findTop3TrendingFeed(@Param("threshold") LocalDateTime threshold, Pageable pageable);
 
-    @Query("SELECT rb " +
+    @Query("SELECT new com.storix.storix_api.domains.plus.dto.StandardReaderBoardInfo(rb.userId, rb.id, rb.content, rb.likeCount, rb.replyCount) " +
             "FROM ReaderBoard rb " +
-            "ORDER BY (rb.likeCount * 3 + rb.replyCount * 4) DESC, rb.id DESC ")
-    List<ReaderBoard> findSteadyTrendingFeed(Pageable pageable);
+            "ORDER BY rb.popularityScore DESC, rb.id DESC ")
+    List<StandardReaderBoardInfo> findSteadyTrendingFeed(Pageable pageable);
 
-    @Query("SELECT rb " +
+    @Query("SELECT new com.storix.storix_api.domains.plus.dto.StandardReaderBoardInfo(rb.userId, rb.id, rb.content, rb.likeCount, rb.replyCount) " +
             "FROM ReaderBoard rb " +
             "WHERE rb.id NOT IN :excludeIds " +
-            "ORDER BY (rb.likeCount * 3 + rb.replyCount * 4) DESC, rb.id DESC ")
-    List<ReaderBoard> findSteadyTrendingFeedNotToday(@Param("excludeIds") List<Long> excludeIds, Pageable pageable);
+            "ORDER BY rb.popularityScore DESC, rb.id DESC ")
+    List<StandardReaderBoardInfo> findSteadyTrendingFeedNotToday(@Param("excludeIds") List<Long> excludeIds, Pageable pageable);
 
     // 피드 관련
     @Query("SELECT rb " +
