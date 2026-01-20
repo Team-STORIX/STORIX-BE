@@ -12,7 +12,6 @@ public record ChatMessageRequestDto(
         return ChatMessage.builder()
                 .roomId(this.roomId)
                 .senderId(senderId)
-                .senderName(senderName)
                 .message(this.message)
                 .messageType(this.messageType)
                 .build();
