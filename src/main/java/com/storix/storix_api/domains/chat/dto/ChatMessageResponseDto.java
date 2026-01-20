@@ -7,6 +7,7 @@ import com.storix.storix_api.domains.chat.domain.MessageType;
 import java.time.LocalDateTime;
 
 public record ChatMessageResponseDto(
+        Long id,
         Long roomId,
         Long senderId,
         String senderName,
@@ -18,14 +19,15 @@ public record ChatMessageResponseDto(
                 timezone = "Asia/Seoul")
         LocalDateTime createdAt
 ) {
-    public static ChatMessageResponseDto from(ChatMessage entity) {
+    public static ChatMessageResponseDto of(ChatMessage chatMessage, String nickname) {
         return new ChatMessageResponseDto(
-                entity.getRoomId(),
-                entity.getSenderId(),
-                entity.getSenderName(),
-                entity.getMessage(),
-                entity.getMessageType(),
-                entity.getCreatedAt()
+                chatMessage.getId(),
+                chatMessage.getRoomId(),
+                chatMessage.getSenderId(),
+                nickname,
+                chatMessage.getMessage(),
+                chatMessage.getMessageType(),
+                chatMessage.getCreatedAt() != null ? chatMessage.getCreatedAt() : LocalDateTime.now()
         );
     }
 }
