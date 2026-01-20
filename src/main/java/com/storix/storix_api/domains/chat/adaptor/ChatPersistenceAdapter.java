@@ -19,7 +19,7 @@ public class ChatPersistenceAdapter implements RecordChatPort, LoadChatPort {
 
     @Override
     public Slice<ChatMessage> loadMessages(Long roomId,  Pageable pageable) {
-        return chatRepository.findAllByRoomId(roomId, pageable);
+        return chatRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId, pageable);
     }
 
     @Override
