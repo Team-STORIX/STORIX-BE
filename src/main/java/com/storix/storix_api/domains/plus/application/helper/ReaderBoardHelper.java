@@ -19,6 +19,7 @@ import com.storix.storix_api.domains.works.dto.WorksInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -91,6 +92,17 @@ public class ReaderBoardHelper {
         return isFeed
                 ? ReaderBoardInfo.ofFeedBoard(board, isLiked)
                 : ReaderBoardInfo.ofMyBoard(board, isLiked);
+    }
+
+    // 좋아요 누른 게시글 조회
+    public Slice<ReaderBoardInfo> findLikedReaderBoardInfo(Long userId, Pageable pageable) {
+
+        Slice<ReaderBoard> boardsEntity =
+                readerFeedAdaptor.findAllLikedReaderBoards(userId, pageable);
+
+        return boardsEntity.map(board ->
+                ReaderBoardInfo.ofFeedBoard(board, true)
+        );
     }
 
 
@@ -173,6 +185,11 @@ public class ReaderBoardHelper {
         );
     }
 
+    // 댓글 리스트 조회
+    public Slice<ReaderBoardReply> findReaderBoardReplyInfo(Long userId, Pageable pageable) {
+        return readerFeedAdaptor.findAllByUserId(userId, pageable);
+    }
+
     public Slice<ReaderBoardReplyInfoWithProfile> mapRepliesWithProfileAndLike(
             Long userId,
             Slice<ReaderBoardReply> replies
@@ -212,6 +229,38 @@ public class ReaderBoardHelper {
 
             return ReaderBoardReplyInfoWithProfile.of(
                     profile,
+                    StandardReplyInfoWithLike.of(replyInfo, isLiked)
+            );
+        });
+    }
+
+    public Slice<ReaderBoardReplyInfoWithProfile> mapMyRepliesWithProfileAndLike(
+            Long userId,
+            StandardProfileInfo myProfile,
+            Slice<ReaderBoardReply> replies
+    ) {
+        List<ReaderBoardReply> content = replies.getContent();
+        if (content.isEmpty()) {
+            return new SliceImpl<>(List.of(), replies.getPageable(), replies.hasNext());
+        }
+
+        // 1) 댓글 ids
+        List<Long> replyIds = content.stream()
+                .map(ReaderBoardReply::getId)
+                .toList();
+
+        // 2) 좋아요 여부 조회
+        Set<Long> likedReplyIds = (userId != null)
+                ? readerFeedAdaptor.findLikedReplyIds(userId, replyIds)
+                : Collections.emptySet();
+
+        // 3) 최종 매핑
+        return replies.map(reply -> {
+            ReaderBoardReplyInfo replyInfo = ReaderBoardReplyInfo.from(reply);
+            boolean isLiked = likedReplyIds.contains(reply.getId());
+
+            return ReaderBoardReplyInfoWithProfile.of(
+                    myProfile,
                     StandardReplyInfoWithLike.of(replyInfo, isLiked)
             );
         });

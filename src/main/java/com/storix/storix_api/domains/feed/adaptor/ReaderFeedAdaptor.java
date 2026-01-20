@@ -184,4 +184,14 @@ public class ReaderFeedAdaptor {
         return new HashSet<>(readerBoardReplyLikeRepository.findLikedReplyIds(userId, replyIds));
     }
 
+    // 프로필 - 댓글 정보 확인
+    public Slice<ReaderBoardReply> findAllByUserId(Long userId, Pageable pageable) {
+        return readerBoardReplyRepository.findAllByUserId(userId, pageable);
+    }
+
+    // 프로필 - 좋아요한 게시글 정보 확인
+    public Slice<ReaderBoard> findAllLikedReaderBoards(Long userId, Pageable pageable) {
+        return readerBoardRepository.findAllLikedReaderBoards(userId, pageable);
+    }
+
 }

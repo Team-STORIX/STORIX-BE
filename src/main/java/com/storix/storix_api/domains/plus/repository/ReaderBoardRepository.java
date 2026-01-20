@@ -16,6 +16,13 @@ public interface ReaderBoardRepository extends JpaRepository<ReaderBoard, Long> 
             "WHERE rb.userId = :userId ")
     Slice<ReaderBoard> findAllReaderBoardByUserId(Long userId, Pageable pageable);
 
+    @Query("SELECT rb " +
+            "FROM ReaderBoardLike rl " +
+            "JOIN rl.board rb " +
+            "WHERE rl.userId = :userId " +
+            "ORDER BY rl.id DESC ")
+    Slice<ReaderBoard> findAllLikedReaderBoards(@Param("userId") Long userId, Pageable pageable);
+
     // 피드 관련
     @Query("SELECT rb " +
             "FROM ReaderBoard rb " +

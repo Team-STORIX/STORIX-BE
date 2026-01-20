@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 public record ReaderBoardReplyInfo(
         Long replyId,
         Long userId,
+        Long boardId,
         String comment,
         String lastCreatedTime,
         int likeCount
@@ -17,6 +18,7 @@ public record ReaderBoardReplyInfo(
         return new ReaderBoardReplyInfo(
                 reply.getId(),
                 reply.getUserId(),
+                reply.getBoardId(),
                 reply.getComment(),
                 formatTimeAgo(reply.getCreatedAt()),
                 reply.getLikeCount()
