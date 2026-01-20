@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.adaptor;
 
+import com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo;
 import com.storix.storix_api.domains.works.dto.WorksInfo;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
@@ -115,6 +116,20 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
             throw UnknownWorksException.EXCEPTION;
         }
         return worksInfo.get();
+    }
+
+    @Override
+    public Map<Long, TopicRoomWorksInfo> loadWorksMapByIds(List<Long> worksIds) {
+        if (worksIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        // IN 절 쿼리 실행
+        List<TopicRoomWorksInfo> infos = worksRepository.findSimpleInfoByIdIn(worksIds);
+
+        // List -> Map 변환 (Key: worksId, Value: Info)
+        return infos.stream()
+                .collect(Collectors.toMap(TopicRoomWorksInfo::id, Function.identity()));
     }
 
 }
