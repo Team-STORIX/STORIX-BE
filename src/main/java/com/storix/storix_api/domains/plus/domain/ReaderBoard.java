@@ -28,7 +28,7 @@ public class ReaderBoard extends Board {
     private boolean isSpoiler;
 
     @Column(name = "popularity_score")
-    private int popularityScore;
+    private int popularityScore = 0;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "readerBoard", cascade = CascadeType.ALL, orphanRemoval = true)
