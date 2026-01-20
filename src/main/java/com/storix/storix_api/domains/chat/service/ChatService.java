@@ -7,7 +7,6 @@ import com.storix.storix_api.domains.chat.dto.ChatMessageRequestDto;
 import com.storix.storix_api.domains.chat.dto.ChatMessageResponseDto;
 import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomPort;
 import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomUserPort;
-import com.storix.storix_api.domains.topicroom.application.port.UpdateTopicRoomPort;
 import com.storix.storix_api.domains.user.application.port.LoadUserPort;
 import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnknownTopicRoomException;
@@ -55,7 +54,7 @@ public class ChatService implements ChatUseCase {
         ChatMessage chatMessage = request.toEntity(userId, nickname);
 
         // Redis 발행
-        publishChatPort.publish(ChatMessageResponseDto.from(chatMessage));
+        publishChatPort.publish(ChatMessageResponseDto.of(chatMessage, nickname));
 
         chatAsyncService.processAfterMessageSent(chatMessage);
 
@@ -73,9 +72,6 @@ public class ChatService implements ChatUseCase {
             throw UnknownTopicRoomException.EXCEPTION;
         }
 
-        // DB에서 해당 방의 모든 메시지 조회
-        Slice<ChatMessage> messageSlice = loadChatPort.loadMessages(roomId, pageable);
-
-        return messageSlice.map(ChatMessageResponseDto::from);
+        return loadChatPort.loadMessages(roomId, pageable);
     }
 }
