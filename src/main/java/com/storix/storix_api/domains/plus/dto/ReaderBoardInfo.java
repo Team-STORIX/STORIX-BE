@@ -14,7 +14,7 @@ public record ReaderBoardInfo(
 
         // 게시글 정보
         Long boardId,
-        boolean isWorksSelected,
+        Boolean isWorksSelected,
         Long worksId,
         String lastCreatedTime,
         String content,
@@ -53,6 +53,22 @@ public record ReaderBoardInfo(
                 isLiked
         );
     }
+
+    // 오늘의 피드 게시글 조회
+    public static ReaderBoardInfo ofHomeBoard(ReaderBoard board, boolean isLiked) {
+        return new ReaderBoardInfo(
+                board.getUserId(),
+                board.getId(),
+                null,
+                null,
+                null,
+                board.getContent(),
+                board.getLikeCount(),
+                board.getReplyCount(),
+                isLiked
+        );
+    }
+
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
