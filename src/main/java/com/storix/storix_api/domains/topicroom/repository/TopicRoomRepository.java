@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
+public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long>, TopicRoomRankingRepository {
 
     @Query("""
         SELECT new com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto(
@@ -69,4 +69,7 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
     List<TopicRoom> findTop5ByOrderByPopularityScoreDescLastChatTimeDesc();
 
     boolean existsByWorksId(Long worksId);
+
+    @Query("SELECT tr FROM TopicRoom tr WHERE tr.activeUserNumber > 1")
+    List<TopicRoom> findAllActiveRooms();
 }
