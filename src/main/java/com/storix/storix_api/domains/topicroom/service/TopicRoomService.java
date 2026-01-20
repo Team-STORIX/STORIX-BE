@@ -3,11 +3,13 @@ package com.storix.storix_api.domains.topicroom.service;
 import com.storix.storix_api.domains.search.dto.SearchResponseWrapperDto;
 import com.storix.storix_api.domains.search.dto.TrendingItem;
 import com.storix.storix_api.domains.search.service.SearchHistoryService;
+import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomUserPort;
 import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomPort;
 import com.storix.storix_api.domains.topicroom.application.port.RecordTopicRoomPort;
 import com.storix.storix_api.domains.topicroom.application.usecase.TopicRoomUseCase;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomReport;
+import com.storix.storix_api.domains.topicroom.domain.TopicRoomUser;
 import com.storix.storix_api.domains.topicroom.domain.enums.TopicRoomRole;
 import com.storix.storix_api.domains.topicroom.dto.TopicRoomCreateRequestDto;
 import com.storix.storix_api.domains.topicroom.dto.TopicRoomReportRequestDto;
@@ -16,6 +18,7 @@ import com.storix.storix_api.domains.user.application.port.LoadUserPort;
 import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.domains.works.domain.Works;
+import com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo;
 import com.storix.storix_api.global.apiPayload.exception.topicRoom.*;
 import com.storix.storix_api.global.utils.ProfanityFilterService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -42,16 +47,28 @@ public class TopicRoomService implements TopicRoomUseCase {
     private final LoadWorksPort loadWorksPort;
     private final SearchHistoryService searchHistoryService;
     private final ProfanityFilterService profanityFilterService;
+    private final LoadTopicRoomUserPort loadTopicRoomMemberPort;
 
     @Override
     public Slice<TopicRoomResponseDto> getMyJoinedRooms(Long userId, Pageable pageable) {
 
-        return loadTopicRoomPort.findParticipationsByUserId(userId, pageable)
-                .map(participation -> {
-                    TopicRoom room = participation.getTopicRoom();
-                    Works works = loadWorksPort.findById(room.getWorksId());
-                    return TopicRoomResponseDto.from(room, works, true);
-                });
+        // 참여 정보 조회
+        Slice<TopicRoomUser> participations = loadTopicRoomPort.findParticipationsByUserId(userId, pageable);
+
+        // 조회된 토픽룸의 worksId
+        List<Long> worksIds = participations.stream()
+                .map(p -> p.getTopicRoom().getWorksId())
+                .toList();
+
+        // works 정보를 한 번에 조회하여 Map으로 변환
+        Map<Long, TopicRoomWorksInfo> worksMap = loadWorksPort.loadWorksMapByIds(worksIds);
+
+        return participations.map(participation -> {
+            TopicRoom room = participation.getTopicRoom();
+            TopicRoomWorksInfo worksInfo = worksMap.get(room.getWorksId());
+
+            return TopicRoomResponseDto.from(room, worksInfo, true);
+        });
     }
 
     @Override
@@ -88,6 +105,32 @@ public class TopicRoomService implements TopicRoomUseCase {
         }
         applyMembershipStatus(trendingRooms, userId);
         return trendingRooms;
+    }
+
+    @Override
+    public List<TopicRoomResponseDto> getPopularRooms(Long userId) {
+        // 1. 상위 5개 토픽룸 가져오기
+        List<TopicRoom> rooms = loadTopicRoomPort.loadTop5PopularRooms();
+        if (rooms.isEmpty()) return Collections.emptyList();
+
+        List<Long> roomIds = rooms.stream().map(TopicRoom::getId).toList();
+        List<Long> worksIds = rooms.stream().map(TopicRoom::getWorksId).distinct().toList();
+
+        Map<Long, TopicRoomWorksInfo> worksMap = loadWorksPort.loadWorksMapByIds(worksIds);
+
+        // 포트를 통해 Set<Long> 형태의 가입된 방 ID 목록 수신
+        Set<Long> joinedRoomIds = (userId != null)
+                ? loadTopicRoomMemberPort.loadJoinedRoomIds(userId, roomIds)
+                : Collections.emptySet();
+
+        return rooms.stream()
+                .map(room -> {
+                    TopicRoomWorksInfo worksInfo = worksMap.get(room.getWorksId());
+                    boolean isJoined = joinedRoomIds.contains(room.getId());
+
+                    return TopicRoomResponseDto.from(room, worksInfo, isJoined);
+                })
+                .toList();
     }
 
     @Override
@@ -220,11 +263,6 @@ public class TopicRoomService implements TopicRoomUseCase {
         recordTopicRoomPort.saveReport(report);
     }
 
-    @Override
-    @Transactional
-    public void updateRoomLastChatTime(Long roomId) {
-        recordTopicRoomPort.updateLastChatTime(roomId, LocalDateTime.now());
-    }
 
     // 참여 여부 마킹 로직 공통화
     private void applyMembershipStatus(List<TopicRoomResponseDto> rooms, Long userId) {

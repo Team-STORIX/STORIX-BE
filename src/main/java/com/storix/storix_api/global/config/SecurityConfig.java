@@ -73,9 +73,11 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/library/**").hasRole("READER")
 
                                 // [TopicRoom]
+                                .requestMatchers("/api/v1/topic-rooms/popular").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/today").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/search").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
+                                .requestMatchers("/ws-stomp/**").permitAll()
 
                                 // [Works]
                                 .requestMatchers(HttpMethod.POST,   "/api/v1/works/review/*").hasRole("READER")
@@ -122,6 +124,7 @@ public class SecurityConfig {
                 "https://www.storix.kr",
                 "https://api.storix.kr",
                 "http://localhost:3000",
+                "http://localhost:5173",
                 "https://storix-fe-git-develop-kim-yunseongs-projects.vercel.app",
                 "https://storix-fe-git-main-kim-yunseongs-projects.vercel.app"
         ));

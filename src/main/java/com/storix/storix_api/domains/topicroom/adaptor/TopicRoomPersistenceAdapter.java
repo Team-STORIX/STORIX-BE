@@ -1,12 +1,15 @@
 package com.storix.storix_api.domains.topicroom.adaptor;
 
+import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomUserPort;
 import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomPort;
 import com.storix.storix_api.domains.topicroom.application.port.RecordTopicRoomPort;
+import com.storix.storix_api.domains.topicroom.application.port.UpdateTopicRoomPort;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomReport;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomUser;
 import com.storix.storix_api.domains.topicroom.domain.enums.TopicRoomRole;
 import com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto;
+import com.storix.storix_api.domains.topicroom.dto.TopicRoomUserResponseDto;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomReportRepository;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomRepository;
 import com.storix.storix_api.domains.topicroom.repository.TopicRoomUserRepository;
@@ -16,11 +19,13 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTopicRoomPort {
+public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTopicRoomPort, UpdateTopicRoomPort, LoadTopicRoomUserPort {
 
     private final TopicRoomRepository topicRoomRepository;
     private final TopicRoomUserRepository topicRoomUserRepository;
@@ -55,15 +60,6 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
         return topicRoomUserRepository.countByUserId(userId);
     }
 
-    @Override public boolean existsByUserIdAndRoomId(Long userId, Long roomId) {
-        return topicRoomUserRepository.existsByUserIdAndTopicRoomId(userId, roomId);
-    }
-
-    @Override public LocalDateTime getLastMessageTime(Long roomId) {
-        // TODO: 채팅 서버 연동 시 구현
-        return LocalDateTime.now().minusMinutes(5);
-    }
-
     @Override public TopicRoom saveRoom(TopicRoom room) {
         return topicRoomRepository.save(room);
     }
@@ -92,12 +88,28 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     }
 
     @Override
-    public void updateLastChatTime(Long roomId, LocalDateTime now) {
-        topicRoomRepository.updateLastChatTime(roomId, now);
+    public void updateLastChatTime(Long roomId, LocalDateTime lastChatTime) {
+        topicRoomRepository.updateLastChatTime(roomId, lastChatTime);
     }
 
-    // 참여 중인 방 ID 리스트 조회 (참여 여부 매핑용)
-    @Override public List<Long> findAllJoinedRoomIdsByUserId(Long userId) {
+    @Override
+    public List<TopicRoom> loadTop5PopularRooms() {
+        return topicRoomRepository.findTop5ByOrderByPopularityScoreDescLastChatTimeDesc();
+    }
+
+    @Override
+    public Set<Long> loadJoinedRoomIds(Long userId, List<Long> roomIds) {
+
+        // 빈 리스트일 경우 -> 빈 Set 반환
+        if (roomIds == null || roomIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        return topicRoomUserRepository.findJoinedRoomIdsByUserIdAndRoomIds(userId, roomIds);
+    }
+
+    @Override
+    public List<Long> findAllJoinedRoomIdsByUserId(Long userId) {
         return topicRoomUserRepository.findAllJoinedRoomIdsByUserId(userId);
     }
 
@@ -107,5 +119,30 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     @Override
     public boolean existsByWorksId(Long worksId) {
         return topicRoomRepository.existsByWorksId(worksId);
+    }
+
+    @Override
+    public boolean existsById(Long roomId) {
+        return topicRoomRepository.existsById(roomId);
+    }
+
+    @Override
+    public boolean existsByUserIdAndRoomId(Long userId, Long roomId) {
+        return topicRoomUserRepository.existsByUserIdAndTopicRoomId(userId, roomId);
+    }
+
+    @Override
+    public List<TopicRoomUserResponseDto> loadMembersByRoomId(Long roomId) {
+        return topicRoomUserRepository.findMembersByRoomId(roomId);
+    }
+
+    @Override
+    public void updatePopularityScores(List<TopicRoom> rooms) {
+        topicRoomRepository.bulkUpdatePopularityScores(rooms);
+    }
+
+    @Override
+    public List<TopicRoom> findAllActiveRooms() {
+        return topicRoomRepository.findAllActiveRooms();
     }
 }

@@ -25,5 +25,6 @@ public interface TopicRoomUseCase {
 
     void reportUser(Long reporterId, Long roomId, TopicRoomReportRequestDto request);
 
-    void updateRoomLastChatTime(Long roomId);
+    List<TopicRoomResponseDto> getPopularRooms(Long userId);
+
 }
