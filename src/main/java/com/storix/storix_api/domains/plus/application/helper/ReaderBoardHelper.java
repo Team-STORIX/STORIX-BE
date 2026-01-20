@@ -11,6 +11,7 @@ import com.storix.storix_api.domains.plus.adaptor.BoardImageAdaptor;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.dto.ReaderBoardImageInfo;
 import com.storix.storix_api.domains.plus.dto.ReaderBoardInfo;
+import com.storix.storix_api.domains.plus.dto.StandardReaderBoardInfo;
 import com.storix.storix_api.domains.profile.dto.ReaderBoardWithProfileInfo;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.dto.StandardProfileInfo;
@@ -109,34 +110,34 @@ public class ReaderBoardHelper {
     // 오늘의 피드 조회
     public List<ReaderBoardInfo> findTop3TrendingFeedInfo(Long userId, LocalDateTime threshold) {
 
-        List<ReaderBoard> boards = readerFeedAdaptor.findTop3TrendingFeed(threshold);
+        // 1) 오늘의 피드 (최대 3개)
+        List<StandardReaderBoardInfo> boards = readerFeedAdaptor.findTop3TrendingFeed(threshold);
+
+        // 게시글 ids
+        List<Long> boardIds = boards.stream()
+                .map(StandardReaderBoardInfo::boardId)
+                .toList();
 
         if (boards.size() < 3) {
             int needed = 3 - boards.size();
 
-            // 중복 피드 방지
-            List<Long> excludeIds = boards.stream()
-                    .map(ReaderBoard::getId)
-                    .toList();
-
             // 부족한 개수만큼만 전체 인기순 적용
-            List<ReaderBoard> fallbackBoards = readerFeedAdaptor.findSteadyTrendingFeedNotToday(excludeIds, needed);
+            List<StandardReaderBoardInfo> fallbackBoards = readerFeedAdaptor.findSteadyTrendingFeedNotToday(boardIds, needed);
 
-            boards.addAll(fallbackBoards );
+            boards.addAll(fallbackBoards);
         }
 
-        // 좋아요 여부 조회 - 비로그인 유저의 경우 false
-        Set<Long> likedBoardIds = (userId != null && !boards.isEmpty())
-                ? readerFeedAdaptor.findLikedBoardIds(
-                userId,
-                boards.stream().map(ReaderBoard::getId).toList()
-        )
+        // 2) 좋아요 여부 조회 - 비로그인 유저의 경우 empty
+        Set<Long> likedBoardIds = (userId != null && !boardIds.isEmpty())
+                ? readerFeedAdaptor.findLikedBoardIds(userId, boardIds)
                 : Collections.emptySet();
 
+
+        // 최종 매핑
         return boards.stream()
                 .map(board -> ReaderBoardInfo.ofHomeBoard(
                         board,
-                        likedBoardIds.contains(board.getId())
+                        likedBoardIds.contains(board.boardId())
                 ))
                 .toList();
     }
