@@ -28,6 +28,9 @@ public enum SuccessCode {
     AUTH_ARTIST_LOGIN_SUCCESS(HttpStatus.OK, "AUTH_SUCCESS_005", "작가 계정 로그인에 성공했습니다."),
     AUTH_WITHDRAW_SUCCESS(HttpStatus.OK, "AUTH_SUCCESS_006", "회원 탈퇴에 성공했습니다."),
 
+    // Home success
+    HOME_TODAY_FEED_LOAD_SUCCESS(HttpStatus.OK, "HOME_SUCCESS_001", "오늘의 피드 조회에 성공했습니다."),
+
     // Profile success
     PROFILE_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_001", "유저 정보 조회에 성공했습니다."),
     PROFILE_NICKNAME_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_002", "변경 가능한 닉네임입니다."),
