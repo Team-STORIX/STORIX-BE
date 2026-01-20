@@ -137,6 +137,11 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     }
 
     @Override
+    public void updatePopularityScores(List<TopicRoom> rooms) {
+        topicRoomRepository.bulkUpdatePopularityScores(rooms);
+    }
+
+    @Override
     public List<TopicRoom> findAllActiveRooms() {
         return topicRoomRepository.findAllActiveRooms();
     }
