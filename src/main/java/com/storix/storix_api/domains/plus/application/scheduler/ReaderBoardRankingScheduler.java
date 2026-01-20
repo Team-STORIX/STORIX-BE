@@ -18,8 +18,6 @@ public class ReaderBoardRankingScheduler {
     @Scheduled(cron = "0 0 * * * *")
     public void calculateReaderBoardPopularity() {
 
-        log.info(">>>> [Scheduler] 독자 게시물 인기도 점수 계산 시작");
-
         LocalDateTime threshold = LocalDateTime.now().minusDays(7);
 
         int updated =
