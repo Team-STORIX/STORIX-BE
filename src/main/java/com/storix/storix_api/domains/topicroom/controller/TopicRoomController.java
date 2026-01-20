@@ -132,10 +132,10 @@ public class TopicRoomController {
     @GetMapping("/popular")
     @Operation(summary = "지금 핫한 토픽룸 조회", description = "토픽룸 depth로 들어왔을 때 보여지는 목록입니다. 최대 5개까지 조회됩니다. 비로그인 사용자일 경우 isJoined가 무조건 false로 반환됩니다.")
     public CustomResponse<List<TopicRoomResponseDto>> getPopularRooms(
-            @AuthenticationPrincipal Long userId
+            @AuthenticationPrincipal AuthUserDetails authUserDetails
     ) {
 
-        List<TopicRoomResponseDto> rooms = topicRoomUseCase.getPopularRooms(userId);
+        List<TopicRoomResponseDto> rooms = topicRoomUseCase.getPopularRooms(authUserDetails.getUserId());
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, rooms);
     }
 }
