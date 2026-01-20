@@ -17,22 +17,25 @@ public class FeedUseCase {
 
     private final FeedService feedService;
 
+    // 전체 게시글 조회
     public CustomResponse<Slice<ReaderBoardWithProfileInfo>> getAllReaderBoard(Long userId, Pageable pageable) {
 
         Slice<ReaderBoardWithProfileInfo> result = feedService.getAllReaderBoard(userId, pageable);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, result);
+        return CustomResponse.onSuccess(SuccessCode.FEED_ALL_READER_BOARD_LOAD_SUCCESS, result);
     }
 
+    // 관심 작품 관련 게시글 조회
     public CustomResponse<Slice<ReaderBoardWithProfileInfo>> getReaderBoard(Long userId, Long worksId, Pageable pageable) {
 
         Slice<ReaderBoardWithProfileInfo> result = feedService.findAllReaderBoardFeedByWorksId(userId, worksId, pageable);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, result);
+        return CustomResponse.onSuccess(SuccessCode.FEED_WORKS_READER_BOARD_LOAD_SUCCESS, result);
     }
 
+    // 단건 게시글 조회
     public CustomResponse<BoardWrapperDto<ReaderBoardReplyInfoWithProfile>> getReaderBoardDetail(Long userId, Long boardId, Pageable pageable) {
 
         BoardWrapperDto<ReaderBoardReplyInfoWithProfile> result = feedService.findReaderBoardDetail(userId, boardId, pageable);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, result);
+        return CustomResponse.onSuccess(SuccessCode.FEED_READER_BOARD_LOAD_SUCCESS, result);
     }
 
 }

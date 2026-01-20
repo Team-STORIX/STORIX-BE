@@ -19,21 +19,21 @@ public class FeedReactionUseCase {
     public CustomResponse<LikeToggleResponse> toggleReaderBoardLike(Long userId, Long boardId) {
 
         LikeToggleResponse result = feedReactionService.toggleReaderBoardLike(userId, boardId);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, result);
+        return CustomResponse.onSuccess(SuccessCode.FEED_READER_BOARD_LIKE_SUCCESS, result);
     }
 
     // 독자 댓글 작성
     public CustomResponse<ReaderBoardReplyResponse> writeReaderBoardReply(Long userId, Long boardId, ReaderBoardReplyRequest req) {
 
         ReaderBoardReplyResponse result = feedReactionService.uploadReaderBoardReply(userId, boardId, req);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, result);
+        return CustomResponse.onSuccess(SuccessCode.FEED_READER_BOARD_REPLY_UPLOAD_SUCCESS, result);
     }
 
     // 독자 댓글 좋아요
     public CustomResponse<LikeToggleResponse> toggleReaderBoardReplyLike(Long userId, Long boardId, Long replyId) {
 
         LikeToggleResponse result = feedReactionService.toggleReaderBoardReplyLike(userId, boardId, replyId);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, result);
+        return CustomResponse.onSuccess(SuccessCode.FEED_READER_BOARD_REPLY_LIKE_SUCCESS, result);
     }
 
 }

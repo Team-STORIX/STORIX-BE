@@ -56,6 +56,18 @@ public enum SuccessCode {
     WORKS_DETAIL_REVIEW_DELETE_SUCCESS(HttpStatus.OK, "WORKS_DETAIL_SUCCESS_006", "내 리뷰 삭제에 성공했습니다."),
     WORKS_DETAIL_REVIEW_REPORT_SUCCESS(HttpStatus.OK, "WORKS_DETAIL_SUCCESS_007", "리뷰 신고에 성공했습니다."),
 
+    // Feed success
+    FEED_ALL_READER_BOARD_LOAD_SUCCESS(HttpStatus.OK, "FEED_SUCCESS_001", "관심 작품 피드 전체 게시글 조회에 성공했습니다."),
+    FEED_WORKS_READER_BOARD_LOAD_SUCCESS(HttpStatus.OK, "FEED_SUCCESS_002", "관심 작품 피드 게시글 리스트 조회에 성공했습니다."),
+    FEED_READER_BOARD_LOAD_SUCCESS(HttpStatus.OK, "FEED_SUCCESS_003", "관심 작품 피드 게시글 단건 조회에 성공했습니다."),
+    FEED_READER_BOARD_LIKE_SUCCESS(HttpStatus.CREATED, "FEED_SUCCESS_004", "관심 작품 피드 게시글 좋아요 토글링에 성공했습니다."),
+    FEED_READER_BOARD_REPLY_UPLOAD_SUCCESS(HttpStatus.CREATED, "FEED_SUCCESS_005", "관심 작품 피드 게시글 댓글 등록에 성공했습니다."),
+    FEED_READER_BOARD_REPLY_LIKE_SUCCESS(HttpStatus.CREATED, "FEED_SUCCESS_006", "관심 작품 피드 게시글 댓글 좋아요 토글링에 성공했습니다."),
+    FEED_READER_BOARD_DELETE_SUCCESS(HttpStatus.OK, "FEED_SUCCESS_007", "관심 작품 피드 내 게시물 삭제에 성공했습니다."),
+    FEED_READER_BOARD_REPORT_SUCCESS(HttpStatus.CREATED, "FEED_SUCCESS_008", "관심 작품 피드 게시글 신고에 성공했습니다."),
+    FEED_READER_BOARD_REPLY_DELETE_SUCCESS(HttpStatus.OK, "FEED_SUCCESS_009", "관심 작품 피드 내 댓글 삭제에 성공했습니다."),
+    FEED_READER_BOARD_REPLY_REPORT_SUCCESS(HttpStatus.CREATED, "FEED_SUCCESS_010", "관심 작품 피드 댓글 신고에 성공했습니다."),
+
     // Favorite success
     FAVORITE_WORKS_LOAD_SUCCESS(HttpStatus.OK, "FAVORITE_SUCCESS_001", "관심 작품 등록 여부 조회에 성공했습니다."),
     FAVORITE_WORKS_ADD_SUCCESS(HttpStatus.CREATED, "FAVORITE_SUCCESS_002", "관심 작품 등록에 성공했습니다."),

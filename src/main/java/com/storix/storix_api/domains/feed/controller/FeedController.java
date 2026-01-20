@@ -138,4 +138,16 @@ public class FeedController {
                 .body(feedKebabUseCase.reportFeed(authUserDetails.getUserId(), boardId, req));
     }
 
+    @Operation(summary = "[케밥 메뉴] 독자 댓글 신고", description = "독자 댓글을 신고하는 api 입니다.")
+    @PostMapping("/reader/board/{boardId}/reply/{replyId}/report")
+    public ResponseEntity<CustomResponse<Void>> reportReply(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @PathVariable @NotNull Long boardId,
+            @PathVariable @NotNull Long replyId,
+            @Valid @RequestBody FeedReportRequest req
+    ) {
+        return ResponseEntity.ok()
+                .body(feedKebabUseCase.reportFeedReply(authUserDetails.getUserId(), boardId, replyId, req));
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.storix.storix_api.domains.feed.dto;
 
+import com.storix.storix_api.domains.feed.domain.FeedReplyReport;
 import com.storix.storix_api.domains.feed.domain.FeedReport;
-import com.storix.storix_api.domains.topicroom.domain.enums.ReportReason;
 
 public record CreateFeedReportCommand (
         Long reporterId,
@@ -10,6 +10,13 @@ public record CreateFeedReportCommand (
 ) {
     public FeedReport toEntity() {
         return new FeedReport(
+                reporterId,
+                reportedUserId,
+                boardId
+        );
+    }
+    public FeedReplyReport toReplyEntity() {
+        return new FeedReplyReport(
                 reporterId,
                 reportedUserId,
                 boardId
