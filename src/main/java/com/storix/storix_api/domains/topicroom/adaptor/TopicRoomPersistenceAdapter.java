@@ -18,6 +18,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -97,6 +98,12 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
 
     @Override
     public Set<Long> loadJoinedRoomIds(Long userId, List<Long> roomIds) {
+
+        // 빈 리스트일 경우 -> 빈 Set 반환
+        if (roomIds == null || roomIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+
         return topicRoomUserRepository.findJoinedRoomIdsByUserIdAndRoomIds(userId, roomIds);
     }
 
