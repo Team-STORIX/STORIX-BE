@@ -30,7 +30,7 @@ public class RedisChatAdapter implements PublishChatPort {
 
             // Redis 연결 실패
             log.error(">>>> [Redis Error] Redis 연결 실패로 메시지 전송 불가 - RoomId: {}, Msg: {}",
-                    response.roomId(), response.message(), e);
+                    response.roomId(), e);
 
             throw ChatConnectionFailureException.EXCEPTION;
         } catch (Exception e) {
