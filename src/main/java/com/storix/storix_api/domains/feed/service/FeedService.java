@@ -4,6 +4,7 @@ import com.storix.storix_api.domains.feed.adaptor.ReaderFeedAdaptor;
 import com.storix.storix_api.domains.feed.domain.ReaderBoardReply;
 import com.storix.storix_api.domains.feed.dto.BoardWrapperDto;
 import com.storix.storix_api.domains.feed.dto.ReaderBoardReplyInfoWithProfile;
+import com.storix.storix_api.domains.home.dto.SlicedReaderBoardWithProfileInfo;
 import com.storix.storix_api.domains.plus.application.helper.ReaderBoardHelper;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.dto.ReaderBoardInfo;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -105,6 +107,37 @@ public class FeedService {
                 readerBoardHelper.mapRepliesWithProfileAndLike(userId, replySlice);
 
         return new BoardWrapperDto<>(board, comments);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SlicedReaderBoardWithProfileInfo> findTodayTrendingFeeds(Long userId) {
+
+        // 1) 오늘의 피드 추천
+        LocalDateTime threshold = LocalDateTime.now().minusHours(24);
+
+        List<ReaderBoardInfo> boards =
+                readerBoardHelper.findTop3TrendingFeedInfo(userId, threshold);
+
+        // 2) 유저 id 리스트
+        List<Long> userIds = boards.stream()
+                .map(ReaderBoardInfo::userId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        // 3) 프로필 정보
+        Map<Long, StandardProfileInfo> profileMap =
+                userAdaptor.findStandardProfileInfoByUserIds(userIds);
+
+        // 최종 매핑
+        return boards.stream()
+                .map(board -> {
+                    StandardProfileInfo profile = profileMap.get(board.userId());
+                    if (profile == null) return null;
+                    return SlicedReaderBoardWithProfileInfo.of(profile, board);
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 
 }
