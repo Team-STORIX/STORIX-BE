@@ -13,7 +13,6 @@ import org.springframework.messaging.*;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -31,12 +30,9 @@ public class StompHandler implements ChannelInterceptor {
     private final RedisMessageListenerContainer container;
     private final RedisSubscriber subscriber;
 
-    // roomId -> Topic 객체
-    private static final Map<String, ChannelTopic> topics = new ConcurrentHashMap<>();
-    // roomId -> 구독자 수
-    private static final Map<String, AtomicInteger> roomSubscriberCounts = new ConcurrentHashMap<>();
-    // SessionId -> { SubscriptionId -> RoomId }
-    private static final Map<String, Map<String, String>> sessionSubscriptionMap = new ConcurrentHashMap<>();
+    private final Map<String, ChannelTopic> topics = new ConcurrentHashMap<>();
+    private final Map<String, AtomicInteger> roomSubscriberCounts = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, String>> sessionSubscriptionMap = new ConcurrentHashMap<>();
 
     public StompHandler(TokenProvider tp, RedisMessageListenerContainer c, @Lazy RedisSubscriber s) {
         this.tokenProvider = tp;
@@ -47,24 +43,15 @@ public class StompHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        StompCommand command = accessor.getCommand();
 
-        // 연결 시점: JWT 토큰 인증
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+        if (StompCommand.CONNECT.equals(command)) {
             handleConnect(accessor);
-        }
-
-        // 구독 시점: Redis 리스너 등록
-        if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
+        } else if (StompCommand.SUBSCRIBE.equals(command)) {
             handleSubscribe(accessor);
-        }
-
-        // 리스너 정리 및 카운터 감소
-        if (StompCommand.UNSUBSCRIBE.equals(accessor.getCommand())) {
+        } else if (StompCommand.UNSUBSCRIBE.equals(command)) {
             handleUnsubscribe(accessor);
-        }
-
-        // 세션 전체 해제
-        if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
+        } else if (StompCommand.DISCONNECT.equals(command)) {
             handleDisconnect(accessor);
         }
 
@@ -73,122 +60,106 @@ public class StompHandler implements ChannelInterceptor {
 
     private void handleConnect(StompHeaderAccessor accessor) {
         String token = accessor.getFirstNativeHeader("Authorization");
-        log.info(">>>> [STOMP] Connect Attempt - Token exists: {}", (token != null));
-
         if (token != null && token.startsWith("Bearer ")) {
             try {
                 AccessTokenInfo info = tokenProvider.parseAccessToken(token.substring(7));
                 AuthUserDetails user = new AuthUserDetails(info.userId(), Role.fromValue(info.role().replace("ROLE_", "")));
-
                 Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
                 accessor.setUser(auth);
+
                 log.info(">>>> [STOMP] 인증 성공: UserID {}", info.userId());
             } catch (Exception e) {
-                log.error(">>>> [STOMP] Auth Failed: {}", e.getMessage());
+
+                log.error(">>>> [STOMP] 인증 실패: {}", e.getMessage());
                 throw new MessageDeliveryException("UNAUTHORIZED");
             }
         } else {
-            log.error(">>>> [STOMP] No Valid Token Found");
             throw new MessageDeliveryException("NO_TOKEN");
         }
     }
 
     private void handleSubscribe(StompHeaderAccessor accessor) {
         String destination = accessor.getDestination();
-        log.info(">>>> [STOMP] SUBSCRIBE 요청 감지: {}", destination);
-
         if (destination != null && destination.startsWith("/sub/chat/room/")) {
             String roomId = destination.substring(destination.lastIndexOf('/') + 1);
             String sessionId = accessor.getSessionId();
             String subId = accessor.getSubscriptionId();
 
-            if (subId == null) {
-                log.warn(">>>> [STOMP] Subscribe Failed: No Subscription ID");
-                return;
-            }
+            if (subId == null) return;
 
-            // 세션-구독 매핑 저장 (SessionId -> SubId -> RoomId)
+            // 세션 구독 정보 저장
             sessionSubscriptionMap
                     .computeIfAbsent(sessionId, k -> new ConcurrentHashMap<>())
                     .put(subId, roomId);
 
-            // 구독자 수 증가
-            int currentCount = roomSubscriberCounts.computeIfAbsent(roomId, k -> new AtomicInteger(0)).incrementAndGet();
-
-            // 구독자 수 증가 및 리스너 등록
+            // 카운트 증가 및 리스너 등록
             increaseCounter(roomId);
         }
     }
 
-    // 특정 구독만 해제
     private void handleUnsubscribe(StompHeaderAccessor accessor) {
         String sessionId = accessor.getSessionId();
         String subId = accessor.getSubscriptionId();
 
         Map<String, String> subscriptions = sessionSubscriptionMap.get(sessionId);
         if (subscriptions != null && subId != null) {
-            String roomId = subscriptions.remove(subId); // 해당 구독 정보만 제거
+            String roomId = subscriptions.remove(subId);
             if (roomId != null) {
-                decreaseCounter(roomId); // 카운트 감소
-                log.info(">>>> [STOMP] Unsubscribe: Session={}, Room={}", sessionId, roomId);
+                decreaseCounter(roomId);
+                log.info(">>>> [STOMP] 구독 해제 완료: Session={}, Room={}", sessionId, roomId);
             }
         }
     }
 
     private void handleDisconnect(StompHeaderAccessor accessor) {
         String sessionId = accessor.getSessionId();
-
-        // 세션의 모든 구독 정보 제거 및 반환
         Map<String, String> subscriptions = sessionSubscriptionMap.remove(sessionId);
 
         if (subscriptions != null) {
+            log.info(">>>> [STOMP] 연결 종료 - 전체 구독 정리 시작: Session={}", sessionId);
             for (String roomId : subscriptions.values()) {
-                decreaseCounter(roomId); // 모든 구독 방에 대해 카운트 감소
+                decreaseCounter(roomId);
             }
-            log.info(">>>> [STOMP] Disconnect: Session={}, Cleaned up {} subscriptions", sessionId, subscriptions.size());
         }
     }
 
-    // 카운트 증가
     private void increaseCounter(String roomId) {
-        int currentCount = roomSubscriberCounts.computeIfAbsent(roomId, k -> new AtomicInteger(0)).incrementAndGet();
-        if (currentCount == 1) {
+        AtomicInteger counter = roomSubscriberCounts.computeIfAbsent(roomId, k -> new AtomicInteger(0));
+        int count = counter.incrementAndGet();
+
+        if (count == 1) {
             topics.computeIfAbsent(roomId, id -> {
                 ChannelTopic topic = new ChannelTopic("room:" + id);
                 container.addMessageListener(subscriber, topic);
-                log.info(">>>> [Redis] New Listener Registered: room:{}", id);
+                log.info(">>>> [Redis] 첫 번째 구독자 발생 - 리스너 등록됨: room:{}", id);
                 return topic;
             });
         }
+        log.debug(">>>> [Redis] 방 참여자 현황: room:{} ({}명)", roomId, count);
     }
 
-    // 카운트 감소
     private void decreaseCounter(String roomId) {
         AtomicInteger counter = roomSubscriberCounts.get(roomId);
         if (counter != null) {
-            int remainingCount = counter.decrementAndGet();
-            if (remainingCount <= 0) {
+            int remaining = counter.decrementAndGet();
+            if (remaining <= 0) {
                 ChannelTopic topic = topics.remove(roomId);
                 if (topic != null) {
                     container.removeMessageListener(subscriber, topic);
-                    log.info(">>>> [Redis] Listener Removed: room:{}", roomId);
+                    log.info(">>>> [Redis] 마지막 구독자 퇴장 - 리스너 해제됨: room:{}", roomId);
                 }
                 roomSubscriberCounts.remove(roomId);
             }
+            log.debug(">>>> [Redis] 방 참여자 현황: room:{} ({}명)", roomId, Math.max(0, remaining));
         }
     }
 
-
     @PreDestroy
     public void cleanup() {
-        log.info(">>>> [Cleanup] 채팅 서버 종료 시 리소스 정리 시작");
-        try {
-            topics.clear();
-            roomSubscriberCounts.clear();
-            sessionSubscriptionMap.clear();
-            log.info(">>>> [Cleanup] 모든 채팅 리소스(로컬 캐시 데이터)가 정상적으로 해제되었습니다.");
-        } catch (Exception e) {
-            log.error(">>>> [Cleanup Error] 리소스 해제 중 오류 발생: ", e);
-        }
+        log.info(">>>> [Cleanup] 채팅 리소스 캐시 정리 시작");
+        topics.clear();
+        roomSubscriberCounts.clear();
+        sessionSubscriptionMap.clear();
     }
 }
