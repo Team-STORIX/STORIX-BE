@@ -22,7 +22,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-stomp").setAllowedOriginPatterns("*");
+        registry.addEndpoint("/ws-stomp").setAllowedOriginPatterns(
+                "https://storix.kr",
+                "https://www.storix.kr",
+                "https://api.storix.kr",
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "https://storix-fe-git-develop-kim-yunseongs-projects.vercel.app",
+                "https://storix-fe-git-main-kim-yunseongs-projects.vercel.app"
+        );
     }
 
     @Override
