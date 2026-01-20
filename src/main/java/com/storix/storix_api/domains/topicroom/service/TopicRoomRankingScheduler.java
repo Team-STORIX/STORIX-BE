@@ -1,7 +1,8 @@
 package com.storix.storix_api.domains.topicroom.service;
 
+import com.storix.storix_api.domains.topicroom.application.port.LoadTopicRoomPort;
+import com.storix.storix_api.domains.topicroom.application.port.UpdateTopicRoomPort;
 import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
-import com.storix.storix_api.domains.topicroom.repository.TopicRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,19 +18,28 @@ import java.util.List;
 @Slf4j
 public class TopicRoomRankingScheduler {
 
-    private final TopicRoomRepository topicRoomRepository;
+    private final LoadTopicRoomPort loadTopicRoomPort;
+    private final UpdateTopicRoomPort updateTopicRoomPort;
 
     @Scheduled(cron = "0 0 * * * *") // 정각에 스케줄러 실행
     @Transactional
     public void calculatePopularity() {
         log.info(">>>> [Scheduler] 인기도 점수 계산 시작");
-        List<TopicRoom> rooms = topicRoomRepository.findAll();
+
+        List<TopicRoom> activeRooms = loadTopicRoomPort.findAllActiveRooms();
+
+        if (activeRooms.isEmpty()) { return; }
+
         LocalDateTime now = LocalDateTime.now();
 
-        for (TopicRoom room : rooms) {
+        for (TopicRoom room : activeRooms) {
             double score = calculateScore(room, now);
-            topicRoomRepository.updatePopularityScore(room.getId(), score);
+            room.updatePopularityScore(score);
         }
+
+        // 한 번에 업데이트
+        updateTopicRoomPort.updatePopularityScores(activeRooms);
+        log.info(">>>> [Scheduler] 총 {}개의 토픽룸 점수 갱신 완료", activeRooms.size());
     }
 
     private double calculateScore(TopicRoom room, LocalDateTime now) {
