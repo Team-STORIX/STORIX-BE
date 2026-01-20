@@ -35,8 +35,8 @@ public class StompHandler implements ChannelInterceptor {
     private static final Map<String, ChannelTopic> topics = new ConcurrentHashMap<>();
     // roomId -> 구독자 수
     private static final Map<String, AtomicInteger> roomSubscriberCounts = new ConcurrentHashMap<>();
-    // sessionId -> roomId
-    private static final Map<String, Set<String>> sessionRoomMap = new ConcurrentHashMap<>();
+    // SessionId -> { SubscriptionId -> RoomId }
+    private static final Map<String, Map<String, String>> sessionSubscriptionMap = new ConcurrentHashMap<>();
 
     public StompHandler(TokenProvider tp, RedisMessageListenerContainer c, @Lazy RedisSubscriber s) {
         this.tokenProvider = tp;
@@ -60,6 +60,11 @@ public class StompHandler implements ChannelInterceptor {
 
         // 리스너 정리 및 카운터 감소
         if (StompCommand.UNSUBSCRIBE.equals(accessor.getCommand())) {
+            handleUnsubscribe(accessor);
+        }
+
+        // 세션 전체 해제
+        if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
             handleDisconnect(accessor);
         }
 
@@ -95,23 +100,37 @@ public class StompHandler implements ChannelInterceptor {
         if (destination != null && destination.startsWith("/sub/chat/room/")) {
             String roomId = destination.substring(destination.lastIndexOf('/') + 1);
             String sessionId = accessor.getSessionId();
+            String subId = accessor.getSubscriptionId();
 
-            // 세션 별 구독 정보 저장
-            sessionRoomMap.computeIfAbsent(sessionId, k -> ConcurrentHashMap.newKeySet()).add(roomId);
+            if (subId == null) {
+                log.warn(">>>> [STOMP] Subscribe Failed: No Subscription ID");
+                return;
+            }
+
+            // 세션-구독 매핑 저장 (SessionId -> SubId -> RoomId)
+            sessionSubscriptionMap
+                    .computeIfAbsent(sessionId, k -> new ConcurrentHashMap<>())
+                    .put(subId, roomId);
 
             // 구독자 수 증가
             int currentCount = roomSubscriberCounts.computeIfAbsent(roomId, k -> new AtomicInteger(0)).incrementAndGet();
 
-            // 해당 방에 대한 리스너가 없을 때만 새로 등록
-            if (currentCount == 1) {
-                topics.computeIfAbsent(roomId, id -> {
-                    ChannelTopic topic = new ChannelTopic("room:" + id);
-                    container.addMessageListener(subscriber, topic);
-                    log.info(">>>> [Redis] New Listener Registered for Topic: {}", topic.getTopic());
-                    return topic;
-                });
-            } else {
-                log.debug(">>>> [Redis] Existing Topic: room:{} (Count: {})", roomId, currentCount);
+            // 구독자 수 증가 및 리스너 등록
+            increaseCounter(roomId);
+        }
+    }
+
+    // 특정 구독만 해제
+    private void handleUnsubscribe(StompHeaderAccessor accessor) {
+        String sessionId = accessor.getSessionId();
+        String subId = accessor.getSubscriptionId();
+
+        Map<String, String> subscriptions = sessionSubscriptionMap.get(sessionId);
+        if (subscriptions != null && subId != null) {
+            String roomId = subscriptions.remove(subId); // 해당 구독 정보만 제거
+            if (roomId != null) {
+                decreaseCounter(roomId); // 카운트 감소
+                log.info(">>>> [STOMP] Unsubscribe: Session={}, Room={}", sessionId, roomId);
             }
         }
     }
@@ -119,27 +138,42 @@ public class StompHandler implements ChannelInterceptor {
     private void handleDisconnect(StompHeaderAccessor accessor) {
         String sessionId = accessor.getSessionId();
 
-        // 이 세션이 구독했던 방 목록 조회 및 제거
-        Set<String> joinedRooms = sessionRoomMap.remove(sessionId);
+        // 세션의 모든 구독 정보 제거 및 반환
+        Map<String, String> subscriptions = sessionSubscriptionMap.remove(sessionId);
 
-        if (joinedRooms != null) {
-            for (String roomId : joinedRooms) {
-                AtomicInteger counter = roomSubscriberCounts.get(roomId);
-                if (counter != null) {
-                    int remainingCount = counter.decrementAndGet();
+        if (subscriptions != null) {
+            for (String roomId : subscriptions.values()) {
+                decreaseCounter(roomId); // 모든 구독 방에 대해 카운트 감소
+            }
+            log.info(">>>> [STOMP] Disconnect: Session={}, Cleaned up {} subscriptions", sessionId, subscriptions.size());
+        }
+    }
 
-                    // 구독자가 0명이 되면 -> Redis 리스너 제거 및 맵 정리
-                    if (remainingCount <= 0) {
-                        ChannelTopic topic = topics.remove(roomId);
-                        if (topic != null) {
-                            container.removeMessageListener(subscriber, topic);
-                            log.info(">>>> [Redis] Unsubscribe Topic: room:{} (No subscribers left)", roomId);
-                        }
-                        roomSubscriberCounts.remove(roomId);
-                    } else {
-                        log.debug(">>>> [Redis] Subscriber Left: room:{} (Remaining: {})", roomId, remainingCount);
-                    }
+    // 카운트 증가
+    private void increaseCounter(String roomId) {
+        int currentCount = roomSubscriberCounts.computeIfAbsent(roomId, k -> new AtomicInteger(0)).incrementAndGet();
+        if (currentCount == 1) {
+            topics.computeIfAbsent(roomId, id -> {
+                ChannelTopic topic = new ChannelTopic("room:" + id);
+                container.addMessageListener(subscriber, topic);
+                log.info(">>>> [Redis] New Listener Registered: room:{}", id);
+                return topic;
+            });
+        }
+    }
+
+    // 카운트 감소
+    private void decreaseCounter(String roomId) {
+        AtomicInteger counter = roomSubscriberCounts.get(roomId);
+        if (counter != null) {
+            int remainingCount = counter.decrementAndGet();
+            if (remainingCount <= 0) {
+                ChannelTopic topic = topics.remove(roomId);
+                if (topic != null) {
+                    container.removeMessageListener(subscriber, topic);
+                    log.info(">>>> [Redis] Listener Removed: room:{}", roomId);
                 }
+                roomSubscriberCounts.remove(roomId);
             }
         }
     }
@@ -151,7 +185,7 @@ public class StompHandler implements ChannelInterceptor {
         try {
             topics.clear();
             roomSubscriberCounts.clear();
-            sessionRoomMap.clear();
+            sessionSubscriptionMap.clear();
             log.info(">>>> [Cleanup] 모든 채팅 리소스(로컬 캐시 데이터)가 정상적으로 해제되었습니다.");
         } catch (Exception e) {
             log.error(">>>> [Cleanup Error] 리소스 해제 중 오류 발생: ", e);
