@@ -149,10 +149,10 @@ public class StompHandler implements ChannelInterceptor {
     public void cleanup() {
         log.info(">>>> [Cleanup] 채팅 서버 종료 시 리소스 정리 시작");
         try {
-            container.destroy();
             topics.clear();
             roomSubscriberCounts.clear();
-            log.info(">>>> [Cleanup] 모든 채팅 리소스가 정상적으로 해제되었습니다.");
+            sessionRoomMap.clear();
+            log.info(">>>> [Cleanup] 모든 채팅 리소스(로컬 캐시 데이터)가 정상적으로 해제되었습니다.");
         } catch (Exception e) {
             log.error(">>>> [Cleanup Error] 리소스 해제 중 오류 발생: ", e);
         }
