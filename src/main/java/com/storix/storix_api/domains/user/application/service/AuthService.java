@@ -2,7 +2,7 @@ package com.storix.storix_api.domains.user.application.service;
 
 import com.storix.storix_api.domains.favorite.adaptor.FavoriteWorksAdaptor;
 import com.storix.storix_api.domains.library.adaptor.LibraryAdaptor;
-import com.storix.storix_api.domains.onboarding.adaptor.OnboardingWorksAdaptor;
+import com.storix.storix_api.domains.onboarding.helper.OnboardingWorksHelper;
 import com.storix.storix_api.domains.user.controller.dto.ArtistSignupRequest;
 import com.storix.storix_api.domains.user.controller.dto.OAuthAuthorizationRequest;
 import com.storix.storix_api.domains.user.controller.dto.ReaderSignupRequest;
@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserAdaptor userAdaptor;
-    private final OnboardingWorksAdaptor onboardingWorksAdaptor;
+    private final OnboardingWorksHelper onboardingWorksHelper;
     private final LibraryAdaptor libraryAdaptor;
     private final TokenAdaptor tokenAdaptor;
     private final FavoriteWorksAdaptor favoriteWorksAdaptor;
@@ -81,7 +81,7 @@ public class AuthService {
         boolean isUserPresent = userAdaptor.isUserPresentWithProviderAndOid(provider, oid);
         if (isUserPresent) throw DuplicateUserException.EXCEPTION;
 
-        onboardingWorksAdaptor.checkReaderSignUpWithOnboardingWorksList(req.favoriteWorksIdList());
+        onboardingWorksHelper.checkReaderSignUpWithOnboardingWorksList(req.favoriteWorksIdList());
 
         userAdaptor.checkNicknameDuplicate(req.nickName());
 

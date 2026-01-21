@@ -1,8 +1,8 @@
 package com.storix.storix_api.domains.onboarding.usecase;
 
 import com.storix.storix_api.UseCase;
-import com.storix.storix_api.domains.onboarding.adaptor.OnboardingWorksAdaptor;
-import com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo;
+import com.storix.storix_api.domains.onboarding.helper.OnboardingWorksHelper;
+import com.storix.storix_api.domains.onboarding.dto.StandardOnboardingWorksInfo;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OnboardingWorksUseCase {
 
-    private final OnboardingWorksAdaptor onboardingWorksAdaptor;
+    private final OnboardingWorksHelper onboardingWorksHelper;
 
-    public CustomResponse<List<OnboardingWorksInfo>> findAllOnboardingWorks() {
-        List<OnboardingWorksInfo> result = onboardingWorksAdaptor.findAllOnboardingWorksList();
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, result);
+    public CustomResponse<List<StandardOnboardingWorksInfo>> findAllOnboardingWorks() {
+        List<StandardOnboardingWorksInfo> result = onboardingWorksHelper.findOnboardingWorksList();
+        return CustomResponse.onSuccess(SuccessCode.ONBOARDING_WORKS_LIST_LOAD_SUCCESS, result);
     }
 
 }
