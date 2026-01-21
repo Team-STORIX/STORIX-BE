@@ -1,13 +1,16 @@
 package com.storix.storix_api.domains.topicroom.repository;
 
 import com.storix.storix_api.domains.topicroom.domain.TopicRoomUser;
+import com.storix.storix_api.domains.topicroom.dto.TopicRoomUserResponseDto;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface TopicRoomUserRepository extends JpaRepository<TopicRoomUser, Long> {
 
@@ -22,7 +25,21 @@ public interface TopicRoomUserRepository extends JpaRepository<TopicRoomUser, Lo
     @Query("DELETE FROM TopicRoomUser tru WHERE tru.userId = :userId AND tru.topicRoom.id = :roomId")
     int deleteByUserIdAndTopicRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
-    // 특정 유저가 참여 중인 모든 방 ID 조회
-    @Query("SELECT tru.topicRoom.id FROM TopicRoomUser tru WHERE tru.userId = :userId")
+    @Query("SELECT tu.topicRoom.id FROM TopicRoomUser tu " +
+            "WHERE tu.userId = :userId AND tu.topicRoom.id IN :roomIds")
+    Set<Long> findJoinedRoomIdsByUserIdAndRoomIds(
+            @Param("userId") Long userId,
+            @Param("roomIds") Collection<Long> roomIds
+    );
+
+    @Query("SELECT tu.topicRoom.id FROM TopicRoomUser tu WHERE tu.userId = :userId")
     List<Long> findAllJoinedRoomIdsByUserId(@Param("userId") Long userId);
+
+    // 특정 방의 멤버 프로필 조회
+    @Query("SELECT new com.storix.storix_api.domains.topicroom.dto.TopicRoomUserResponseDto(" +
+            "u.id, u.nickName, u.profileImageUrl) " +
+            "FROM TopicRoomUser tu " +
+            "JOIN User u ON tu.userId = u.id " + // tu.userId 값과 User 엔티티의 id를 매칭
+            "WHERE tu.topicRoom.id = :roomId")
+    List<TopicRoomUserResponseDto> findMembersByRoomId(@Param("roomId") Long roomId);
 }

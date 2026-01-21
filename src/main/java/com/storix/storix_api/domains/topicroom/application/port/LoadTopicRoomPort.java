@@ -23,9 +23,11 @@ public interface LoadTopicRoomPort {
 
     long countJoinedRooms(Long userId);
 
-    boolean existsByUserIdAndRoomId(Long userId, Long roomId);
-
-    LocalDateTime getLastMessageTime(Long roomId);
-
     boolean existsByWorksId(Long worksId);
+
+    boolean existsById(Long roomId);
+
+    List<TopicRoom> loadTop5PopularRooms();
+
+    List<TopicRoom> findAllActiveRooms();
 }

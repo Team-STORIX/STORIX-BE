@@ -47,6 +47,9 @@ public class SecurityConfig {
                         (requests) -> requests
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                                // [Onboarding]
+                                .requestMatchers("/api/v1/onboarding/**").permitAll()
           
                                 // [Auth]
                                 .requestMatchers("/api/v1/auth/oauth/**").permitAll()
@@ -54,6 +57,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/users/artist/login").permitAll()
                                 .requestMatchers("/api/v1/auth/tokens/refresh").permitAll()
                                 .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
+
+                                // [Home]
+                                .requestMatchers("/api/v1/home/**").permitAll()
           
                                 // [Search]
                                 .requestMatchers("/api/v1/search/**").permitAll()
@@ -73,9 +79,11 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/library/**").hasRole("READER")
 
                                 // [TopicRoom]
+                                .requestMatchers("/api/v1/topic-rooms/popular").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/today").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/search").permitAll()
                                 .requestMatchers("/api/v1/topic-rooms/**").hasRole("READER")
+                                .requestMatchers("/ws-stomp/**").permitAll()
 
                                 // [Works]
                                 .requestMatchers(HttpMethod.POST,   "/api/v1/works/review/*").hasRole("READER")
@@ -122,6 +130,7 @@ public class SecurityConfig {
                 "https://www.storix.kr",
                 "https://api.storix.kr",
                 "http://localhost:3000",
+                "http://localhost:5173",
                 "https://storix-fe-git-develop-kim-yunseongs-projects.vercel.app",
                 "https://storix-fe-git-main-kim-yunseongs-projects.vercel.app"
         ));

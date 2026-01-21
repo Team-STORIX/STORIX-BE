@@ -31,6 +31,7 @@ public enum ErrorCode {
     // Auth error
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "LOGIN_ERROR_001", "아이디 또는 비밀번호가 일치하지 않습니다"),
     DUPLICATE_USER_SIGN(HttpStatus.BAD_REQUEST, "SIGNUP_ERROR_001", "중복 가입 요청입니다."),
+    ONBOARDING_INVALID_WORKS(HttpStatus.BAD_REQUEST, "SIGNUP_ERROR_002", "서버 DB에 적재된 온보딩 작품 리스트와 관심 작품 리스트 정보가 다릅니다."),
     INVALID_USER_LOGOUT(HttpStatus.BAD_REQUEST, "LOGOUT_ERROR_001", "이미 로그아웃 처리가 되었거나, 다른 소셜 계정에 대한 로그아웃 요청입니다."),
     INVALID_USER_WITHDRAW(HttpStatus.BAD_REQUEST, "WITHDRAW_ERROR_001", "이미 탈퇴 처리된 사용자입니다."),
     ONBOARDING_DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "NICKNAME_ERROR_001", "이미 사용 중인 닉네임입니다."),
@@ -89,6 +90,12 @@ public enum ErrorCode {
     ALREADY_JOINED_ROOM(HttpStatus.CONFLICT, "TOPIC_ROOM_ERROR_005", "이미 참여 중인 토픽룸입니다."),
     SELF_REPORT_ERROR(HttpStatus.BAD_REQUEST, "TOPIC_ROOM_ERROR_006", "자기 자신은 신고할 수 없습니다."),
     TOPIC_ROOM_ALREADY_EXISTS(HttpStatus.CONFLICT, "TOPIC_ROOM_ERROR_007", "이미 해당 작품에 대한 토픽룸이 존재합니다."),
+    TOPIC_ROOM_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC_ROOM_ERROR_008", "해당 토픽룸에 참여하지 않은 유저입니다."),
+
+    // Chat error
+    CHAT_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CHAT_ERROR_001", "채팅 메시지 발행 중 서버 관리자에게 문의 바랍니다."),
+    CHAT_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CHAT_ERROR_002", "Redis 연결 실패로 메시지 전송이 불가합니다. 서버 관리자에게 문의 바랍니다."),
+
 
     // Works error
     WORKS_NOT_FOUND(HttpStatus.NOT_FOUND, "WORKS_ERROR_001", "해당 작품을 찾을 수 없습니다."),

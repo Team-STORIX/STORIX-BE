@@ -1,8 +1,8 @@
 package com.storix.storix_api.domains.topicroom.dto;
 
 import com.storix.storix_api.domains.topicroom.domain.TopicRoom;
-import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.domain.WorksType;
+import com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo;
 import lombok.*;
 
 import java.time.Duration;
@@ -35,13 +35,13 @@ public class TopicRoomResponseDto {
         this.isJoined = isJoined;
     }
 
-    public static TopicRoomResponseDto from(TopicRoom room, Works works, boolean isJoined) {
+    public static TopicRoomResponseDto from(TopicRoom room, TopicRoomWorksInfo worksInfo, boolean isJoined) {
         return TopicRoomResponseDto.builder()
                 .topicRoomId(room.getId())
                 .topicRoomName(room.getTopicRoomName())
-                .worksType(works.getWorksType().getDbValue())
-                .worksName(works.getWorksName())
-                .thumbnailUrl(works.getThumbnailUrl())
+                .worksType(String.valueOf(worksInfo.worksType()))
+                .worksName(worksInfo.worksName())
+                .thumbnailUrl(worksInfo.imageUrl())
                 .activeUserNumber(room.getActiveUserNumber())
                 .lastChatTime(formatTimeAgo(room.getLastChatTime()))
                 .isJoined(isJoined)

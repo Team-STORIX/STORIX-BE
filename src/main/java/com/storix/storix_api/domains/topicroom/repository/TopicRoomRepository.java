@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
+public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long>, TopicRoomRankingRepository {
 
     @Query("""
         SELECT new com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto(
@@ -33,7 +33,7 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
         WHERE t.createdAt > :threshold
         ORDER BY t.activeUserNumber DESC
     """)
-    List<TopicRoomResponseDto> findTop3TrendingWithWorks(@Param("threshold") LocalDateTime threshold);
+    List<TopicRoomResponseDto> findTop3TrendingWithWorks(@Param("threshold") LocalDateTime threshold, Pageable pageable);
 
     @Query("""
         SELECT new com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto(
@@ -55,9 +55,16 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long> {
             "WHERE t.id = :id AND t.activeUserNumber > 0")
     int decrementActiveUserNumber(@Param("id") Long id);
 
+    // 마지막 채팅 시간 갱신
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE TopicRoom t SET t.lastChatTime = :now WHERE t.id = :id")
-    void updateLastChatTime(@Param("id") Long id, @Param("now") LocalDateTime now);
+    @Query("UPDATE TopicRoom t SET t.lastChatTime = :lastChatTime WHERE t.id = :roomId")
+    void updateLastChatTime(@Param("roomId") Long roomId, @Param("lastChatTime") LocalDateTime lastChatTime);
+
+    // 인기도 순으로 조회
+    List<TopicRoom> findTop5ByOrderByPopularityScoreDescLastChatTimeDesc();
 
     boolean existsByWorksId(Long worksId);
+
+    @Query("SELECT tr FROM TopicRoom tr WHERE tr.activeUserNumber > 1")
+    List<TopicRoom> findAllActiveRooms();
 }

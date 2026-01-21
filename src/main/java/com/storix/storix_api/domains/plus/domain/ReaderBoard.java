@@ -27,6 +27,9 @@ public class ReaderBoard extends Board {
     @Column(name = "is_spoiler")
     private boolean isSpoiler;
 
+    @Column(name = "popularity_score")
+    private int popularityScore = 0;
+
     @ToString.Exclude
     @OneToMany(mappedBy = "readerBoard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReaderBoardImage> images = new ArrayList<>();

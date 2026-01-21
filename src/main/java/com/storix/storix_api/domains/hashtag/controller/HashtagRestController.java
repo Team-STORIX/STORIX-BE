@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/hashtags")
 @RequiredArgsConstructor
-@Tag(name = "추천 해시태그", description = "홈화면 및 검색 화면에서의 추천 해시태그 관련 API")
+@Tag(name = "홈", description = "홈화면 관련 API")
 public class HashtagRestController {
 
     private final HashtagRecommendService hashtagRecommendationService;

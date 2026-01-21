@@ -27,6 +27,10 @@ public enum SuccessCode {
     AUTH_ARTIST_SIGNUP_SUCCESS(HttpStatus.CREATED, "AUTH_SUCCESS_004", "작가 계정 생성이 완료되었습니다."),
     AUTH_ARTIST_LOGIN_SUCCESS(HttpStatus.OK, "AUTH_SUCCESS_005", "작가 계정 로그인에 성공했습니다."),
     AUTH_WITHDRAW_SUCCESS(HttpStatus.OK, "AUTH_SUCCESS_006", "회원 탈퇴에 성공했습니다."),
+    ONBOARDING_WORKS_LIST_LOAD_SUCCESS(HttpStatus.OK, "ONBOARDING_SUCCESS_001", "온보딩 작품 리스트 조회에 성공했습니다."),
+
+    // Home success
+    HOME_TODAY_FEED_LOAD_SUCCESS(HttpStatus.OK, "HOME_SUCCESS_001", "오늘의 피드 조회에 성공했습니다."),
 
     // Profile success
     PROFILE_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_001", "유저 정보 조회에 성공했습니다."),
@@ -37,6 +41,8 @@ public enum SuccessCode {
     PROFILE_FAVORITE_ARTIST_LIST_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_006", "프로필 관심 작가 리스트 조회에 성공했습니다."),
     PROFILE_FAVORITE_WORKS_LIST_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_007", "프로필 관심 작품 리스트 조회에 성공했습니다."),
     PROFILE_MY_BOARDS_LIST_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_008", "프로필 내 활동 게시글 리스트 조회에 성공했습니다."),
+    PROFILE_MY_BOARDS_REPLY_LIST_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_009", "프로필 내 활동 댓글 리스트 조회에 성공했습니다."),
+    PROFILE_MY_BOARDS_LIKE_LIST_LOAD_SUCCESS(HttpStatus.OK, "PROFILE_SUCCESS_010", "프로필 내 활동 좋아요 리스트 조회에 성공했습니다."),
 
     // Image success
     IMAGE_ISSUE_PRESIGNED_URL_SUCCESS(HttpStatus.OK, "IMAGE_SUCCESS_001", "이미지를 업로드할 Presigned Url 발급에 성공했습니다."),

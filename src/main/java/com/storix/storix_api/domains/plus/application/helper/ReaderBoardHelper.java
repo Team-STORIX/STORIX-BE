@@ -11,6 +11,7 @@ import com.storix.storix_api.domains.plus.adaptor.BoardImageAdaptor;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
 import com.storix.storix_api.domains.plus.dto.ReaderBoardImageInfo;
 import com.storix.storix_api.domains.plus.dto.ReaderBoardInfo;
+import com.storix.storix_api.domains.plus.dto.StandardReaderBoardInfo;
 import com.storix.storix_api.domains.profile.dto.ReaderBoardWithProfileInfo;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.dto.StandardProfileInfo;
@@ -19,8 +20,10 @@ import com.storix.storix_api.domains.works.dto.WorksInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
@@ -93,6 +96,68 @@ public class ReaderBoardHelper {
                 : ReaderBoardInfo.ofMyBoard(board, isLiked);
     }
 
+    // 좋아요 누른 게시글 조회
+    public Slice<ReaderBoardInfo> findLikedReaderBoardInfo(Long userId, Pageable pageable) {
+
+        Slice<ReaderBoard> boardsEntity =
+                readerFeedAdaptor.findAllLikedReaderBoards(userId, pageable);
+
+        return boardsEntity.map(board ->
+                ReaderBoardInfo.ofFeedBoard(board, true)
+        );
+    }
+
+    // 오늘의 피드 조회
+    public List<ReaderBoardInfo> findTop3TrendingFeedInfo(Long userId, LocalDateTime threshold) {
+
+        // 1) 오늘의 피드 (최대 3개)
+        List<StandardReaderBoardInfo> boards = readerFeedAdaptor.findTop3TrendingFeed(threshold);
+
+        if (boards.size() < 3) {
+            int needed = 3 - boards.size();
+
+            // 오늘의 피드 게시글 Ids
+            List<Long> excludeIds = boards.stream()
+                    .map(StandardReaderBoardInfo::boardId)
+                    .toList();
+
+            // 부족한 개수만큼만 전체 인기순 적용 (최근 7일까지)
+            List<StandardReaderBoardInfo> fallbackBoards = readerFeedAdaptor.findSteadyTrendingFeedNotToday(excludeIds, needed);
+
+            boards.addAll(fallbackBoards);
+        }
+
+        // 인기 점수 기준 재정렬
+        boards.sort(
+                Comparator
+                        .comparing(StandardReaderBoardInfo::popularityScore)
+                        .reversed()
+        );
+
+        // 상위 3개 유지
+        boards = boards.stream()
+                .limit(3)
+                .toList();
+
+        // 게시물 ids
+        List<Long> boardIds = boards.stream()
+                .map(StandardReaderBoardInfo::boardId)
+                .toList();
+
+        // 2) 좋아요 여부 조회 - 비로그인 유저의 경우 empty
+        Set<Long> likedBoardIds = (userId != null && !boardIds.isEmpty())
+                ? readerFeedAdaptor.findLikedBoardIds(userId, boardIds)
+                : Collections.emptySet();
+
+
+        // 최종 매핑
+        return boards.stream()
+                .map(board -> ReaderBoardInfo.ofHomeBoard(
+                        board,
+                        likedBoardIds.contains(board.boardId())
+                ))
+                .toList();
+    }
 
     public Slice<ReaderBoardWithProfileInfo> map(
             Slice<ReaderBoardInfo> boards,
@@ -173,6 +238,11 @@ public class ReaderBoardHelper {
         );
     }
 
+    // 댓글 리스트 조회
+    public Slice<ReaderBoardReply> findReaderBoardReplyInfo(Long userId, Pageable pageable) {
+        return readerFeedAdaptor.findAllByUserId(userId, pageable);
+    }
+
     public Slice<ReaderBoardReplyInfoWithProfile> mapRepliesWithProfileAndLike(
             Long userId,
             Slice<ReaderBoardReply> replies
@@ -212,6 +282,38 @@ public class ReaderBoardHelper {
 
             return ReaderBoardReplyInfoWithProfile.of(
                     profile,
+                    StandardReplyInfoWithLike.of(replyInfo, isLiked)
+            );
+        });
+    }
+
+    public Slice<ReaderBoardReplyInfoWithProfile> mapMyRepliesWithProfileAndLike(
+            Long userId,
+            StandardProfileInfo myProfile,
+            Slice<ReaderBoardReply> replies
+    ) {
+        List<ReaderBoardReply> content = replies.getContent();
+        if (content.isEmpty()) {
+            return new SliceImpl<>(List.of(), replies.getPageable(), replies.hasNext());
+        }
+
+        // 1) 댓글 ids
+        List<Long> replyIds = content.stream()
+                .map(ReaderBoardReply::getId)
+                .toList();
+
+        // 2) 좋아요 여부 조회
+        Set<Long> likedReplyIds = (userId != null)
+                ? readerFeedAdaptor.findLikedReplyIds(userId, replyIds)
+                : Collections.emptySet();
+
+        // 3) 최종 매핑
+        return replies.map(reply -> {
+            ReaderBoardReplyInfo replyInfo = ReaderBoardReplyInfo.from(reply);
+            boolean isLiked = likedReplyIds.contains(reply.getId());
+
+            return ReaderBoardReplyInfoWithProfile.of(
+                    myProfile,
                     StandardReplyInfoWithLike.of(replyInfo, isLiked)
             );
         });
