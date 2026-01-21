@@ -36,6 +36,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                                                                         @Param("worksIds") List<Long> worksIds);
 
     // 작품 상세탭
+    long countByWorksId(Long worksId);
+
     @Query("SELECT new com.storix.storix_api.domains.plus.dto.SliceReviewInfo(r.libraryUserId, r.id, r.isSpoiler, r.content) " +
             "FROM Review r " +
             "WHERE r.libraryUserId = :userId AND r.worksId = :worksId")
