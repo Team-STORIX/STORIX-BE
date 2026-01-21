@@ -9,6 +9,7 @@ public record StandardReaderBoardInfo(
         String content,
         int likeCount,
         int replyCount,
+        boolean isSpoiler,
 
         // 인기 점수
         int popularityScore
