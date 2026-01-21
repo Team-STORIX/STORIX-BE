@@ -24,14 +24,19 @@ public class CookieHelper {
     }
 
     public HttpHeaders getTokenCookie(String refreshToken) {
-        ResponseCookie refreshTokenCookie =
+        ResponseCookie.ResponseCookieBuilder cookieBuilder =
                 ResponseCookie.from("refreshToken", refreshToken)
                         .httpOnly(true)
                         .secure(!isLocal())
                         .sameSite(isLocal() ? "Lax" : "Strict")
                         .path("/")
-                        .maxAge(Duration.ofMillis(tokenProvider.getRefreshTokenValidityMs()))
-                        .build();
+                        .maxAge(Duration.ofMillis(tokenProvider.getRefreshTokenValidityMs()));
+
+        if (!isLocal()) {
+            cookieBuilder.domain(".storix.kr");
+        }
+
+        ResponseCookie refreshTokenCookie = cookieBuilder.build();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
@@ -39,14 +44,19 @@ public class CookieHelper {
     }
 
     public HttpHeaders deleteCookie() {
-        ResponseCookie refreshTokenCookie =
+        ResponseCookie.ResponseCookieBuilder cookieBuilder =
                 ResponseCookie.from("refreshToken", null)
                         .httpOnly(true)
                         .secure(!isLocal())
                         .sameSite(isLocal() ? "Lax" : "Strict")
                         .path("/")
-                        .maxAge(0)
-                        .build();
+                        .maxAge(0);
+
+        if (!isLocal()) {
+            cookieBuilder.domain(".storix.kr");
+        }
+
+        ResponseCookie refreshTokenCookie = cookieBuilder.build();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
