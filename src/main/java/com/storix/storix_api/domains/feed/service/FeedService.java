@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.feed.service;
 
+import com.storix.storix_api.domains.favorite.adaptor.FavoriteWorksAdaptor;
 import com.storix.storix_api.domains.feed.adaptor.ReaderFeedAdaptor;
 import com.storix.storix_api.domains.feed.domain.ReaderBoardReply;
 import com.storix.storix_api.domains.feed.dto.BoardWrapperDto;
@@ -11,9 +12,12 @@ import com.storix.storix_api.domains.plus.dto.ReaderBoardInfo;
 import com.storix.storix_api.domains.profile.dto.ReaderBoardWithProfileInfo;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.user.dto.StandardProfileInfo;
+import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
+import com.storix.storix_api.domains.works.dto.SlicedWorksInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +32,12 @@ import java.util.Set;
 public class FeedService {
 
     private final UserAdaptor userAdaptor;
+    private final FavoriteWorksAdaptor favoriteWorksAdaptor;
+
     private final ReaderFeedAdaptor readerFeedAdaptor;
     private final ReaderBoardHelper readerBoardHelper;
+
+    private final LoadWorksPort loadWorksPort;
 
     @Transactional(readOnly = true)
     public Slice<ReaderBoardWithProfileInfo> getAllReaderBoard(Long userId, Pageable pageable) {
@@ -62,6 +70,30 @@ public class FeedService {
         // 최종 매핑
         return readerBoardHelper.map(boardInfos, info ->
                 profileMap.get(info.userId()));
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<SlicedWorksInfo> findFavoriteWorksList(Long userId, Pageable pageable) {
+
+        // 관심 작품 등록 리스트 조회
+        Slice<Long> worksIdsSlice = favoriteWorksAdaptor.findAllFavoriteWorksId(userId, pageable);
+        List<Long> worksIds = worksIdsSlice.getContent();
+
+        if (worksIds.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, worksIdsSlice.hasNext());
+        }
+
+        // 1) 관심 작품 정보 조회
+        Map<Long, SlicedWorksInfo> slicedWorksInfoMap =
+                loadWorksPort.findAllSlicedWorksInfoByWorksIds(worksIds);
+
+        // 최종 매핑
+        List<SlicedWorksInfo> result = worksIds.stream()
+                .map(slicedWorksInfoMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+
+        return new SliceImpl<>(result, pageable, worksIdsSlice.hasNext());
     }
 
     @Transactional(readOnly = true)

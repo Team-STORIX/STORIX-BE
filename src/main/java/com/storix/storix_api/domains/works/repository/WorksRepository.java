@@ -3,6 +3,7 @@ package com.storix.storix_api.domains.works.repository;
 import com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
+import com.storix.storix_api.domains.works.dto.SlicedWorksInfo;
 import com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo;
 import com.storix.storix_api.domains.works.dto.WorksInfo;
 import org.springframework.data.domain.Pageable;
@@ -126,5 +127,11 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "WHERE w.isOnboarding = true " +
             "ORDER BY w.id ASC ")
     List<OnboardingWorksInfo> findAllOnboardingWorksInfo();
+
+    // 피드 관심 작품 리스트 조회용
+    @Query("SELECT new com.storix.storix_api.domains.works.dto.SlicedWorksInfo(w.id, w.thumbnailUrl, w.worksName) " +
+            "FROM Works w " +
+            "WHERE w.id IN :worksIds")
+    List<SlicedWorksInfo> findAllSlicedWorksInfoByWorksIds(@Param("worksIds") List<Long> worksIds);
 
 }

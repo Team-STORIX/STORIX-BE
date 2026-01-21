@@ -10,8 +10,10 @@ import com.storix.storix_api.domains.feed.dto.ReaderBoardReplyInfoWithProfile;
 import com.storix.storix_api.domains.feed.usecase.FeedKebabUseCase;
 import com.storix.storix_api.domains.feed.usecase.FeedReactionUseCase;
 import com.storix.storix_api.domains.feed.usecase.FeedUseCase;
+import com.storix.storix_api.domains.profile.dto.ProfileSortType;
 import com.storix.storix_api.domains.profile.dto.ReaderBoardWithProfileInfo;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
+import com.storix.storix_api.domains.works.dto.SlicedWorksInfo;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +48,18 @@ public class FeedController {
         Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
         return ResponseEntity.ok()
                 .body(feedUseCase.getAllReaderBoard(authUserDetails.getUserId(), pageable));
+    }
+
+    @Operation(summary = "[관심 작품] 관심 작품 리스트 조회", description = "관심 작품 리스트를 조회하는 api 입니다. 무한스크롤 형식입니다.")
+    @GetMapping("/reader/board/favorite/works")
+    public ResponseEntity<CustomResponse<Slice<SlicedWorksInfo>>> getFavoriteWorksList(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails,
+            @RequestParam(defaultValue = "LATEST") ProfileSortType sort,
+            @RequestParam(defaultValue = "0") @Min(0) int page
+    ) {
+        Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
+        return ResponseEntity.ok()
+                .body( feedUseCase.getSlicedFavoriteWorksInfo(authUserDetails.getUserId(), pageable));
     }
 
     @Operation(summary = "[관심 작품] 게시글 리스트 조회", description = "관심 작품 id로 관련 게시글을 조회합니다. 무한 스크롤로 구성됩니다.")
