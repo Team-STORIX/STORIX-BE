@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.repository;
 
+import com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo;
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo;
@@ -118,4 +119,12 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "FROM Works w " +
             "WHERE w.id IN :ids")
     List<TopicRoomWorksInfo> findSimpleInfoByIdIn(@Param("ids") List<Long> ids);
+
+    // 온보딩 작품 리스트 조회용
+    @Query("SELECT new com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo(w.id, w.worksName, w.thumbnailUrl, w.author, w.illustrator, w.originalAuthor) " +
+            "FROM Works w " +
+            "WHERE w.isOnboarding = true " +
+            "ORDER BY w.id ASC ")
+    List<OnboardingWorksInfo> findAllOnboardingWorksInfo();
+
 }
