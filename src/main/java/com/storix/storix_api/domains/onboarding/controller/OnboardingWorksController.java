@@ -1,6 +1,6 @@
 package com.storix.storix_api.domains.onboarding.controller;
 
-import com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo;
+import com.storix.storix_api.domains.onboarding.dto.StandardOnboardingWorksInfo;
 import com.storix.storix_api.domains.onboarding.usecase.OnboardingWorksUseCase;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +23,7 @@ public class OnboardingWorksController {
 
     @Operation(summary = "온보딩 관심 작품 리스트 조회", description = "온보딩 관심 작품 리스트를 조회하는 api 입니다.")
     @GetMapping("/works")
-    public ResponseEntity<CustomResponse<List<OnboardingWorksInfo>>> getOnboardingWorks(
+    public ResponseEntity<CustomResponse<List<StandardOnboardingWorksInfo>>> getOnboardingWorks(
     ) {
         return ResponseEntity.ok()
                 .body(onboardingWorksUseCase.findAllOnboardingWorks());
