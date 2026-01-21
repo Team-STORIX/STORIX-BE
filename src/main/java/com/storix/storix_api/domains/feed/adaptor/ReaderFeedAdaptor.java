@@ -10,16 +10,19 @@ import com.storix.storix_api.domains.feed.repository.ReaderBoardLikeRepository;
 import com.storix.storix_api.domains.feed.repository.ReaderBoardReplyLikeRepository;
 import com.storix.storix_api.domains.feed.repository.ReaderBoardReplyRepository;
 import com.storix.storix_api.domains.plus.domain.ReaderBoard;
+import com.storix.storix_api.domains.plus.dto.StandardReaderBoardInfo;
 import com.storix.storix_api.domains.plus.repository.ReaderBoardRepository;
 import com.storix.storix_api.global.apiPayload.exception.feed.BoardReplyNotFoundException;
 import com.storix.storix_api.global.apiPayload.exception.feed.InvalidBoardRequestException;
 import com.storix.storix_api.global.apiPayload.exception.user.ForbiddenApproachException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
@@ -192,6 +195,22 @@ public class ReaderFeedAdaptor {
     // 프로필 - 좋아요한 게시글 정보 확인
     public Slice<ReaderBoard> findAllLikedReaderBoards(Long userId, Pageable pageable) {
         return readerBoardRepository.findAllLikedReaderBoards(userId, pageable);
+    }
+
+    // 오늘의 피드
+    public List<StandardReaderBoardInfo> findTop3TrendingFeed(LocalDateTime threshold) {
+        Pageable pageable = PageRequest.of(0, 3);
+
+        return readerBoardRepository.findTop3TrendingFeed(threshold, pageable);
+    }
+
+    public List<StandardReaderBoardInfo> findSteadyTrendingFeedNotToday(List<Long> excludeIds, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+
+        if (excludeIds == null || excludeIds.isEmpty()) {
+            return readerBoardRepository.findSteadyTrendingFeed(pageable);
+        }
+        return readerBoardRepository.findSteadyTrendingFeedNotToday(excludeIds, pageable);
     }
 
 }

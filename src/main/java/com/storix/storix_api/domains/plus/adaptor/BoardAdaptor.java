@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -76,6 +77,11 @@ public class BoardAdaptor {
         } else {
             throw InvalidBoardRequestException.EXCEPTION;
         }
+    }
+
+    // 홈 오늘의 토픽룸 점수 갱신
+    public int updateAllPopularityScoresRecentDays(LocalDateTime threshold) {
+        return readerBoardRepository.updatePopularityScoresRecentDays(threshold);
     }
 
     /**

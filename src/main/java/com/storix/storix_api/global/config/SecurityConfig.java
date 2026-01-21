@@ -57,6 +57,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/users/artist/login").permitAll()
                                 .requestMatchers("/api/v1/auth/tokens/refresh").permitAll()
                                 .requestMatchers("/api/v1/auth/developer/**").permitAll() // 추후 Admin 변경
+
+                                // [Home]
+                                .requestMatchers("/api/v1/home/**").permitAll()
           
                                 // [Search]
                                 .requestMatchers("/api/v1/search/**").permitAll()
