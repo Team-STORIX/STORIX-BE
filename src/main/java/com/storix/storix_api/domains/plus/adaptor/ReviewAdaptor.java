@@ -104,6 +104,10 @@ public class ReviewAdaptor {
         return reviewId;
     }
 
+    public ReviewedWorksIdAndRatingInfo getReviewedWorksIdAndRatingInfo(Long reviewId) {
+        return reviewRepository.findWorksAndRatingInfo(reviewId);
+    }
+
     public void deleteReview(Long userId, Long reviewId) {
         int isDeleted = reviewRepository.deleteByIdAndUserId(reviewId, userId);
         if (isDeleted == 0) {
