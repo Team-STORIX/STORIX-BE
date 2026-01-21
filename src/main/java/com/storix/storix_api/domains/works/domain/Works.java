@@ -82,6 +82,9 @@ public class Works {
     )
     private Set<Hashtag> hashtags = new HashSet<>();
 
+    @Column(name = "is_onboarding")
+    private Boolean isOnboarding;
+
     @Builder
     private Works(Platform platform, String worksName,
                   String artistName, String author, String illustrator,
