@@ -43,7 +43,7 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
 
     @Override
     public List<TopicRoomResponseDto> findTop3TrendingWithWorks(LocalDateTime threshold) {
-        return topicRoomRepository.findTop3TrendingWithWorks(threshold);
+        return topicRoomRepository.findTop3TrendingWithWorks(threshold, PageRequest.of(0, 3));
     }
 
     @Override
