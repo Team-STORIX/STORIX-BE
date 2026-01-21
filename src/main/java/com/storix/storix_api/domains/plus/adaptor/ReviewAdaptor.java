@@ -105,7 +105,12 @@ public class ReviewAdaptor {
     }
 
     public ReviewedWorksIdAndRatingInfo getReviewedWorksIdAndRatingInfo(Long reviewId) {
-        return reviewRepository.findWorksAndRatingInfo(reviewId);
+        Optional<ReviewedWorksIdAndRatingInfo> reviewInfo = reviewRepository.findWorksAndRatingInfo(reviewId);
+        if (reviewInfo.isPresent()) {
+            return reviewInfo.get();
+        } else {
+            throw UnknownReviewException.EXCEPTION;
+        }
     }
 
     public void deleteReview(Long userId, Long reviewId) {
