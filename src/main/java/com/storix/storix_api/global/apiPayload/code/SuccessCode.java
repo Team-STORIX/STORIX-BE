@@ -27,6 +27,7 @@ public enum SuccessCode {
     AUTH_ARTIST_SIGNUP_SUCCESS(HttpStatus.CREATED, "AUTH_SUCCESS_004", "작가 계정 생성이 완료되었습니다."),
     AUTH_ARTIST_LOGIN_SUCCESS(HttpStatus.OK, "AUTH_SUCCESS_005", "작가 계정 로그인에 성공했습니다."),
     AUTH_WITHDRAW_SUCCESS(HttpStatus.OK, "AUTH_SUCCESS_006", "회원 탈퇴에 성공했습니다."),
+    ONBOARDING_WORKS_LIST_LOAD_SUCCESS(HttpStatus.OK, "ONBOARDING_SUCCESS_001", "온보딩 작품 리스트 조회에 성공했습니다."),
 
     // Home success
     HOME_TODAY_FEED_LOAD_SUCCESS(HttpStatus.OK, "HOME_SUCCESS_001", "오늘의 피드 조회에 성공했습니다."),
