@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.adaptor;
 
+import com.storix.storix_api.domains.works.dto.SlicedWorksInfo;
 import com.storix.storix_api.domains.works.dto.TopicRoomWorksInfo;
 import com.storix.storix_api.domains.works.dto.WorksInfo;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
@@ -117,6 +118,22 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
         }
         return worksInfo.get();
     }
+
+    // 관심 작품 리스트 조회 용
+    public Map<Long, SlicedWorksInfo> findAllSlicedWorksInfoByWorksIds(List<Long> worksIds) {
+        if (worksIds == null || worksIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<SlicedWorksInfo> slicedWorksInfos = worksRepository.findAllSlicedWorksInfoByWorksIds(worksIds);
+
+        return slicedWorksInfos.stream()
+                .collect(Collectors.toMap(
+                        SlicedWorksInfo::worksId,
+                        Function.identity()
+                ));
+    }
+
 
     @Override
     public Map<Long, TopicRoomWorksInfo> loadWorksMapByIds(List<Long> worksIds) {
