@@ -33,7 +33,7 @@ public interface TopicRoomRepository extends JpaRepository<TopicRoom, Long>, Top
         WHERE t.createdAt > :threshold
         ORDER BY t.activeUserNumber DESC
     """)
-    List<TopicRoomResponseDto> findTop3TrendingWithWorks(@Param("threshold") LocalDateTime threshold);
+    List<TopicRoomResponseDto> findTop3TrendingWithWorks(@Param("threshold") LocalDateTime threshold, Pageable pageable);
 
     @Query("""
         SELECT new com.storix.storix_api.domains.topicroom.dto.TopicRoomResponseDto(
