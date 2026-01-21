@@ -70,7 +70,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT new com.storix.storix_api.domains.plus.dto.ReviewedWorksIdAndRatingInfo(r.worksId, r.id, r.rating) " +
             "FROM Review r " +
             "WHERE r.id = :reviewId")
-    ReviewedWorksIdAndRatingInfo findWorksAndRatingInfo(@Param("reviewId") Long reviewId);
+    Optional<ReviewedWorksIdAndRatingInfo> findWorksAndRatingInfo(@Param("reviewId") Long reviewId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Review r " +
