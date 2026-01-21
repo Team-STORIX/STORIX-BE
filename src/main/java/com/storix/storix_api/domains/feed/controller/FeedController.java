@@ -10,8 +10,6 @@ import com.storix.storix_api.domains.feed.dto.ReaderBoardReplyInfoWithProfile;
 import com.storix.storix_api.domains.feed.usecase.FeedKebabUseCase;
 import com.storix.storix_api.domains.feed.usecase.FeedReactionUseCase;
 import com.storix.storix_api.domains.feed.usecase.FeedUseCase;
-import com.storix.storix_api.domains.profile.dto.FavoriteWorksWithReviewInfo;
-import com.storix.storix_api.domains.profile.dto.ProfileFavoriteWorksWrapperDto;
 import com.storix.storix_api.domains.profile.dto.ProfileSortType;
 import com.storix.storix_api.domains.profile.dto.ReaderBoardWithProfileInfo;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
