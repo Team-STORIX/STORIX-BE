@@ -40,7 +40,7 @@ public class OnboardingWorksHelper {
 
                 return objectMapper.readValue(
                         json,
-                        new TypeReference<List<StandardOnboardingWorksInfo>>() {}
+                        new TypeReference<>() {}
                 );
             } catch (Exception e) {
                 redisTemplate.delete(KEY);

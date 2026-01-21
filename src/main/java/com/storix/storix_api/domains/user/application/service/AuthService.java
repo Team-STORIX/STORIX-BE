@@ -81,7 +81,6 @@ public class AuthService {
         boolean isUserPresent = userAdaptor.isUserPresentWithProviderAndOid(provider, oid);
         if (isUserPresent) throw DuplicateUserException.EXCEPTION;
 
-        // TODO
         onboardingWorksHelper.checkReaderSignUpWithOnboardingWorksList(req.favoriteWorksIdList());
 
         userAdaptor.checkNicknameDuplicate(req.nickName());
