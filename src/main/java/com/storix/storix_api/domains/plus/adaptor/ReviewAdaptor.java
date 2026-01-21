@@ -61,6 +61,10 @@ public class ReviewAdaptor {
     }
 
     // 작품 상세탭
+    public long getReviewCount(Long worksId) {
+        return reviewRepository.countByWorksId(worksId);
+    }
+
     public boolean isMyReviewExist(Long userId, Long worksId) {
         return reviewRepository.existsByLibraryUserIdAndWorksId(userId, worksId);
     }
