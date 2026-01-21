@@ -5,6 +5,7 @@ import com.storix.storix_api.domains.feed.dto.BoardWrapperDto;
 import com.storix.storix_api.domains.feed.dto.ReaderBoardReplyInfoWithProfile;
 import com.storix.storix_api.domains.feed.service.FeedService;
 import com.storix.storix_api.domains.profile.dto.ReaderBoardWithProfileInfo;
+import com.storix.storix_api.domains.works.dto.SlicedWorksInfo;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,13 @@ public class FeedUseCase {
 
         Slice<ReaderBoardWithProfileInfo> result = feedService.getAllReaderBoard(userId, pageable);
         return CustomResponse.onSuccess(SuccessCode.FEED_ALL_READER_BOARD_LOAD_SUCCESS, result);
+    }
+
+    // 관심 작품 리스트 조회
+    public CustomResponse<Slice<SlicedWorksInfo>> getSlicedFavoriteWorksInfo(Long userId, Pageable pageable) {
+
+        Slice<SlicedWorksInfo> result = feedService.findFavoriteWorksList(userId, pageable);
+        return CustomResponse.onSuccess(SuccessCode.FEED_FAVORITE_WORKS_INFO_LOAD_SUCCESS, result);
     }
 
     // 관심 작품 관련 게시글 조회
