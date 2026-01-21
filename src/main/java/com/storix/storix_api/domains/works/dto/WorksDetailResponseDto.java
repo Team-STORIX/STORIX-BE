@@ -19,10 +19,11 @@ public record WorksDetailResponseDto(
         String platform,
         String ageClassification,
         Double avgRating,
+        Long reviewCount,
         String description,
         List<String> hashtags
 ) {
-    public static WorksDetailResponseDto from(Works works) {
+    public static WorksDetailResponseDto from(Works works, Long reviewCount) {
         return WorksDetailResponseDto.builder()
                 .worksId(works.getId())
                 .worksName(works.getWorksName())
@@ -35,6 +36,7 @@ public record WorksDetailResponseDto(
                 .platform(works.getPlatform().getDbValue())
                 .ageClassification(works.getAgeClassification().getDbValue())
                 .avgRating(works.getAvgRating())
+                .reviewCount(reviewCount)
                 .description(works.getDescription())
                 .hashtags(works.getHashtags().stream()
                         .map(Hashtag::getName)
