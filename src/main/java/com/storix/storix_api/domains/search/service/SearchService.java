@@ -16,6 +16,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @Service
 @RequiredArgsConstructor
 public class SearchService implements SearchUseCase {
@@ -86,7 +89,7 @@ public class SearchService implements SearchUseCase {
                 .artistName(works.getArtistName())
                 .thumbnailUrl(works.getThumbnailUrl())
                 .reviewsCount(works.getReviewsCount() != null ? works.getReviewsCount() : 0L)
-                .avgRating(works.getAvgRating() != null ? works.getAvgRating() : 0.0)
+                .avgRating(works.getAvgRating() != null ? roundAvgRating(works.getAvgRating()) : 0.0)
                 .worksType(works.getWorksType() != null ? works.getWorksType().getDbValue() : null)
                 .build();
     }
@@ -97,5 +100,12 @@ public class SearchService implements SearchUseCase {
                 .artistName(user.getNickName())
                 .profileUrl(user.getProfileImageUrl() == null ? null : baseUrl + "/" +user.getProfileImageUrl())
                 .build();
+    }
+
+    private Double roundAvgRating(Double avgRating) {
+        return BigDecimal
+                .valueOf(avgRating)
+                .setScale(1, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 }
