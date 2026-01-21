@@ -4,6 +4,8 @@ import com.storix.storix_api.domains.hashtag.domain.Hashtag;
 import com.storix.storix_api.domains.works.domain.Works;
 import lombok.Builder;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Builder
@@ -19,10 +21,11 @@ public record WorksDetailResponseDto(
         String platform,
         String ageClassification,
         Double avgRating,
+        Long reviewCount,
         String description,
         List<String> hashtags
 ) {
-    public static WorksDetailResponseDto from(Works works) {
+    public static WorksDetailResponseDto from(Works works, Long reviewCount) {
         return WorksDetailResponseDto.builder()
                 .worksId(works.getId())
                 .worksName(works.getWorksName())
@@ -34,11 +37,19 @@ public record WorksDetailResponseDto(
                 .genre(works.getGenre().getDbValue())
                 .platform(works.getPlatform().getDbValue())
                 .ageClassification(works.getAgeClassification().getDbValue())
-                .avgRating(works.getAvgRating())
+                .avgRating(works.getAvgRating() != null ? roundAvgRating(works.getAvgRating()) : 0.0)
+                .reviewCount(reviewCount)
                 .description(works.getDescription())
                 .hashtags(works.getHashtags().stream()
                         .map(Hashtag::getName)
                         .toList())
                 .build();
+    }
+
+    public static Double roundAvgRating(Double avgRating) {
+        return BigDecimal
+                .valueOf(avgRating)
+                .setScale(1, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 }

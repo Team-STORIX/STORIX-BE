@@ -1,7 +1,7 @@
 package com.storix.storix_api.domains.works.service;
 
+import com.storix.storix_api.domains.plus.adaptor.ReviewAdaptor;
 import com.storix.storix_api.domains.user.application.port.LoadUserPort;
-import com.storix.storix_api.domains.user.domain.User;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.domains.works.application.usecase.WorksUseCase;
 import com.storix.storix_api.domains.works.domain.Works;
@@ -9,9 +9,7 @@ import com.storix.storix_api.domains.works.dto.WorksDetailResponseDto;
 import com.storix.storix_api.global.apiPayload.exception.topicRoom.UnverifiedException;
 import com.storix.storix_api.global.apiPayload.exception.user.LoginRequiredException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +17,8 @@ public class WorksService implements WorksUseCase {
 
     private final LoadWorksPort loadWorksPort;
     private final LoadUserPort loadUserPort;
+
+    private final ReviewAdaptor reviewAdaptor;
 
     @Override
     public WorksDetailResponseDto getWorksDetail(Long userId, Long worksId) {
@@ -40,7 +40,10 @@ public class WorksService implements WorksUseCase {
                 throw UnverifiedException.EXCEPTION;
             }
         }
-        return WorksDetailResponseDto.from(works);
+
+        long reviewCount = reviewAdaptor.getReviewCount(worksId);
+
+        return WorksDetailResponseDto.from(works, reviewCount);
     }
 
 

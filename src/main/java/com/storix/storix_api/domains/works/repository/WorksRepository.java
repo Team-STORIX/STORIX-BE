@@ -55,9 +55,8 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
         UPDATE Works w
         SET
           w.avgRating =
-            ROUND(
-              (COALESCE(w.avgRating, 0.0) * COALESCE(w.reviewsCount, 0) + :newRating) / (COALESCE(w.reviewsCount, 0) + 1),
-              1),
+            (COALESCE(w.avgRating, 0.0) * COALESCE(w.reviewsCount, 0) + :newRating)
+            / (COALESCE(w.reviewsCount, 0) + 1),
           w.reviewsCount = COALESCE(w.reviewsCount, 0) + 1
         WHERE w.id = :worksId
     """)
@@ -73,9 +72,9 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
           w.avgRating =
             CASE
               WHEN COALESCE(w.reviewsCount, 0) <= 1 THEN NULL
-              ELSE ROUND(
-                (COALESCE(w.avgRating, 0.0) * COALESCE(w.reviewsCount, 0) - :deletedRating) / (COALESCE(w.reviewsCount, 0) - 1),
-                1)
+              ELSE
+                (COALESCE(w.avgRating, 0.0) * COALESCE(w.reviewsCount, 0) - :deletedRating)
+                / (COALESCE(w.reviewsCount, 0) - 1)
             END,
           w.reviewsCount =
             CASE

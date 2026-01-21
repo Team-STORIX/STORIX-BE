@@ -61,6 +61,10 @@ public class ReviewAdaptor {
     }
 
     // 작품 상세탭
+    public long getReviewCount(Long worksId) {
+        return reviewRepository.countByWorksId(worksId);
+    }
+
     public boolean isMyReviewExist(Long userId, Long worksId) {
         return reviewRepository.existsByLibraryUserIdAndWorksId(userId, worksId);
     }
@@ -98,6 +102,15 @@ public class ReviewAdaptor {
             throw InvalidReviewUpdateRequestException.EXCEPTION;
         }
         return reviewId;
+    }
+
+    public ReviewedWorksIdAndRatingInfo getReviewedWorksIdAndRatingInfo(Long reviewId) {
+        Optional<ReviewedWorksIdAndRatingInfo> reviewInfo = reviewRepository.findWorksAndRatingInfo(reviewId);
+        if (reviewInfo.isPresent()) {
+            return reviewInfo.get();
+        } else {
+            throw UnknownReviewException.EXCEPTION;
+        }
     }
 
     public void deleteReview(Long userId, Long reviewId) {
