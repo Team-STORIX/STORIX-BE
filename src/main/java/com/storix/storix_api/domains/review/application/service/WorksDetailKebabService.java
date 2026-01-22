@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.review.application.service;
 
+import com.storix.storix_api.domains.library.adaptor.LibraryAdaptor;
 import com.storix.storix_api.domains.plus.adaptor.ReviewAdaptor;
 import com.storix.storix_api.domains.plus.dto.ReviewedWorksIdAndRatingInfo;
 import com.storix.storix_api.domains.review.adaptor.ReviewLikeAdaptor;
@@ -22,6 +23,7 @@ public class WorksDetailKebabService {
     private final ReviewAdaptor reviewAdaptor;
     private final ReviewLikeAdaptor reviewLikeAdaptor;
     private final ReviewReportAdaptor reviewReportAdaptor;
+    private final LibraryAdaptor libraryAdaptor;
 
     private final LoadWorksPort loadWorksPort;
 
@@ -49,6 +51,9 @@ public class WorksDetailKebabService {
         ReviewedWorksIdAndRatingInfo dto =
                 reviewAdaptor.getReviewedWorksIdAndRatingInfo(reviewId);
         loadWorksPort.updateDecrementingReviewInfoToWorks(dto.worksId(), dto.rating().getRatingValue());
+
+        // 서재 리뷰 작품 개수 반영
+        libraryAdaptor.decrementReviewCount(userId);
 
         reviewAdaptor.deleteReview(userId, reviewId);
     }
