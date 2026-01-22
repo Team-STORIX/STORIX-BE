@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.plus.repository;
 
 import com.storix.storix_api.domains.plus.domain.Rating;
 import com.storix.storix_api.domains.plus.domain.Review;
+import com.storix.storix_api.domains.plus.dto.RatingCountInfo;
 import com.storix.storix_api.domains.plus.dto.ReviewedWorksIdAndRatingInfo;
 import com.storix.storix_api.domains.plus.dto.SliceReviewInfo;
 import org.springframework.data.domain.Pageable;
@@ -96,10 +97,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     int findLikeCountById(@Param("reviewId") Long reviewId);
 
     // 프로필 탭
-    @Query("SELECT r.rating, COUNT(r) " +
+    @Query("SELECT new com.storix.storix_api.domains.plus.dto.RatingCountInfo(r.rating, count(r)) " +
             "FROM Review r " +
             "WHERE r.libraryUserId = :userId " +
             "GROUP BY r.rating ")
-    List<Object[]> countByRating(@Param("userId") Long userId);
+    List<RatingCountInfo> countByRating(@Param("userId") Long userId);
 
 }
