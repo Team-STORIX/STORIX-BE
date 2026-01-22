@@ -51,6 +51,6 @@ public class ProfileFavoriteUseCase {
     public CustomResponse<RatingCountResponse> getRatingDistribution(Long userId) {
 
         RatingCountResponse result = profileFavoriteService.findRatingDistributionByUserId(userId);
-        return CustomResponse.onSuccess(SuccessCode.SUCCESS, result);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_RATING_DISTRIBUTION_LOAD_SUCCESS, result);
     }
 }
