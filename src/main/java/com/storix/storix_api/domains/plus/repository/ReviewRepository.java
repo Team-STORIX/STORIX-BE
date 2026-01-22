@@ -95,4 +95,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "WHERE r.id = :reviewId")
     int findLikeCountById(@Param("reviewId") Long reviewId);
 
+    // 프로필 탭
+    @Query("SELECT r.rating, COUNT(r) " +
+            "FROM Review r " +
+            "WHERE r.libraryUserId = :userId " +
+            "GROUP BY r.rating ")
+    List<Object[]> countByRating(@Param("userId") Long userId);
+
 }
