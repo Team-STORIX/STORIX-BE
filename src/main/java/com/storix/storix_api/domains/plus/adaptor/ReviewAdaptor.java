@@ -119,4 +119,9 @@ public class ReviewAdaptor {
             throw InvalidReviewDeleteRequestException.EXCEPTION;
         }
     }
+
+    public List<Object[]> countByRating(Long userId) {
+        return reviewRepository.countByRating(userId);
+    }
+
 }
