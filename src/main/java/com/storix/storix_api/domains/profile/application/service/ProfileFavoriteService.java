@@ -4,6 +4,7 @@ import com.storix.storix_api.domains.favorite.adaptor.FavoriteArtistAdaptor;
 import com.storix.storix_api.domains.favorite.adaptor.FavoriteWorksAdaptor;
 import com.storix.storix_api.domains.plus.adaptor.ReviewAdaptor;
 import com.storix.storix_api.domains.plus.domain.Rating;
+import com.storix.storix_api.domains.plus.dto.RatingCountInfo;
 import com.storix.storix_api.domains.plus.dto.ReviewedWorksIdAndRatingInfo;
 import com.storix.storix_api.domains.profile.dto.FavoriteWorksWithReviewInfo;
 import com.storix.storix_api.domains.profile.dto.RatingCountResponse;
@@ -128,7 +129,7 @@ public class ProfileFavoriteService {
     @Transactional(readOnly = true)
     public RatingCountResponse findRatingDistributionByUserId(Long userId) {
 
-        List<Object[]> raws = reviewAdaptor.countByRating(userId);
+        List<RatingCountInfo> raws = reviewAdaptor.countByRating(userId);
 
         Map<String, Long> result = Arrays.stream(Rating.values())
                 .collect(Collectors.toMap(
@@ -138,10 +139,8 @@ public class ProfileFavoriteService {
                         LinkedHashMap::new
                 ));
 
-        for (Object[] row : raws) {
-            Rating rating = (Rating) row[0];
-            Long count = (Long) row[1];
-            result.put(rating.getDbValue(), count);
+        for (RatingCountInfo dto : raws) {
+            result.put(dto.rating().getDbValue(), dto.count());
         }
 
         return RatingCountResponse.of(result);
