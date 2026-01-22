@@ -2,6 +2,7 @@ package com.storix.storix_api.domains.library.adaptor;
 
 import com.storix.storix_api.domains.library.domain.Library;
 import com.storix.storix_api.domains.library.repository.LibraryRepository;
+import com.storix.storix_api.global.apiPayload.exception.feed.InvalidReviewRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +17,11 @@ public class LibraryAdaptor {
         libraryRepository.incrementReviewCount(libraryUserId);
     }
 
-    public int decrementReviewCount(Long libraryUserId) {
-        return libraryRepository.decrementReviewCount(libraryUserId);
+    public void decrementReviewCount(Long libraryUserId) {
+        int isDeleted = libraryRepository.decrementReviewCount(libraryUserId);
+        if (isDeleted == 0) {
+            throw InvalidReviewRequestException.EXCEPTION;
+        }
     }
 
     // 게시물 개수 업데이트
