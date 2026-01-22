@@ -6,6 +6,7 @@ import com.storix.storix_api.domains.plus.adaptor.ReviewAdaptor;
 import com.storix.storix_api.domains.plus.domain.Rating;
 import com.storix.storix_api.domains.plus.dto.ReviewedWorksIdAndRatingInfo;
 import com.storix.storix_api.domains.profile.dto.FavoriteWorksWithReviewInfo;
+import com.storix.storix_api.domains.profile.dto.RatingCountResponse;
 import com.storix.storix_api.domains.user.dto.FavoriteArtistInfo;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
@@ -17,9 +18,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -125,4 +124,26 @@ public class ProfileFavoriteService {
         return new SliceImpl<>(ordered, pageable, worksIdsSlice.hasNext());
     }
 
+    // 별점 분포 조회
+    @Transactional(readOnly = true)
+    public RatingCountResponse findRatingDistributionByUserId(Long userId) {
+
+        List<Object[]> raws = reviewAdaptor.countByRating(userId);
+
+        Map<String, Long> result = Arrays.stream(Rating.values())
+                .collect(Collectors.toMap(
+                        Rating::getDbValue,
+                        r -> 0L,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+
+        for (Object[] row : raws) {
+            Rating rating = (Rating) row[0];
+            Long count = (Long) row[1];
+            result.put(rating.getDbValue(), count);
+        }
+
+        return RatingCountResponse.of(result);
+    }
 }
