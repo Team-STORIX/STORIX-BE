@@ -1,10 +1,7 @@
 package com.storix.storix_api.domains.plus.adaptor;
 
 import com.storix.storix_api.domains.plus.domain.Review;
-import com.storix.storix_api.domains.plus.dto.CreateReviewCommand;
-import com.storix.storix_api.domains.plus.dto.ReviewInfo;
-import com.storix.storix_api.domains.plus.dto.ReviewedWorksIdAndRatingInfo;
-import com.storix.storix_api.domains.plus.dto.SliceReviewInfo;
+import com.storix.storix_api.domains.plus.dto.*;
 import com.storix.storix_api.domains.plus.repository.ReviewRepository;
 import com.storix.storix_api.domains.review.controller.dto.ModifyReviewRequest;
 import com.storix.storix_api.global.apiPayload.exception.plus.DuplicateReviewUploadException;
@@ -120,7 +117,7 @@ public class ReviewAdaptor {
         }
     }
 
-    public List<Object[]> countByRating(Long userId) {
+    public List<RatingCountInfo> countByRating(Long userId) {
         return reviewRepository.countByRating(userId);
     }
 
