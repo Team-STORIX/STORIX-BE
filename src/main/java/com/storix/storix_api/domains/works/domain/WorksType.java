@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.works.domain;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -11,5 +12,6 @@ public enum WorksType {
     WEBNOVEL("웹소설"),
     COMIC("만화");
 
+    @JsonValue
     private final String dbValue;
 }
