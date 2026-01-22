@@ -137,8 +137,9 @@ public class TopicRoomController {
     public CustomResponse<List<TopicRoomResponseDto>> getPopularRooms(
             @AuthenticationPrincipal AuthUserDetails authUserDetails
     ) {
+        Long userId = (authUserDetails != null) ? authUserDetails.getUserId() : null;
 
-        List<TopicRoomResponseDto> rooms = topicRoomUseCase.getPopularRooms(authUserDetails.getUserId());
+        List<TopicRoomResponseDto> rooms = topicRoomUseCase.getPopularRooms(userId);
         return CustomResponse.onSuccess(SuccessCode.SUCCESS, rooms);
     }
 

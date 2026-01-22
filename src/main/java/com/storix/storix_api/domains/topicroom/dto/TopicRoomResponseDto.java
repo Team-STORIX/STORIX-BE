@@ -39,7 +39,7 @@ public class TopicRoomResponseDto {
         return TopicRoomResponseDto.builder()
                 .topicRoomId(room.getId())
                 .topicRoomName(room.getTopicRoomName())
-                .worksType(String.valueOf(worksInfo.worksType()))
+                .worksType(worksInfo.worksType() != null ? worksInfo.worksType().getDbValue() : null)
                 .worksName(worksInfo.worksName())
                 .thumbnailUrl(worksInfo.imageUrl())
                 .activeUserNumber(room.getActiveUserNumber())
