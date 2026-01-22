@@ -118,7 +118,7 @@ public class ProfileController {
     }
 
     // 리뷰 별점 분포 조회
-    @Operation(summary = "[독자] 리뷰 별점 분포 조회", description = "프로필 관심 작품 리스트를 조회하는 api 입니다. 무한스크롤 형식입니다.")
+    @Operation(summary = "[독자] 리뷰 별점 분포 조회", description = "프로필 리뷰 별점 분포를 조회하는 api 입니다.")
     @GetMapping("/reader/ratings")
     public ResponseEntity<CustomResponse<RatingCountResponse>> getRatingDistribution(
             @AuthenticationPrincipal AuthUserDetails authUserDetails
