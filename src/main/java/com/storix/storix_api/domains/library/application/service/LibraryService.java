@@ -63,11 +63,14 @@ public class LibraryService {
         List<StandardLibraryWorksInfo> content = reviewInfo.stream()
                 .map(r -> {
                     LibraryWorksInfo works = worksMap.get(r.worksId());
+                    if (works == null) return null;
+
                     String artistName = artistNameParseHelper
                             .buildArtistName(works.originalAuthor(), works.author(), works.illustrator());
 
                     return StandardLibraryWorksInfo.of(works, artistName, r.reviewId(), r.rating());
                 })
+                .filter(Objects::nonNull)
                 .toList();
 
         return new SliceImpl<>(content, pageable, reviewInfo.hasNext());
