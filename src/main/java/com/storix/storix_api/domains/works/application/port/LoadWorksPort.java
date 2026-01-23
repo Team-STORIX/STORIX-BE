@@ -45,4 +45,7 @@ public interface LoadWorksPort {
     Map<Long, SlicedWorksInfo> findAllSlicedWorksInfoByWorksIds(List<Long> worksIds);
 
     Map<Long, TopicRoomWorksInfo> loadWorksMapByIds(List<Long> worksIds);
+
+    // 랜덤 작품 조회 (없으면 빈 리스트)
+    List<Works> findRandomWorksExcluding(List<Long> excludedIds, int limit);
 }
