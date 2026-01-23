@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface FavoriteWorksRepository extends JpaRepository<FavoriteWorks, Long> {
 
     // 관심 작품 등록 / 해제용
@@ -27,4 +29,10 @@ public interface FavoriteWorksRepository extends JpaRepository<FavoriteWorks, Lo
     @Query("SELECT f.worksId FROM FavoriteWorks f " +
             "WHERE f.userId = :userId")
     Slice<Long> findWorksIdsByUserId(Long userId, Pageable pageable);
+
+    // 선호 해시태그 용
+    @Query("SELECT f.worksId FROM FavoriteWorks f " +
+            "WHERE f.userId = :userId")
+    List<Long> findAllWorksIdsByUserId(Long userId);
+
 }
