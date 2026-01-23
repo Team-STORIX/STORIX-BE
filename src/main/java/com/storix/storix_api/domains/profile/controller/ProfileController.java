@@ -127,6 +127,16 @@ public class ProfileController {
                 .body(profileFavoriteUseCase.getRatingDistribution(authUserDetails.getUserId()));
     }
 
+    // 선호 해시태그 조회
+    @Operation(summary = "[독자] 선호 해시태그 조회", description = "선호 해시태그를 조회하는 api 입니다.")
+    @GetMapping("/reader/hashtags")
+    public ResponseEntity<CustomResponse<FavoriteHashtagsResponse>> getFavoriteHashtags(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails
+    ) {
+        return ResponseEntity.ok()
+                .body(profileFavoriteUseCase.getHashtags(authUserDetails.getUserId()));
+    }
+
     // 내가 쓴 게시글 조회
     @Operation(summary = "[독자] 내가 쓴 게시글 조회", description = "프로필 내가 쓴 게시글을 조회하는 api 입니다. 무한스크롤 형식입니다.")
     @GetMapping("/reader/activity/board")
