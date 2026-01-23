@@ -10,6 +10,7 @@ import com.storix.storix_api.domains.works.repository.WorksRepository;
 import com.storix.storix_api.global.apiPayload.exception.plus.WorksNotExistException;
 import com.storix.storix_api.global.apiPayload.exception.works.UnknownWorksException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -132,6 +133,18 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
                         SlicedWorksInfo::worksId,
                         Function.identity()
                 ));
+    }
+
+    @Override
+    public List<Works> findRandomWorksExcluding(List<Long> excludedIds, int limit) {
+        PageRequest pageable = PageRequest.of(0, limit);
+
+        // 제외할 ID가 없으면 전체 랜덤 조회
+        if (excludedIds == null || excludedIds.isEmpty()) {
+            return worksRepository.findRandomWorks(pageable);
+        }
+
+        return worksRepository.findRandomWorksExcluding(excludedIds, pageable);
     }
 
 
