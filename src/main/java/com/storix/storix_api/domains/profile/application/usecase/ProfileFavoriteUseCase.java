@@ -2,11 +2,8 @@ package com.storix.storix_api.domains.profile.application.usecase;
 
 import com.storix.storix_api.UseCase;
 import com.storix.storix_api.domains.profile.application.service.ProfileFavoriteService;
-import com.storix.storix_api.domains.profile.dto.FavoriteWorksWithReviewInfo;
-import com.storix.storix_api.domains.profile.dto.RatingCountResponse;
+import com.storix.storix_api.domains.profile.dto.*;
 import com.storix.storix_api.domains.user.dto.FavoriteArtistInfo;
-import com.storix.storix_api.domains.profile.dto.ProfileFavoriteArtistWrapperDto;
-import com.storix.storix_api.domains.profile.dto.ProfileFavoriteWorksWrapperDto;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +49,12 @@ public class ProfileFavoriteUseCase {
 
         RatingCountResponse result = profileFavoriteService.findRatingDistributionByUserId(userId);
         return CustomResponse.onSuccess(SuccessCode.PROFILE_RATING_DISTRIBUTION_LOAD_SUCCESS, result);
+    }
+
+    // 선호 해시태그 조회
+    public CustomResponse<FavoriteHashtagsResponse> getHashtags(Long userId) {
+
+        FavoriteHashtagsResponse result = profileFavoriteService.findFavoriteHashtagsByUserId(userId);
+        return CustomResponse.onSuccess(SuccessCode.PROFILE_FAVORITE_HASHTAGS_LOAD_SUCCESS, result);
     }
 }
