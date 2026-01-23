@@ -133,4 +133,17 @@ public interface WorksRepository extends JpaRepository<Works, Long> {
             "WHERE w.id IN :worksIds")
     List<SlicedWorksInfo> findAllSlicedWorksInfoByWorksIds(@Param("worksIds") List<Long> worksIds);
 
+
+    // 특정 ID들을 제외한 랜덤 작품 조회
+    @Query("SELECT DISTINCT w FROM Works w " +
+            "LEFT JOIN FETCH w.hashtags " +
+            "WHERE w.id NOT IN :ids " +
+            "ORDER BY function('RAND')")
+    List<Works> findRandomWorksExcluding(@Param("ids") List<Long> ids, Pageable pageable);
+
+    // 제외할 ID가 없을 때 사용하는 전체 대상 랜덤 조회
+    @Query("SELECT DISTINCT w FROM Works w " +
+            "LEFT JOIN FETCH w.hashtags " +
+            "ORDER BY function('RAND')")
+    List<Works> findRandomWorks(Pageable pageable);
 }
