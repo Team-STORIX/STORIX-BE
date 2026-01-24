@@ -103,4 +103,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "GROUP BY r.rating ")
     List<RatingCountInfo> countByRating(@Param("userId") Long userId);
 
+
+    @Query("SELECT r.worksId " +
+            "FROM Review r " +
+            "WHERE r.libraryUserId = :userId " +
+            "AND r.rating IN (:ratings)")
+    List<Long> findWorksIdsByRatings(@Param("userId") Long userId,
+                                     @Param("ratings") List<Rating> ratings);
+
 }

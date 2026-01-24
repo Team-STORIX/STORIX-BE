@@ -1,10 +1,12 @@
 package com.storix.storix_api.domains.library.application.service;
 
 import com.storix.storix_api.domains.library.adaptor.LibraryAdaptor;
-import com.storix.storix_api.domains.library.dto.LibraryWorksInfo;
+import com.storix.storix_api.domains.library.dto.StandardLibraryWorksInfo;
 import com.storix.storix_api.domains.plus.adaptor.ReviewAdaptor;
 import com.storix.storix_api.domains.plus.dto.ReviewedWorksIdAndRatingInfo;
 import com.storix.storix_api.domains.works.adaptor.WorksPersistenceAdaptor;
+import com.storix.storix_api.domains.works.application.helper.ArtistNameParseHelper;
+import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -26,6 +28,8 @@ public class LibraryService {
     private final ReviewAdaptor reviewAdaptor;
     private final WorksPersistenceAdaptor worksPersistenceAdaptor;
 
+    private final ArtistNameParseHelper artistNameParseHelper;
+
     // 총 리뷰 개수 정보 조회
     @Transactional(readOnly = true)
     public int getTotalReviewCount(Long userId) {
@@ -34,7 +38,7 @@ public class LibraryService {
 
     // 서재 내 리뷰한 작품 정보 조회
     @Transactional(readOnly = true)
-    public Slice<LibraryWorksInfo> getReviewedWorksInfo(Long userId, Pageable pageable) {
+    public Slice<StandardLibraryWorksInfo> getReviewedWorksInfo(Long userId, Pageable pageable) {
 
         // 리뷰 정보 조회
         Slice<ReviewedWorksIdAndRatingInfo> reviewInfo = reviewAdaptor.getWorksListByUserId(userId, pageable);
@@ -48,19 +52,25 @@ public class LibraryService {
             return new SliceImpl<>(List.of(), pageable, reviewInfo.hasNext());
         }
 
-        List<com.storix.storix_api.domains.works.dto.LibraryWorksInfo> worksList = worksPersistenceAdaptor.getLibraryWorksInfo(worksIds);
+        List<LibraryWorksInfo> worksList = worksPersistenceAdaptor.getLibraryWorksInfo(worksIds);
 
         // 리뷰 정보 순서대로 세팅
-        Map<Long, com.storix.storix_api.domains.works.dto.LibraryWorksInfo> worksMap = worksList.stream()
+        Map<Long, LibraryWorksInfo> worksMap = worksList.stream()
                 .collect(Collectors.toMap(
-                        com.storix.storix_api.domains.works.dto.LibraryWorksInfo::worksId,
+                        LibraryWorksInfo::worksId,
                         Function.identity()));
 
-        List<LibraryWorksInfo> content = reviewInfo.stream()
-                .map(r -> LibraryWorksInfo.of(
-                        worksMap.get(r.worksId()),
-                        r.reviewId(),
-                        r.rating()))
+        List<StandardLibraryWorksInfo> content = reviewInfo.stream()
+                .map(r -> {
+                    LibraryWorksInfo works = worksMap.get(r.worksId());
+                    if (works == null) return null;
+
+                    String artistName = artistNameParseHelper
+                            .buildArtistName(works.originalAuthor(), works.author(), works.illustrator());
+
+                    return StandardLibraryWorksInfo.of(works, artistName, r.reviewId(), r.rating());
+                })
+                .filter(Objects::nonNull)
                 .toList();
 
         return new SliceImpl<>(content, pageable, reviewInfo.hasNext());
@@ -68,7 +78,7 @@ public class LibraryService {
 
     // 서재 내 리뷰한 작품 정보 검색
     @Transactional(readOnly = true)
-    public Slice<LibraryWorksInfo> searchReviewedWorksInfo(Long userId, String keyword, Pageable pageable) {
+    public Slice<StandardLibraryWorksInfo> searchReviewedWorksInfo(Long userId, String keyword, Pageable pageable) {
 
         // 모든 리뷰의 worksId, rating 리스트 조회
         List<ReviewedWorksIdAndRatingInfo> reviewInfo = reviewAdaptor.findAllWorksIdsByUserId(userId);
@@ -82,18 +92,21 @@ public class LibraryService {
             return new SliceImpl<>(List.of(), pageable, false);
         }
 
-        Slice<com.storix.storix_api.domains.works.dto.LibraryWorksInfo> worksSlice = worksPersistenceAdaptor.searchLibraryWorksInfoByIds(allWorksIds, keyword, pageable);
+        Slice<LibraryWorksInfo> worksSlice = worksPersistenceAdaptor.searchLibraryWorksInfoByIds(allWorksIds, keyword, pageable);
 
         // 리뷰 정보 반영한 작품 검색 결과 세팅
         Map<Long, ReviewedWorksIdAndRatingInfo> reviewMap = reviewInfo.stream()
                 .collect(Collectors.toMap(ReviewedWorksIdAndRatingInfo::worksId, Function.identity()));
 
-        List<LibraryWorksInfo> content = worksSlice.getContent().stream()
+        List<StandardLibraryWorksInfo> content = worksSlice.getContent().stream()
                 .map(w -> {
                     ReviewedWorksIdAndRatingInfo r = reviewMap.get(w.worksId());
                     if (r == null) return null;
 
-                    return LibraryWorksInfo.of(w, r.reviewId(), r.rating());
+                    String artistName = artistNameParseHelper
+                            .buildArtistName(w.originalAuthor(), w.author(), w.illustrator());
+
+                    return StandardLibraryWorksInfo.of(w, artistName, r.reviewId(), r.rating());
                 })
                 .filter(Objects::nonNull)
                 .toList();

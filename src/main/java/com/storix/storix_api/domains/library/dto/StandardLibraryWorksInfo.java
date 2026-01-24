@@ -1,8 +1,9 @@
 package com.storix.storix_api.domains.library.dto;
 
 import com.storix.storix_api.domains.plus.domain.Rating;
+import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 
-public record LibraryWorksInfo(
+public record StandardLibraryWorksInfo(
         // 작품 정보
         Long worksId,
         String worksName,
@@ -15,16 +16,17 @@ public record LibraryWorksInfo(
         Long reviewId,
         String rating
 ) {
-    public static LibraryWorksInfo of(
-            com.storix.storix_api.domains.works.dto.LibraryWorksInfo worksInfo,
+    public static StandardLibraryWorksInfo of(
+            LibraryWorksInfo worksInfo,
+            String artistName,
             Long reviewId,
             Rating rating
     ) {
-        return new LibraryWorksInfo(
+        return new StandardLibraryWorksInfo(
                 // 작품 정보
                 worksInfo.worksId(),
                 worksInfo.worksName(),
-                worksInfo.artistName(),
+                artistName,
                 worksInfo.thumbnailUrl(),
                 worksInfo.worksType().getDbValue(),
                 worksInfo.genre().getDbValue(),

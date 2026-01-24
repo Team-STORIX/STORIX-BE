@@ -1,5 +1,6 @@
 package com.storix.storix_api.domains.plus.adaptor;
 
+import com.storix.storix_api.domains.plus.domain.Rating;
 import com.storix.storix_api.domains.plus.domain.Review;
 import com.storix.storix_api.domains.plus.dto.*;
 import com.storix.storix_api.domains.plus.repository.ReviewRepository;
@@ -117,8 +118,14 @@ public class ReviewAdaptor {
         }
     }
 
+    // 프로필 탭
     public List<RatingCountInfo> countByRating(Long userId) {
         return reviewRepository.countByRating(userId);
+    }
+
+    public List<Long> findWorksIdsByHighRatings(Long userId) {
+        return reviewRepository.findWorksIdsByRatings(
+                userId, List.of(Rating.FIVE, Rating.FOUR_POINT_FIVE));
     }
 
 }

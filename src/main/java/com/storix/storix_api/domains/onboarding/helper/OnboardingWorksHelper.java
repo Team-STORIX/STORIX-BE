@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.storix.storix_api.domains.onboarding.dto.OnboardingWorksInfo;
 import com.storix.storix_api.domains.onboarding.dto.StandardOnboardingWorksInfo;
+import com.storix.storix_api.domains.works.application.helper.ArtistNameParseHelper;
 import com.storix.storix_api.domains.works.repository.WorksRepository;
 
 import com.storix.storix_api.global.apiPayload.exception.user.InvalidOnboardingWorksException;
@@ -25,9 +26,11 @@ public class OnboardingWorksHelper {
     private static final String KEY = "onboarding::onboardingWorksList::v1";
     private static final Duration TTL = Duration.ofDays(7);
 
-    private final WorksRepository worksRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+
+    private final WorksRepository worksRepository;
+    private final ArtistNameParseHelper artistNameParseHelper;
 
     @Transactional(readOnly = true)
     public List<StandardOnboardingWorksInfo> findOnboardingWorksList() {
@@ -52,7 +55,12 @@ public class OnboardingWorksHelper {
         List<OnboardingWorksInfo> raws = worksRepository.findAllOnboardingWorksInfo();
 
         List<StandardOnboardingWorksInfo> result = raws.stream()
-                .map(raw -> StandardOnboardingWorksInfo.of(raw, buildArtistName(raw)))
+                .map(raw ->
+                        StandardOnboardingWorksInfo.of
+                                (raw, artistNameParseHelper
+                                        .buildArtistName(raw.getOriginalAuthor(), raw.getAuthor(), raw.getIllustrator())
+                                )
+                )
                 .toList();
 
         // 3) 캐시 저장
@@ -64,31 +72,6 @@ public class OnboardingWorksHelper {
         }
 
         return result;
-    }
-
-    private String buildArtistName(OnboardingWorksInfo raw) {
-        LinkedHashSet<String> tokens = new LinkedHashSet<>();
-
-        addTokens(tokens, raw.getOriginalAuthor());
-        addTokens(tokens, raw.getAuthor());
-        addTokens(tokens, raw.getIllustrator());
-
-        return String.join(",", tokens);
-    }
-
-    private void addTokens(Set<String> out, String value) {
-        if (value == null) return;
-
-        String trimmed = value.trim();
-        if (trimmed.isEmpty()) return;
-
-        for (String token : trimmed.split(",")) {
-            String t = token.trim();
-            if (!t.isEmpty()) {
-                t = t.replaceAll("\\s+", " ");
-                out.add(t);
-            }
-        }
     }
 
     @Transactional(readOnly = true)

@@ -2,15 +2,18 @@ package com.storix.storix_api.domains.profile.application.service;
 
 import com.storix.storix_api.domains.favorite.adaptor.FavoriteArtistAdaptor;
 import com.storix.storix_api.domains.favorite.adaptor.FavoriteWorksAdaptor;
+import com.storix.storix_api.domains.hashtag.adaptor.HashtagAdaptor;
 import com.storix.storix_api.domains.plus.adaptor.ReviewAdaptor;
 import com.storix.storix_api.domains.plus.domain.Rating;
 import com.storix.storix_api.domains.plus.dto.RatingCountInfo;
 import com.storix.storix_api.domains.plus.dto.ReviewedWorksIdAndRatingInfo;
+import com.storix.storix_api.domains.profile.dto.FavoriteHashtagsResponse;
 import com.storix.storix_api.domains.profile.dto.FavoriteWorksWithReviewInfo;
 import com.storix.storix_api.domains.profile.dto.RatingCountResponse;
 import com.storix.storix_api.domains.user.dto.FavoriteArtistInfo;
 import com.storix.storix_api.domains.user.adaptor.UserAdaptor;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
+import com.storix.storix_api.domains.works.domain.Genre;
 import com.storix.storix_api.domains.works.dto.WorksInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,7 @@ public class ProfileFavoriteService {
     private final FavoriteArtistAdaptor favoriteArtistAdaptor;
     private final FavoriteWorksAdaptor favoriteWorksAdaptor;
     private final ReviewAdaptor reviewAdaptor;
+    private final HashtagAdaptor hashtagAdaptor;
 
     private final UserAdaptor userAdaptor;
 
@@ -84,7 +88,7 @@ public class ProfileFavoriteService {
     public Slice<FavoriteWorksWithReviewInfo> findAllFavoriteWorksInfo(Long userId, Pageable pageable) {
 
         // 관심 작품 등록 리스트 조회
-        Slice<Long> worksIdsSlice = favoriteWorksAdaptor.findAllFavoriteWorksId(userId, pageable);
+        Slice<Long> worksIdsSlice = favoriteWorksAdaptor.findSliceFavoriteWorksId(userId, pageable);
         List<Long> worksIds = worksIdsSlice.getContent();
 
         if (worksIds.isEmpty()) {
@@ -144,5 +148,74 @@ public class ProfileFavoriteService {
         }
 
         return RatingCountResponse.of(result);
+    }
+
+    // 선호 해시태그 조회
+    @Transactional(readOnly = true)
+    public FavoriteHashtagsResponse findFavoriteHashtagsByUserId(Long userId) {
+
+        // 결과 Map
+        Map<Integer, String> rankingMap = new LinkedHashMap<>();
+        for (int i = 1; i <= 5; i++) {
+            rankingMap.put(i, null);
+        }
+
+        // 1) 관심 작품 id
+        List<Long> worksIds = favoriteWorksAdaptor.findAllFavoriteWorksIdsByUserId(userId);
+        if (worksIds == null || worksIds.isEmpty()) {
+            return new FavoriteHashtagsResponse(Map.of());
+        }
+
+        // 고평점 작품 id
+        List<Long> worksIdsByHighRatings = reviewAdaptor.findWorksIdsByHighRatings(userId);
+
+        // 2) 해시태그 정보
+        Map<Long, List<String>> hashTags = hashtagAdaptor.findHashTagsByWorksIds(worksIds);
+        if (hashTags == null || hashTags.isEmpty()) {
+            return new FavoriteHashtagsResponse(Map.of());
+        }
+
+        // 관심 작품으로 등록된 고평점 작품의 해시태그 정보
+        Set<Long> highRatedWorksSet = new HashSet<>(worksIdsByHighRatings == null ? List.of() : worksIdsByHighRatings);
+        Set<String> highRatedTagSet = hashTags.entrySet().stream()
+                .filter(e -> highRatedWorksSet.contains(e.getKey()))
+                .map(Map.Entry::getValue)
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+
+        // 장르 문자열 정보
+        Set<String> genreValues = Arrays.stream(Genre.values())
+                .map(Genre::getDbValue)
+                .collect(Collectors.toSet());
+
+        // 3) 빈도 집계
+        Map<String, Long> freq = hashTags.values().stream()
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty()) // 빈도 2 이상
+                .filter(s -> !genreValues.contains(s)) // 장르 해시태그 제외
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // 4) 정렬 및 랭킹 매핑
+        List<String> rankedTags = freq.entrySet().stream()
+                .filter(e -> e.getValue() >= 2)
+                .sorted(
+                        Comparator.<Map.Entry<String, Long>>comparingLong(Map.Entry::getValue).reversed()
+                                .thenComparing(e -> highRatedTagSet.contains(e.getKey()) ? 0 : 1)
+                                .thenComparing(Map.Entry::getKey)
+                )
+                .map(Map.Entry::getKey)
+                .limit(5)
+                .toList();
+
+        // 최종 매핑
+        for (int i = 0; i < rankedTags.size(); i++) {
+            rankingMap.put(i + 1, rankedTags.get(i));
+        }
+        return new FavoriteHashtagsResponse(rankingMap);
     }
 }
