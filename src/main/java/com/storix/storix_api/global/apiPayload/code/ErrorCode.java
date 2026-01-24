@@ -126,8 +126,10 @@ public enum ErrorCode {
     REVIEW_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "REVIEW_ERROR_001", "이미 삭제된 리뷰이거나 정보를 찾을 수 없습니다."),
     DUPLICATE_FEED_USER_REPORT(HttpStatus.BAD_REQUEST, "FEED_ERROR_001", "이미 신고가 완료된 게시물입니다."),
     DUPLICATE_FEED_REPLY_USER_REPORT(HttpStatus.BAD_REQUEST, "FEED_ERROR_002", "이미 신고가 완료된 댓글입니다."),
-    BOARD_REPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "REPLY_ERROR_001", "해당 게시글에 대한 댓글 정보를 찾을 수 없습니다.");
+    BOARD_REPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "REPLY_ERROR_001", "해당 게시글에 대한 댓글 정보를 찾을 수 없습니다."),
 
+    // Preference error
+    PREFERENCE_ALREADY_DONE_TODAY(HttpStatus.BAD_REQUEST, "PREFERENCE_ERROR_001", "취향 탐색 기능은 하루에 한 번만 가능합니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
