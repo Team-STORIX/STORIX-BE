@@ -18,7 +18,7 @@ public abstract class BoardReply extends BaseTimeEntity {
     @Column(name = "user_id", nullable = false)
     protected Long userId;
 
-    @Column(name = "comment", nullable = false)
+    @Column(length = 300, nullable = false)
     protected String comment;
 
     @Column(name = "like_count", nullable = false)
