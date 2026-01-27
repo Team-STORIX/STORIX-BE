@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 @RequiredArgsConstructor
 public enum FeedSortType {
 
-    LATEST("최신순", Sort.by(Sort.Direction.DESC, "id"));
+    LATEST("기본순", Sort.by(Sort.Direction.ASC, "id"));
 
     private final String description;
     private final Sort sortValue;
