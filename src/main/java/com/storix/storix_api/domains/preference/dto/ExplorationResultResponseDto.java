@@ -1,6 +1,6 @@
 package com.storix.storix_api.domains.preference.dto;
 
-import com.storix.storix_api.domains.library.dto.LibraryWorksInfo;
+import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

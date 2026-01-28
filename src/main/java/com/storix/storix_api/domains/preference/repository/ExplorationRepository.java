@@ -1,6 +1,5 @@
 package com.storix.storix_api.domains.preference.repository;
 
-import com.storix.storix_api.domains.library.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.preference.domain.PreferenceExploration;
 import com.storix.storix_api.domains.works.domain.Works;
 import org.springframework.data.jpa.repository.JpaRepository;

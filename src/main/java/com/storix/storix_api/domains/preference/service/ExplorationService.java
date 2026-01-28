@@ -2,7 +2,7 @@ package com.storix.storix_api.domains.preference.service;
 
 import ch.qos.logback.core.status.ErrorStatus;
 import com.nimbusds.oauth2.sdk.GeneralException;
-import com.storix.storix_api.domains.library.dto.LibraryWorksInfo;
+import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.preference.application.helper.ExplorationCacheHelper;
 import com.storix.storix_api.domains.preference.application.usecase.ExplorationUseCase;
 import com.storix.storix_api.domains.preference.dto.ExplorationResultResponseDto;
