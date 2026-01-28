@@ -139,7 +139,7 @@ public class ReviewService {
 
         // 2) 프로필 정보
         StandardProfileInfo profile =
-                userAdaptor.findStandardProfileInfoByUserId(userId);
+                userAdaptor.findStandardProfileInfoByUserId(reviewInfo.reviewerId());
 
         // 3) 작품 정보
         Long worksId = reviewInfo.worksId();

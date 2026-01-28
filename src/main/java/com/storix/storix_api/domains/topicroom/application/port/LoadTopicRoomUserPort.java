@@ -13,5 +13,5 @@ public interface LoadTopicRoomUserPort {
     boolean existsByUserIdAndRoomId(Long userId, Long roomId);
 
     // 유저 프로필 조회용
-    List<TopicRoomUserResponseDto> loadMembersByRoomId(Long roomId);
+    List<Long> loadMemberIdsByRoomId(Long roomId);
 }

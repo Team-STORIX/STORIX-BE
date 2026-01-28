@@ -132,8 +132,8 @@ public class TopicRoomPersistenceAdapter implements LoadTopicRoomPort, RecordTop
     }
 
     @Override
-    public List<TopicRoomUserResponseDto> loadMembersByRoomId(Long roomId) {
-        return topicRoomUserRepository.findMembersByRoomId(roomId);
+    public List<Long> loadMemberIdsByRoomId(Long roomId) {
+        return topicRoomUserRepository.findMemberIdsByRoomId(roomId);
     }
 
     @Override

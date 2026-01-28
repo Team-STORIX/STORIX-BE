@@ -4,6 +4,7 @@ import com.storix.storix_api.domains.feed.controller.dto.FeedReportRequest;
 import com.storix.storix_api.domains.feed.controller.dto.ReaderBoardReplyRequest;
 import com.storix.storix_api.domains.feed.controller.dto.ReaderBoardReplyResponse;
 import com.storix.storix_api.domains.feed.domain.FeedSortType;
+import com.storix.storix_api.domains.feed.domain.ReplySortType;
 import com.storix.storix_api.domains.feed.dto.BoardWrapperDto;
 import com.storix.storix_api.domains.feed.dto.LikeToggleResponse;
 import com.storix.storix_api.domains.feed.dto.ReaderBoardReplyInfoWithProfile;
@@ -80,7 +81,7 @@ public class FeedController {
     public ResponseEntity<CustomResponse<BoardWrapperDto<ReaderBoardReplyInfoWithProfile>>> getReaderBoardDetail(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @PathVariable @NotNull Long boardId,
-            @RequestParam(defaultValue = "LATEST") FeedSortType sort,
+            @RequestParam(defaultValue = "LATEST") ReplySortType sort,
             @RequestParam(defaultValue = "0") @Min(0) int page
     ) {
         Pageable pageable = PageRequest.of(page, 10, sort.getSortValue());
