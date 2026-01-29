@@ -60,35 +60,25 @@ public class ExplorationService implements ExplorationUseCase {
     @Transactional
     public void submitExploration(Long userId, ExplorationSubmitRequestDto request) {
 
+        // 작품 존재 여부 확인
         loadWorksPort.checkWorksExistById(request.worksId());
 
-        if (cacheHelper.isAlreadyParticipatedToday(userId)) {
-            throw DuplicatedExplorationException.EXCEPTION;
-        }
+        PendingSwipeDto pendingDto = PendingSwipeDto.builder()
+                .userId(userId).worksId(request.worksId()).isLiked(request.isLiked()).build();
 
-        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+        Long result = cacheHelper.submitWithLua(userId, pendingDto);
 
-        // 오늘의 작품 id
-        List<Long> dbWorksIds = explorationRepository.findWorksIdsByUserIdAndCreatedAtAfter(userId, startOfToday);
-
-        // Redis에 대기 중인 작품 id
-        Set<Long> redisWorksIds = cacheHelper.getPendingWorksIds(userId);
-
-        Set<Long> uniqueDidWorks = new HashSet<>(dbWorksIds);
-        uniqueDidWorks.addAll(redisWorksIds);
-
-        int currentTotal = uniqueDidWorks.size();
-
-
-        if (currentTotal >= 15) {
+        if (result == -1 || result == -2) {
+            // 이미 참여 & 동시 요청으로 인해 15개를 넘어간 경우
             cacheHelper.markAsParticipatedToday(userId);
             throw DuplicatedExplorationException.EXCEPTION;
         }
 
-        cacheHelper.addPendingSwipe(userId, request.worksId(), request.isLiked());
+        if (result == -3) {
+            throw new RuntimeException();
+        }
 
-        // 저장 후 개수 체크
-        if (currentTotal + 1 >= 15) {
+        if (result == 15) {
             cacheHelper.markAsParticipatedToday(userId);
             cacheHelper.deleteChartCache(userId);
         }

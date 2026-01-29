@@ -26,7 +26,6 @@ public class ExplorationBatchScheduler {
     public void flushExplorationDataToDb() {
 
         int batchSize = 100;
-
         List<PendingSwipeDto> batch = cacheHelper.popBatchFromGlobalQueue(batchSize);
 
         if (batch.isEmpty()) {
@@ -46,6 +45,11 @@ public class ExplorationBatchScheduler {
             log.info("Flushed {} exploration records to DB.", entities.size());
         } catch (Exception e) {
             log.error("Failed to save exploration batch to DB", e);
+
+            // 실패 시 데이터를 다시 글로벌 큐에 삽입 -> 다음 주기에 처리
+            for (PendingSwipeDto dto : batch) {
+                cacheHelper.rePushToGlobalQueue(dto);
+            }
         }
     }
 }
