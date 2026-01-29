@@ -10,6 +10,7 @@ import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class PreferenceController {
     @PostMapping("/exploration")
     public CustomResponse<String> submitResponse(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
-            @RequestBody ExplorationSubmitRequestDto request
+            @RequestBody @Valid ExplorationSubmitRequestDto request
     ) {
         explorationUseCase.submitExploration(authUserDetails.getUserId(), request);
         return CustomResponse.onSuccess(SuccessCode.SUCCESS);
