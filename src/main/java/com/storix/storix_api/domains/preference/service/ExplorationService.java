@@ -36,6 +36,8 @@ public class ExplorationService implements ExplorationUseCase {
             return Collections.emptyList();
         }
 
+        LocalDateTime threshold = getSessionThreshold();
+
         // 중복 방지
         List<Long> dbHistoryIds = explorationRepository.findRespondedWorksIdsByUserId(userId);
         Set<Long> pendingIds = cacheHelper.getPendingWorksIds(userId);
@@ -44,11 +46,10 @@ public class ExplorationService implements ExplorationUseCase {
         allHistoryIds.addAll(pendingIds);
 
         // 오늘 진행도 계산
-        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
-        int todayCount = explorationRepository.countByUserIdAndCreatedAtAfter(userId, startOfToday)
+        int sessionCount = explorationRepository.countByUserIdAndCreatedAtAfter(userId, threshold)
                 + pendingIds.size();
 
-        int needed = 15 - todayCount;
+        int needed = 15 - sessionCount;
         if (needed <= 0) return Collections.emptyList();
 
         return loadWorksPort.findRandomWorksExcluding(new ArrayList<>(allHistoryIds), needed)
