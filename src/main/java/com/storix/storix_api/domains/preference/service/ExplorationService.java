@@ -57,7 +57,6 @@ public class ExplorationService implements ExplorationUseCase {
                 .toList();
     }
 
-
     @Override
     @Transactional
     public void submitExploration(Long userId, ExplorationSubmitRequestDto request) {
@@ -65,8 +64,15 @@ public class ExplorationService implements ExplorationUseCase {
         // 작품 존재 여부 확인
         loadWorksPort.checkWorksExistById(request.worksId());
 
+        if (cacheHelper.isAlreadyParticipatedToday(userId)) {
+            throw DuplicatedExplorationException.EXCEPTION;
+        }
+
         PendingSwipeDto pendingDto = PendingSwipeDto.builder()
-                .userId(userId).worksId(request.worksId()).isLiked(request.isLiked()).build();
+                .userId(userId)
+                .worksId(request.worksId())
+                .isLiked(request.isLiked())
+                .build();
 
         Long result = cacheHelper.submitWithLua(userId, pendingDto);
 
@@ -96,10 +102,11 @@ public class ExplorationService implements ExplorationUseCase {
     @Override
     @Transactional(readOnly = true)
     public ExplorationResultResponseDto getExplorationResults(Long userId) {
-        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
 
-        List<Works> dbLiked = explorationRepository.findWorksByLikedStatusToday(userId, true, startOfToday);
-        List<Works> dbDisliked = explorationRepository.findWorksByLikedStatusToday(userId, false, startOfToday);
+        LocalDateTime threshold = LocalDateTime.now().minusHours(3);
+
+        List<Works> dbLiked = explorationRepository.findWorksByLikedStatusToday(userId, true, threshold);
+        List<Works> dbDisliked = explorationRepository.findWorksByLikedStatusToday(userId, false, threshold);
 
         // Redis 대기열 조회 및 병합
         List<PendingSwipeDto> pending = cacheHelper.getAllPendingSwipes(userId);
@@ -177,5 +184,10 @@ public class ExplorationService implements ExplorationUseCase {
                         null, null
                 ))
                 .toList();
+    }
+
+    // 세션 시간 계산
+    private LocalDateTime getSessionThreshold() {
+        return LocalDateTime.now().minusHours(3);
     }
 }
