@@ -7,6 +7,7 @@ import com.storix.storix_api.domains.preference.dto.PendingSwipeDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -57,13 +58,14 @@ public class ExplorationCacheHelper {
                     LocalDateTime.now().toLocalDate().atTime(java.time.LocalTime.MAX)).getSeconds();
 
             return redisTemplate.execute(
-                    new org.springframework.data.redis.core.script.DefaultRedisScript<>(SUBMIT_SCRIPT, Long.class),
-                    java.util.List.of(doneKey, countKey, detailKey, GLOBAL_QUEUE_KEY),
+                    new DefaultRedisScript<>(SUBMIT_SCRIPT, Long.class),
+                    List.of(doneKey, countKey, detailKey, GLOBAL_QUEUE_KEY),
                     json,
-                    String.valueOf(secondsToMidnight),
+                    "86400",
                     "86400",
                     String.valueOf(MAX_QUEUE_SIZE)
             );
+
         } catch (Exception e) {
             log.error(">>> Lua script execution 실패: {}", e.getMessage());
             return -3L;
