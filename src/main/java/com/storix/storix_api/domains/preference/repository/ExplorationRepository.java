@@ -28,9 +28,4 @@ public interface ExplorationRepository extends JpaRepository<PreferenceExplorati
     @Query("SELECT w.genre, COUNT(w) FROM PreferenceExploration pe JOIN Works w ON pe.worksId = w.id " +
             "WHERE pe.userId = :userId AND pe.isLiked = true GROUP BY w.genre")
     List<Object[]> countLikedGenresByUserId(@Param("userId") Long userId);
-
-
-    // [수정] 단순히 개수(int)가 아니라, 중복 제거를 위해 ID 리스트를 가져와야 함
-    @Query("SELECT pe.worksId FROM PreferenceExploration pe WHERE pe.userId = :userId AND pe.createdAt >= :startOfDay")
-    List<Long> findWorksIdsByUserIdAndCreatedAtAfter(@Param("userId") Long userId, @Param("startOfDay") LocalDateTime startOfDay);
 }
