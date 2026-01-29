@@ -105,25 +105,26 @@ public class ExplorationService implements ExplorationUseCase {
 
         LocalDateTime threshold = LocalDateTime.now().minusHours(3);
 
-        List<Works> dbLiked = explorationRepository.findWorksByLikedStatusToday(userId, true, threshold);
-        List<Works> dbDisliked = explorationRepository.findWorksByLikedStatusToday(userId, false, threshold);
+        List<Long> dbLikedIds = explorationRepository.findRespondedWorksIdsByStatusToday(userId, true, threshold);
+        List<Long> dbDislikedIds = explorationRepository.findRespondedWorksIdsByStatusToday(userId, false, threshold);
 
         // Redis 대기열 조회 및 병합
         List<PendingSwipeDto> pending = cacheHelper.getAllPendingSwipes(userId);
-        Set<Long> dbIds = Stream.concat(dbLiked.stream(), dbDisliked.stream())
-                .map(Works::getId).collect(Collectors.toSet());
 
-        List<Long> pLikedIds = pending.stream().filter(p -> p.isLiked() && !dbIds.contains(p.worksId()))
-                .map(PendingSwipeDto::worksId).toList();
-        List<Long> pDislikedIds = pending.stream().filter(p -> !p.isLiked() && !dbIds.contains(p.worksId()))
-                .map(PendingSwipeDto::worksId).toList();
+        Set<Long> finalLikedIds = new HashSet<>(dbLikedIds);
+        finalLikedIds.addAll(pending.stream()
+                .filter(PendingSwipeDto::isLiked)
+                .map(PendingSwipeDto::worksId)
+                .collect(Collectors.toSet()));
 
-        // Redis 데이터에 대한 작품 상세 정보 로드
-        List<Works> allLiked = new ArrayList<>(dbLiked);
-        allLiked.addAll(loadWorksPort.findWorksByIds(pLikedIds));
+        Set<Long> finalDislikedIds = new HashSet<>(dbDislikedIds);
+        finalDislikedIds.addAll(pending.stream()
+                .filter(p -> !p.isLiked())
+                .map(PendingSwipeDto::worksId)
+                .collect(Collectors.toSet()));
 
-        List<Works> allDisliked = new ArrayList<>(dbDisliked);
-        allDisliked.addAll(loadWorksPort.findWorksByIds(pDislikedIds));
+        List<Works> allLiked = loadWorksPort.findWorksByIds(new ArrayList<>(finalLikedIds));
+        List<Works> allDisliked = loadWorksPort.findWorksByIds(new ArrayList<>(finalDislikedIds));
 
         return ExplorationResultResponseDto.builder()
                 .likedWorks(toLibraryWorksInfoList(allLiked))
