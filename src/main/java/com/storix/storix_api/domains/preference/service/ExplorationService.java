@@ -141,25 +141,6 @@ public class ExplorationService implements ExplorationUseCase {
         });
     }
 
-    private List<GenreScoreInfo> calculateTodayScores(List<Works> likedWorks) {
-        if (likedWorks.isEmpty()) return Collections.emptyList();
-
-        Map<String, Long> genreCounts = likedWorks.stream()
-                .collect(Collectors.groupingBy(
-                        w -> w.getGenre().getDbValue(),
-                        Collectors.counting()
-                ));
-
-        long total = likedWorks.size();
-
-        return genreCounts.entrySet().stream()
-                .map(entry -> new GenreScoreInfo(
-                        entry.getKey(),
-                        Math.round((entry.getValue() / (double) total) * 5.0 * 10) / 10.0
-                ))
-                .toList();
-    }
-
     private List<GenreScoreInfo> transformToScoreInfo(List<Object[]> rawCounts) {
         long totalLiked = rawCounts.stream().mapToLong(row -> (long) row[1]).sum();
         if (totalLiked == 0) return Collections.emptyList();
