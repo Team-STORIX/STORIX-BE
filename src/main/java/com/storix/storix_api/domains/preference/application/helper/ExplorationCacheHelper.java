@@ -32,15 +32,18 @@ public class ExplorationCacheHelper {
     private static final String PENDING_LIST_PREFIX = "exploration::pending::detail::";
     private static final String GLOBAL_QUEUE_KEY = "exploration::queue";
     private static final String DAILY_COUNT_KEY_PREFIX = "exploration::count::today::";
+    private static final int MAX_QUEUE_SIZE = 10000;
 
     private static final String SUBMIT_SCRIPT =
-            "if redis.call('exists', KEYS[1]) == 1 then return -1 end " +        // 1. 이미 완료 : -1 반환
-                    "local count = redis.call('incr', KEYS[2]) " +                      // 2. 카운트 증가
-                    "if count > 15 then return -2 end " +                               // 3. 15개 초과 : -2 반환
-                    "redis.call('rpush', KEYS[3], ARGV[1]) " +                          // 4. 유저 상세 큐 저장
-                    "redis.call('rpush', KEYS[4], ARGV[1]) " +                          // 5. 글로벌 큐 저장
-                    "if count == 1 then redis.call('expire', KEYS[2], ARGV[2]) end " +  // 카운트 TTL 설정
-                    "redis.call('expire', KEYS[3], ARGV[3]) " +                         // 상세 큐 TTL 설정
+            "if redis.call('exists', KEYS[1]) == 1 then return -1 end " +
+                    "local q_len = redis.call('llen', KEYS[4]) " +
+                    "if q_len > tonumber(ARGV[4]) then return -4 end " +
+                    "local count = redis.call('incr', KEYS[2]) " +
+                    "if count > 15 then return -2 end " +
+                    "redis.call('rpush', KEYS[3], ARGV[1]) " +
+                    "redis.call('rpush', KEYS[4], ARGV[1]) " +
+                    "if count == 1 then redis.call('expire', KEYS[2], ARGV[2]) end " +
+                    "redis.call('expire', KEYS[3], ARGV[3]) " +
                     "return count";
 
     public Long submitWithLua(Long userId, PendingSwipeDto dto) {
@@ -58,7 +61,8 @@ public class ExplorationCacheHelper {
                     java.util.List.of(doneKey, countKey, detailKey, GLOBAL_QUEUE_KEY),
                     json,
                     String.valueOf(secondsToMidnight),
-                    "86400"
+                    "86400",
+                    String.valueOf(MAX_QUEUE_SIZE)
             );
         } catch (Exception e) {
             log.error(">>> Lua script execution 실패: {}", e.getMessage());

@@ -8,6 +8,8 @@ import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.domains.works.domain.Genre;
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
+import com.storix.storix_api.global.apiPayload.code.ErrorCode;
+import com.storix.storix_api.global.apiPayload.exception.STORIXCodeException;
 import com.storix.storix_api.global.apiPayload.exception.preference.DuplicatedExplorationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -75,7 +77,13 @@ public class ExplorationService implements ExplorationUseCase {
         }
 
         if (result == -3) {
-            throw new RuntimeException();
+            throw new STORIXCodeException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
+        if (result == -4) {
+
+            // 큐가 가득 찬 상태
+            throw new STORIXCodeException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
         if (result == 15) {
