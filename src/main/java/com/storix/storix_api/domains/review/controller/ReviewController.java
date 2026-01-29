@@ -65,7 +65,7 @@ public class ReviewController {
             @PathVariable @NotNull Long reviewId
     ) {
         return ResponseEntity.ok()
-                .body(worksDetailReviewUseCase.getReviewDetail(authUserDetails.getUserId(), reviewId));
+                .body(worksDetailReviewUseCase.getReviewDetail(authUserDetails, reviewId));
     }
 
     @Operation(summary = "리뷰 좋아요", description = "리뷰 id로 좋아요를 토글링하는 api 입니다. 좋아요 여부와 최신 좋아요 수가 반환됩니다.")
