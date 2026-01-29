@@ -3,16 +3,23 @@ package com.storix.storix_api.domains.preference.application.helper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.storix.storix_api.domains.preference.dto.GenreScoreInfo;
+import com.storix.storix_api.domains.preference.dto.PendingSwipeDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ExplorationCacheHelper {
@@ -101,5 +108,23 @@ public class ExplorationCacheHelper {
 
     public void deleteChartCache(Long userId) {
         redisTemplate.delete(CHART_KEY_PREFIX + userId);
+    }
+
+    public List<PendingSwipeDto> popBatchFromGlobalQueue(int count) {
+
+        List<PendingSwipeDto> batch = new java.util.ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+
+            String json = redisTemplate.opsForList().leftPop(GLOBAL_QUEUE_KEY);
+            if (json == null) break; // 큐가 비었으면 중단
+
+            try {
+                batch.add(objectMapper.readValue(json, PendingSwipeDto.class));
+            } catch (Exception e) {
+                log.warn(">>> 취향분석 cache helper [pop GQ for scheduler]{}", String.valueOf(e));
+            }
+        }
+        return batch;
     }
 }
