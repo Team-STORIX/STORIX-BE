@@ -1,25 +1,22 @@
 package com.storix.storix_api.domains.preference.service;
 
-import ch.qos.logback.core.status.ErrorStatus;
-import com.nimbusds.oauth2.sdk.GeneralException;
-import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.domains.preference.application.helper.ExplorationCacheHelper;
 import com.storix.storix_api.domains.preference.application.usecase.ExplorationUseCase;
-import com.storix.storix_api.domains.preference.dto.ExplorationResultResponseDto;
-import com.storix.storix_api.domains.preference.dto.ExplorationSubmitRequestDto;
-import com.storix.storix_api.domains.preference.dto.ExplorationWorksResponseDto;
-import com.storix.storix_api.domains.preference.dto.GenreScoreInfo;
+import com.storix.storix_api.domains.preference.dto.*;
 import com.storix.storix_api.domains.preference.repository.ExplorationRepository;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
 import com.storix.storix_api.domains.works.domain.Works;
+import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.global.apiPayload.exception.preference.DuplicatedExplorationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -32,93 +29,154 @@ public class ExplorationService implements ExplorationUseCase {
     @Override
     @Transactional(readOnly = true)
     public List<ExplorationWorksResponseDto> getExplorationWorks(Long userId) {
-        // [제약조건] 오늘 이미 15개를 다 채워서 결과를 본 유저인지 확인
         if (cacheHelper.isAlreadyParticipatedToday(userId)) {
             return Collections.emptyList();
         }
 
-        // 이미 응답한 작품 ID 가져오기 (PWA 상태 유지용)
-        List<Long> respondedIds = explorationRepository.findRespondedWorksIdsByUserId(userId);
-        int needed = 15 - respondedIds.size();
+        // 중복 방지
+        List<Long> dbHistoryIds = explorationRepository.findRespondedWorksIdsByUserId(userId);
+        Set<Long> pendingIds = cacheHelper.getPendingWorksIds(userId);
 
+        Set<Long> allHistoryIds = new HashSet<>(dbHistoryIds);
+        allHistoryIds.addAll(pendingIds);
+
+        // 오늘 진행도 계산
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+        int todayCount = explorationRepository.countByUserIdAndCreatedAtAfter(userId, startOfToday)
+                + pendingIds.size();
+
+        int needed = 15 - todayCount;
         if (needed <= 0) return Collections.emptyList();
 
-        // 인덱스를 타는 ID 기반 랜덤 조회 (성능 최적화)
-        return loadWorksPort.findRandomWorksExcluding(respondedIds, needed)
+        return loadWorksPort.findRandomWorksExcluding(new ArrayList<>(allHistoryIds), needed)
                 .stream()
                 .map(ExplorationWorksResponseDto::from)
                 .toList();
     }
 
+
     @Override
     @Transactional
     public void submitExploration(Long userId, ExplorationSubmitRequestDto request) {
-        // [제약조건] 오늘 참여 완료 여부 재검증
+
+        loadWorksPort.checkWorksExistById(request.worksId());
+
         if (cacheHelper.isAlreadyParticipatedToday(userId)) {
             throw DuplicatedExplorationException.EXCEPTION;
         }
 
-        // 1. 개별 응답 저장
-        explorationRepository.save(request.toEntity(userId));
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
 
-        // 2. 현재까지 응답한 개수 확인
-        List<Long> respondedIds = explorationRepository.findRespondedWorksIdsByUserId(userId);
+        // 오늘의 작품 id
+        List<Long> dbWorksIds = explorationRepository.findWorksIdsByUserIdAndCreatedAtAfter(userId, startOfToday);
 
-        // 3. 15개가 완료되었다면 '오늘 참여 완료'로 Redis에 기록 (TTL 자정까지)
-        if (respondedIds.size() >= 15) {
+        // Redis에 대기 중인 작품 id
+        Set<Long> redisWorksIds = cacheHelper.getPendingWorksIds(userId);
+
+        Set<Long> uniqueDidWorks = new HashSet<>(dbWorksIds);
+        uniqueDidWorks.addAll(redisWorksIds);
+
+        int currentTotal = uniqueDidWorks.size();
+
+
+        if (currentTotal >= 15) {
             cacheHelper.markAsParticipatedToday(userId);
-            cacheHelper.deleteChartCache(userId); // 기존 차트 캐시 무효화하여 갱신 유도
+            throw DuplicatedExplorationException.EXCEPTION;
+        }
+
+        cacheHelper.addPendingSwipe(userId, request.worksId(), request.isLiked());
+
+        // 저장 후 개수 체크
+        if (currentTotal + 1 >= 15) {
+            cacheHelper.markAsParticipatedToday(userId);
+            cacheHelper.deleteChartCache(userId);
         }
     }
+
 
     @Override
     @Transactional(readOnly = true)
     public ExplorationResultResponseDto getExplorationResults(Long userId) {
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
 
-        // 1. 엔티티 리스트 조회
-        List<Works> likedEntities = explorationRepository.findWorksByLikedStatus(userId, true);
-        List<Works> dislikedEntities = explorationRepository.findWorksByLikedStatus(userId, false);
+        List<Works> dbLiked = explorationRepository.findWorksByLikedStatusToday(userId, true, startOfToday);
+        List<Works> dbDisliked = explorationRepository.findWorksByLikedStatusToday(userId, false, startOfToday);
 
-        // 2. 변환 후 DTO 생성
+        // Redis 대기열 조회 및 병합
+        List<PendingSwipeDto> pending = cacheHelper.getAllPendingSwipes(userId);
+        Set<Long> dbIds = Stream.concat(dbLiked.stream(), dbDisliked.stream())
+                .map(Works::getId).collect(Collectors.toSet());
+
+        List<Long> pLikedIds = pending.stream().filter(p -> p.isLiked() && !dbIds.contains(p.worksId()))
+                .map(PendingSwipeDto::worksId).toList();
+        List<Long> pDislikedIds = pending.stream().filter(p -> !p.isLiked() && !dbIds.contains(p.worksId()))
+                .map(PendingSwipeDto::worksId).toList();
+
+        // Redis 데이터에 대한 작품 상세 정보 로드
+        List<Works> allLiked = new ArrayList<>(dbLiked);
+        allLiked.addAll(loadWorksPort.findWorksByIds(pLikedIds));
+
+        List<Works> allDisliked = new ArrayList<>(dbDisliked);
+        allDisliked.addAll(loadWorksPort.findWorksByIds(pDislikedIds));
+
         return ExplorationResultResponseDto.builder()
-                .likedWorks(toLibraryWorksInfoList(likedEntities))
-                .dislikedWorks(toLibraryWorksInfoList(dislikedEntities))
-                .genreScores(getGenreChart(userId))
+                .likedWorks(toLibraryWorksInfoList(allLiked))
+                .dislikedWorks(toLibraryWorksInfoList(allDisliked))
+                .genreScores(calculateTodayScores(allLiked))
                 .build();
     }
 
-    // 🔄 변환 헬퍼 메서드 (Record 생성자 사용)
-    private List<LibraryWorksInfo> toLibraryWorksInfoList(List<Works> worksList) {
-        return worksList.stream()
-                .map(w -> new LibraryWorksInfo(
-                        // 1. 작품 정보 (엔티티에서 꺼내옴)
-                        w.getId(),
-                        w.getWorksName(),
-                        w.getArtistName(),
-                        w.getThumbnailUrl(),
-                        w.getWorksType().getDbValue(), // Enum -> String 변환
-                        w.getGenre().getDbValue(),     // Enum -> String 변환
 
-                        // 2. 리뷰 정보 (취향 탐색 결과에는 없으므로 null 처리)
-                        null, // reviewId
-                        null  // rating
+
+    public List<GenreScoreInfo> getCumulativeStats(Long userId) {
+        return cacheHelper.getOrGenerateChart(userId, () -> {
+            List<Object[]> raw = explorationRepository.countLikedGenresByUserId(userId);
+            return transformToScoreInfo(raw);
+        });
+    }
+
+    private List<GenreScoreInfo> calculateTodayScores(List<Works> likedWorks) {
+        if (likedWorks.isEmpty()) return Collections.emptyList();
+
+        Map<String, Long> genreCounts = likedWorks.stream()
+                .collect(Collectors.groupingBy(
+                        w -> w.getGenre().getDbValue(),
+                        Collectors.counting()
+                ));
+
+        long total = likedWorks.size();
+
+        return genreCounts.entrySet().stream()
+                .map(entry -> new GenreScoreInfo(
+                        entry.getKey(),
+                        Math.round((entry.getValue() / (double) total) * 5.0 * 10) / 10.0
                 ))
                 .toList();
     }
 
-    private List<GenreScoreInfo> getGenreChart(Long userId) {
-        return cacheHelper.getOrGenerateChart(userId, () -> {
-            List<Object[]> rawCounts = explorationRepository.countLikedGenresByUserId(userId);
-            long totalLiked = rawCounts.stream().mapToLong(row -> (long) row[1]).sum();
+    private List<GenreScoreInfo> transformToScoreInfo(List<Object[]> rawCounts) {
+        long totalLiked = rawCounts.stream().mapToLong(row -> (long) row[1]).sum();
+        if (totalLiked == 0) return Collections.emptyList();
 
-            if (totalLiked == 0) return Collections.emptyList();
+        return rawCounts.stream()
+                .map(row -> new GenreScoreInfo(
+                        row[0].toString(),
+                        Math.round(((long) row[1] / (double) totalLiked) * 5.0 * 10) / 10.0
+                ))
+                .toList();
+    }
 
-            return rawCounts.stream()
-                    .map(row -> new GenreScoreInfo(
-                            row[0].toString(),
-                            Math.round(((long) row[1] / (double) totalLiked) * 5.0 * 10) / 10.0
-                    ))
-                    .toList();
-        });
+    private List<LibraryWorksInfo> toLibraryWorksInfoList(List<Works> worksList) {
+        return worksList.stream()
+                .map(w -> new LibraryWorksInfo(
+                        w.getId(),
+                        w.getWorksName(),
+                        w.getArtistName(),
+                        w.getThumbnailUrl(),
+                        w.getWorksType().getDbValue(),
+                        w.getGenre().getDbValue(),
+                        null, null
+                ))
+                .toList();
     }
 }
