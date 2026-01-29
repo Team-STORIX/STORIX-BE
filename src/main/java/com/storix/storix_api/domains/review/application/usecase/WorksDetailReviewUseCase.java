@@ -41,7 +41,9 @@ public class WorksDetailReviewUseCase {
     }
 
     // 리뷰 단건 조회
-    public CustomResponse<DetailedReviewInfoWithProfile> getReviewDetail(Long userId, Long reviewId) {
+    public CustomResponse<DetailedReviewInfoWithProfile> getReviewDetail(AuthUserDetails authUserDetails, Long reviewId) {
+
+        Long userId = (authUserDetails != null) ? authUserDetails.getUserId() : null;
 
         DetailedReviewInfoWithProfile result = reviewService.findReviewDetail(userId, reviewId);
         return CustomResponse.onSuccess(SuccessCode.WORKS_DETAIL_REVIEW_DETAIL_LOAD_SUCCESS, result);
