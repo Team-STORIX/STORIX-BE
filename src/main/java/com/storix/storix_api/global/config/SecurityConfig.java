@@ -86,6 +86,7 @@ public class SecurityConfig {
                                 .requestMatchers("/ws-stomp/**").permitAll()
 
                                 // [Works]
+                                .requestMatchers(HttpMethod.PATCH,   "/api/v1/works/review/*").hasRole("READER")
                                 .requestMatchers(HttpMethod.POST,   "/api/v1/works/review/*").hasRole("READER")
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/works/review/*").hasRole("READER")
                                 .requestMatchers("/api/v1/works/review/*/like").hasRole("READER")
