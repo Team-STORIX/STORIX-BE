@@ -16,10 +16,14 @@ import java.util.function.Supplier;
 @Component
 @RequiredArgsConstructor
 public class ExplorationCacheHelper {
-    private final RedisTemplate<String, Object> redisTemplate;
+
+    private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
-    private static final String KEY_PREFIX = "exploration::chart::v1::";
-    private static final String PARTICIPATION_KEY_PREFIX = "exploration::done::today::";
+
+    private static final String CHART_KEY_PREFIX = "exploration::chart::total::";
+    private static final String DONE_KEY_PREFIX = "exploration::done::today::";
+    private static final String PENDING_LIST_PREFIX = "exploration::pending::detail::";
+    private static final String GLOBAL_QUEUE_KEY = "exploration::queue";
 
     public List<GenreScoreInfo> getOrGenerateChart(Long userId, Supplier<List<GenreScoreInfo>> scoreSupplier) {
         String key = KEY_PREFIX + userId;
@@ -31,29 +35,67 @@ public class ExplorationCacheHelper {
             } catch (Exception e) { redisTemplate.delete(key); }
         }
 
-        List<GenreScoreInfo> scores = scoreSupplier.get();
+        // 캐시 없으면 DB 조회
+        List<GenreScoreInfo> data = supplier.get();
         try {
-            redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(scores), Duration.ofDays(7));
+            redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(data), Duration.ofDays(7));
         } catch (Exception ignored) {}
 
-        return scores;
+        return data;
     }
 
-    public void deleteChartCache(Long userId) {
-        redisTemplate.delete(KEY_PREFIX + userId);
+
+    public void addPendingSwipe(Long userId, Long worksId, boolean isLiked) {
+
+        PendingSwipeDto dto = PendingSwipeDto.builder()
+                .userId(userId).worksId(worksId).isLiked(isLiked).build();
+
+        try {
+            String json = objectMapper.writeValueAsString(dto);
+
+            // 유저별 리스트에 저장 (하루 유지)
+            redisTemplate.opsForList().rightPush(PENDING_LIST_PREFIX + userId, json);
+            redisTemplate.expire(PENDING_LIST_PREFIX + userId, Duration.ofDays(1));
+
+            // 스케줄러 사용을 위함
+            redisTemplate.opsForList().rightPush(GLOBAL_QUEUE_KEY, json);
+
+        } catch (Exception e) {
+            log.warn(">>> 취향분석 cache helper [pending]: {}", String.valueOf(e));
+        }
     }
 
+    // 유저별 pending data 전체 조회
+    public List<PendingSwipeDto> getAllPendingSwipes(Long userId) {
+        List<String> rawList = redisTemplate.opsForList().range(PENDING_LIST_PREFIX + userId, 0, -1);
+        if (rawList == null) return Collections.emptyList();
+
+        return rawList.stream()
+                .map(s -> {
+                    try { return objectMapper.readValue(s, PendingSwipeDto.class); }
+                    catch (Exception e) { return null; }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public Set<Long> getPendingWorksIds(Long userId) {
+        return getAllPendingSwipes(userId).stream()
+                .map(PendingSwipeDto::worksId)
+                .collect(Collectors.toSet());
+    }
+
+    // 오늘 완료 마킹 및 캐시 관리
     public boolean isAlreadyParticipatedToday(Long userId) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(PARTICIPATION_KEY_PREFIX + userId));
+        return Boolean.TRUE.equals(redisTemplate.hasKey(DONE_KEY_PREFIX + userId));
     }
 
     public void markAsParticipatedToday(Long userId) {
-        String key = PARTICIPATION_KEY_PREFIX + userId;
-        // 오늘 남은 시간 계산 (자정 만료)
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime midnight = now.toLocalDate().atTime(LocalTime.MAX);
-        Duration duration = Duration.between(now, midnight);
+        Duration duration = Duration.between(LocalDateTime.now(), LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX));
+        redisTemplate.opsForValue().set(DONE_KEY_PREFIX + userId, "true", duration);
+    }
 
-        redisTemplate.opsForValue().set(key, "true", duration);
+    public void deleteChartCache(Long userId) {
+        redisTemplate.delete(CHART_KEY_PREFIX + userId);
     }
 }
