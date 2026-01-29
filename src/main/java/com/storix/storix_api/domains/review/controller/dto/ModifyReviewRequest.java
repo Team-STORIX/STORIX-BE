@@ -2,14 +2,15 @@ package com.storix.storix_api.domains.review.controller.dto;
 
 import com.storix.storix_api.domains.plus.domain.Rating;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record ModifyReviewRequest(
 
-        @NotBlank(message = "별점을 선택해주세요.")
+        @NotNull(message = "별점을 선택해주세요.")
         Rating rating,
 
-        @NotBlank(message = "스포일러 여부를 선택해주세요.")
+        @NotNull(message = "스포일러 여부를 선택해주세요.")
         boolean isSpoiler,
 
         @NotBlank(message = "리뷰 내용을 입력해주세요.")

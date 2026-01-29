@@ -79,7 +79,7 @@ public class ReviewController {
     }
 
     @Operation(summary = "내 리뷰 수정", description = "리뷰 id로 리뷰를 수정하는 api 입니다. 수정된 리뷰 id가 반환됩니다.")
-    @PostMapping("/review/{reviewId}")
+    @PatchMapping("/review/{reviewId}")
     public ResponseEntity<CustomResponse<Long>> modifyMyReview(
             @AuthenticationPrincipal AuthUserDetails authUserDetails,
             @PathVariable @NotNull Long reviewId,
