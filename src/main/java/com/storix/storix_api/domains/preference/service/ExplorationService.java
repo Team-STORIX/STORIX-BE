@@ -5,6 +5,7 @@ import com.storix.storix_api.domains.preference.application.usecase.ExplorationU
 import com.storix.storix_api.domains.preference.dto.*;
 import com.storix.storix_api.domains.preference.repository.ExplorationRepository;
 import com.storix.storix_api.domains.works.application.port.LoadWorksPort;
+import com.storix.storix_api.domains.works.domain.Genre;
 import com.storix.storix_api.domains.works.domain.Works;
 import com.storix.storix_api.domains.works.dto.LibraryWorksInfo;
 import com.storix.storix_api.global.apiPayload.exception.preference.DuplicatedExplorationException;
@@ -127,7 +128,7 @@ public class ExplorationService implements ExplorationUseCase {
     }
 
 
-
+    @Override
     public List<GenreScoreInfo> getCumulativeStats(Long userId) {
         return cacheHelper.getOrGenerateChart(userId, () -> {
             List<Object[]> raw = explorationRepository.countLikedGenresByUserId(userId);
@@ -160,7 +161,7 @@ public class ExplorationService implements ExplorationUseCase {
 
         return rawCounts.stream()
                 .map(row -> new GenreScoreInfo(
-                        row[0].toString(),
+                        ((Genre) row[0]).getDbValue(),
                         Math.round(((long) row[1] / (double) totalLiked) * 5.0 * 10) / 10.0
                 ))
                 .toList();
