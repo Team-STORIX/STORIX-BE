@@ -30,11 +30,11 @@ public class ExplorationWorksResponseDto {
                 .thumbnailUrl(works.getThumbnailUrl())
                 .artistName(works.getArtistName())
                 .platform(works.getPlatform() != null ? works.getPlatform().toString() : null)
-                .genre(works.getGenre().getDbValue())
+                .genre(works.getGenre() != null ? works.getGenre().getDbValue() : null)
                 .description(works.getDescription())
-                .hashtags(works.getHashtags().stream()
+                .hashtags(works.getHashtags() != null ? works.getHashtags().stream()
                         .map(Hashtag::getName)
-                        .toList())
+                        .toList() : List.of())
                 .build();
     }
 }
