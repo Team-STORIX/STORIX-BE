@@ -4,9 +4,12 @@ import com.storix.storix_api.domains.preference.application.usecase.ExplorationU
 import com.storix.storix_api.domains.preference.dto.ExplorationResultResponseDto;
 import com.storix.storix_api.domains.preference.dto.ExplorationSubmitRequestDto;
 import com.storix.storix_api.domains.preference.dto.ExplorationWorksResponseDto;
+import com.storix.storix_api.domains.preference.dto.GenreScoreInfo;
 import com.storix.storix_api.domains.user.adaptor.AuthUserDetails;
 import com.storix.storix_api.global.apiPayload.CustomResponse;
 import com.storix.storix_api.global.apiPayload.code.SuccessCode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/preference")
+@Tag(name = "취향 분석", description = "취향 분석 API")
 public class PreferenceController {
 
     private final ExplorationUseCase explorationUseCase;
@@ -53,5 +57,17 @@ public class PreferenceController {
     ) {
         return CustomResponse.onSuccess(SuccessCode.SUCCESS,
                 explorationUseCase.getExplorationResults(authUserDetails.getUserId()));
+    }
+
+    // 마이페이지 누적 조회
+    @Operation(summary = "마이페이지 선호 장르 통계", description = "레이더 차트용 선호 장르별 점수를 조회합니다.")
+    @GetMapping("/stats")
+    public CustomResponse<List<GenreScoreInfo>> getStats(
+            @AuthenticationPrincipal AuthUserDetails authUserDetails
+    ) {
+        return CustomResponse.onSuccess(
+                SuccessCode.SUCCESS,
+                explorationUseCase.getCumulativeStats(authUserDetails.getUserId())
+        );
     }
 }
