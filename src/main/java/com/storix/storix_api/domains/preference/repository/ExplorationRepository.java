@@ -20,12 +20,19 @@ public interface ExplorationRepository extends JpaRepository<PreferenceExplorati
             "WHERE pe.userId = :userId AND pe.isLiked = :isLiked AND pe.createdAt >= :startOfDay")
     List<Works> findWorksByLikedStatusToday(@Param("userId") Long userId, @Param("isLiked") boolean isLiked, @Param("startOfDay") LocalDateTime startOfDay);
 
-    // 여태까지 응답한 모든 작품 ID (중복 방지용)
-    @Query("SELECT pe.worksId FROM PreferenceExploration pe WHERE pe.userId = :userId")
-    List<Long> findRespondedWorksIdsByUserId(@Param("userId") Long userId);
+    @Query("SELECT pe.worksId FROM PreferenceExploration pe " +
+            "WHERE pe.userId = :userId AND pe.isLiked = :isLiked AND pe.createdAt >= :threshold")
+    List<Long> findRespondedWorksIdsByStatusToday(
+            @Param("userId") Long userId,
+            @Param("isLiked") boolean isLiked,
+            @Param("threshold") LocalDateTime threshold
+    );
 
     // 마이페이지 누적 차트용
     @Query("SELECT w.genre, COUNT(w) FROM PreferenceExploration pe JOIN Works w ON pe.worksId = w.id " +
             "WHERE pe.userId = :userId AND pe.isLiked = true GROUP BY w.genre")
     List<Object[]> countLikedGenresByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT pe.worksId FROM PreferenceExploration pe WHERE pe.userId = :userId")
+    List<Long> findRespondedWorksIdsByUserId(@Param("userId") Long userId);
 }
