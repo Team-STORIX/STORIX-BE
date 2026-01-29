@@ -129,7 +129,6 @@ public class ExplorationService implements ExplorationUseCase {
         return ExplorationResultResponseDto.builder()
                 .likedWorks(toLibraryWorksInfoList(allLiked))
                 .dislikedWorks(toLibraryWorksInfoList(allDisliked))
-                .genreScores(calculateTodayScores(allLiked))
                 .build();
     }
 

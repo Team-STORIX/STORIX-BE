@@ -14,5 +14,4 @@ public class ExplorationResultResponseDto {
 
     private List<LibraryWorksInfo> likedWorks;
     private List<LibraryWorksInfo> dislikedWorks;
-    private List<GenreScoreInfo> genreScores;
 }
