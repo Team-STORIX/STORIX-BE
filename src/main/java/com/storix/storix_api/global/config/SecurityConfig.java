@@ -103,6 +103,9 @@ public class SecurityConfig {
                                 // [Feed]
                                 .requestMatchers("/api/v1/feed/**").hasRole("READER")
 
+                                // [Preference]
+                                .requestMatchers("/api/v1/preference/**").hasRole("READER")
+
                                 .anyRequest().authenticated()
                 )
 

@@ -10,6 +10,7 @@ import com.storix.storix_api.domains.works.repository.WorksRepository;
 import com.storix.storix_api.global.apiPayload.exception.plus.WorksNotExistException;
 import com.storix.storix_api.global.apiPayload.exception.works.UnknownWorksException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -134,19 +135,47 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
                 ));
     }
 
+    @Override
+    public List<Works> findRandomWorksExcluding(List<Long> excludedIds, int needed) {
+
+        List<Long> candidateIds = (excludedIds == null || excludedIds.isEmpty())
+                ? worksRepository.findAllCandidateIds()
+                : worksRepository.findCandidateIdsExcluding(excludedIds);
+
+        if (candidateIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Collections.shuffle(candidateIds);
+
+        List<Long> targetIds = candidateIds.stream()
+                .limit(needed)
+                .toList();
+
+        return worksRepository.findAllByIdWithHashtags(targetIds);
+    }
+
 
     @Override
     public Map<Long, TopicRoomWorksInfo> loadWorksMapByIds(List<Long> worksIds) {
+
         if (worksIds == null || worksIds.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        // IN 절 쿼리 실행
         List<TopicRoomWorksInfo> infos = worksRepository.findSimpleInfoByIdIn(worksIds);
 
-        // List -> Map 변환 (Key: worksId, Value: Info)
         return infos.stream()
                 .collect(Collectors.toMap(TopicRoomWorksInfo::id, Function.identity()));
     }
 
+    @Override
+    public List<Works> findWorksByIds(List<Long> worksIds) {
+
+        if (worksIds == null || worksIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return worksRepository.findAllById(worksIds);
+    }
 }
