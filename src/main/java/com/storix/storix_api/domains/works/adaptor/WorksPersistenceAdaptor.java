@@ -136,28 +136,35 @@ public class WorksPersistenceAdaptor implements LoadWorksPort {
     }
 
     @Override
-    public List<Works> findRandomWorksExcluding(List<Long> excludedIds, int limit) {
-        PageRequest pageable = PageRequest.of(0, limit);
+    public List<Works> findRandomWorksExcluding(List<Long> excludedIds, int needed) {
 
-        // 제외할 ID가 없으면 전체 랜덤 조회
-        if (excludedIds == null || excludedIds.isEmpty()) {
-            return worksRepository.findRandomWorks(pageable);
+        List<Long> candidateIds = (excludedIds == null || excludedIds.isEmpty())
+                ? worksRepository.findAllCandidateIds()
+                : worksRepository.findCandidateIdsExcluding(excludedIds);
+
+        if (candidateIds.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        return worksRepository.findRandomWorksExcluding(excludedIds, pageable);
+        Collections.shuffle(candidateIds);
+
+        List<Long> targetIds = candidateIds.stream()
+                .limit(needed)
+                .toList();
+
+        return worksRepository.findAllByIdWithHashtags(targetIds);
     }
 
 
     @Override
     public Map<Long, TopicRoomWorksInfo> loadWorksMapByIds(List<Long> worksIds) {
+
         if (worksIds == null || worksIds.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        // IN 절 쿼리 실행
         List<TopicRoomWorksInfo> infos = worksRepository.findSimpleInfoByIdIn(worksIds);
 
-        // List -> Map 변환 (Key: worksId, Value: Info)
         return infos.stream()
                 .collect(Collectors.toMap(TopicRoomWorksInfo::id, Function.identity()));
     }
