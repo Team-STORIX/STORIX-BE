@@ -28,9 +28,12 @@ public class HashtagRestController {
     public CustomResponse<List<HashtagRecommendResponseDto>> getRecommendedHashtags(
             @AuthenticationPrincipal AuthUserDetails authUserDetails
             ) {
+
+        Long userId = (authUserDetails != null) ? authUserDetails.getUserId() : null;
+
         return CustomResponse.onSuccess(
                 SuccessCode.SUCCESS,
-                hashtagRecommendationService.getRecommendedHashtags(authUserDetails.getUserId())
+                hashtagRecommendationService.getRecommendedHashtags(userId)
         );
     }
 
