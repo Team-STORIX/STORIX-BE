@@ -61,8 +61,8 @@ public class ExplorationCacheHelper {
                     new DefaultRedisScript<>(SUBMIT_SCRIPT, Long.class),
                     List.of(doneKey, countKey, detailKey, GLOBAL_QUEUE_KEY),
                     json,
-                    "86400",
-                    "86400",
+                    "43200",
+                    "43200",
                     String.valueOf(MAX_QUEUE_SIZE)
             );
 
