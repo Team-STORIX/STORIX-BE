@@ -50,7 +50,9 @@ public class ExplorationCacheHelper {
         List<GenreScoreInfo> data = supplier.get();
         try {
             redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(data), Duration.ofDays(7));
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            log.warn(">>> 취향분석 cache helper [chart cache write 실패]: {}", e.getMessage());
+        }
 
         return data;
     }
