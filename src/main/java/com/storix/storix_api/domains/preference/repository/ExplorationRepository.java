@@ -6,27 +6,31 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ExplorationRepository extends JpaRepository<PreferenceExploration, Long> {
 
-    // 1) 차트 집계: 특정 유저가 좋아요한 장르별 카운트
-    @Query("SELECT w.genre, COUNT(w) FROM PreferenceExploration pe " +
-            "JOIN Works w ON pe.worksId = w.id " +
-            "WHERE pe.userId = :userId AND pe.isLiked = true " +
-            "GROUP BY w.genre")
-    List<Object[]> countLikedGenresByUserId(@Param("userId") Long userId);
+    // 오늘 DB에 저장된 총 응답 수
+    @Query("SELECT COUNT(pe) FROM PreferenceExploration pe WHERE pe.userId = :userId AND pe.createdAt >= :startOfDay")
+    int countByUserIdAndCreatedAtAfter(@Param("userId") Long userId, @Param("startOfDay") LocalDateTime startOfDay);
 
-    // 2) 중복 방지: 이미 응답한 작품 ID 목록
+    // 오늘 DB에 저장된 작품 리스트 (JOIN 포함)
+    @Query("SELECT w FROM PreferenceExploration pe JOIN Works w ON pe.worksId = w.id " +
+            "WHERE pe.userId = :userId AND pe.isLiked = :isLiked AND pe.createdAt >= :startOfDay")
+    List<Works> findWorksByLikedStatusToday(@Param("userId") Long userId, @Param("isLiked") boolean isLiked, @Param("startOfDay") LocalDateTime startOfDay);
+
+    // 여태까지 응답한 모든 작품 ID (중복 방지용)
     @Query("SELECT pe.worksId FROM PreferenceExploration pe WHERE pe.userId = :userId")
     List<Long> findRespondedWorksIdsByUserId(@Param("userId") Long userId);
 
-    // 3) 결과 조회: 좋아요/별로예요 탭 리스트 (팀원의 DTO 구조 활용)
-    @Query("SELECT w FROM PreferenceExploration pe " +
-            "JOIN Works w ON pe.worksId = w.id " +
-            "WHERE pe.userId = :userId AND pe.isLiked = :isLiked")
-    List<Works> findWorksByLikedStatus(
-            @Param("userId") Long userId,
-            @Param("isLiked") boolean isLiked
-    );
+    // 마이페이지 누적 차트용
+    @Query("SELECT w.genre, COUNT(w) FROM PreferenceExploration pe JOIN Works w ON pe.worksId = w.id " +
+            "WHERE pe.userId = :userId AND pe.isLiked = true GROUP BY w.genre")
+    List<Object[]> countLikedGenresByUserId(@Param("userId") Long userId);
+
+
+    // [수정] 단순히 개수(int)가 아니라, 중복 제거를 위해 ID 리스트를 가져와야 함
+    @Query("SELECT pe.worksId FROM PreferenceExploration pe WHERE pe.userId = :userId AND pe.createdAt >= :startOfDay")
+    List<Long> findWorksIdsByUserIdAndCreatedAtAfter(@Param("userId") Long userId, @Param("startOfDay") LocalDateTime startOfDay);
 }
