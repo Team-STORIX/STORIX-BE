@@ -25,14 +25,18 @@ public class ExplorationCacheHelper {
     private static final String PENDING_LIST_PREFIX = "exploration::pending::detail::";
     private static final String GLOBAL_QUEUE_KEY = "exploration::queue";
 
-    public List<GenreScoreInfo> getOrGenerateChart(Long userId, Supplier<List<GenreScoreInfo>> scoreSupplier) {
-        String key = KEY_PREFIX + userId;
-        Object cached = redisTemplate.opsForValue().get(key);
+    // 레이더 차트 분석용
+    public List<GenreScoreInfo> getOrGenerateChart(Long userId, Supplier<List<GenreScoreInfo>> supplier) {
+
+        String key = CHART_KEY_PREFIX + userId;
+        String cached = redisTemplate.opsForValue().get(key);
 
         if (cached != null) {
             try {
-                return objectMapper.readValue((String) cached, new TypeReference<>() {});
-            } catch (Exception e) { redisTemplate.delete(key); }
+                return objectMapper.readValue(cached, new TypeReference<>() {});
+            } catch (Exception e) {
+                redisTemplate.delete(key);
+            }
         }
 
         // 캐시 없으면 DB 조회
