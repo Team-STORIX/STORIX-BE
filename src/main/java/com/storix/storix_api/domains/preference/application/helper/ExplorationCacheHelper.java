@@ -31,6 +31,40 @@ public class ExplorationCacheHelper {
     private static final String DONE_KEY_PREFIX = "exploration::done::today::";
     private static final String PENDING_LIST_PREFIX = "exploration::pending::detail::";
     private static final String GLOBAL_QUEUE_KEY = "exploration::queue";
+    private static final String DAILY_COUNT_KEY_PREFIX = "exploration::count::today::";
+
+    private static final String SUBMIT_SCRIPT =
+            "if redis.call('exists', KEYS[1]) == 1 then return -1 end " +        // 1. 이미 완료 : -1 반환
+                    "local count = redis.call('incr', KEYS[2]) " +                      // 2. 카운트 증가
+                    "if count > 15 then return -2 end " +                               // 3. 15개 초과 : -2 반환
+                    "redis.call('rpush', KEYS[3], ARGV[1]) " +                          // 4. 유저 상세 큐 저장
+                    "redis.call('rpush', KEYS[4], ARGV[1]) " +                          // 5. 글로벌 큐 저장
+                    "if count == 1 then redis.call('expire', KEYS[2], ARGV[2]) end " +  // 카운트 TTL 설정
+                    "redis.call('expire', KEYS[3], ARGV[3]) " +                         // 상세 큐 TTL 설정
+                    "return count";
+
+    public Long submitWithLua(Long userId, PendingSwipeDto dto) {
+        try {
+            String json = objectMapper.writeValueAsString(dto);
+            String doneKey = DONE_KEY_PREFIX + userId;
+            String countKey = DAILY_COUNT_KEY_PREFIX + userId;
+            String detailKey = PENDING_LIST_PREFIX + userId;
+
+            long secondsToMidnight = java.time.Duration.between(LocalDateTime.now(),
+                    LocalDateTime.now().toLocalDate().atTime(java.time.LocalTime.MAX)).getSeconds();
+
+            return redisTemplate.execute(
+                    new org.springframework.data.redis.core.script.DefaultRedisScript<>(SUBMIT_SCRIPT, Long.class),
+                    java.util.List.of(doneKey, countKey, detailKey, GLOBAL_QUEUE_KEY),
+                    json,
+                    String.valueOf(secondsToMidnight),
+                    "86400"
+            );
+        } catch (Exception e) {
+            log.error(">>> Lua script execution 실패: {}", e.getMessage());
+            return -3L;
+        }
+    }
 
     // 레이더 차트 분석용
     public List<GenreScoreInfo> getOrGenerateChart(Long userId, Supplier<List<GenreScoreInfo>> supplier) {
@@ -128,5 +162,17 @@ public class ExplorationCacheHelper {
             }
         }
         return batch;
+    }
+
+    // 복구 로직
+    public void rePushToGlobalQueue(PendingSwipeDto dto) {
+        try {
+            String json = objectMapper.writeValueAsString(dto);
+
+            // 큐의 앞쪽에 푸시되도록
+            redisTemplate.opsForList().leftPush(GLOBAL_QUEUE_KEY, json);
+        } catch (Exception e) {
+            log.error("글로벌 큐 re-push 시도 fail: ", e);
+        }
     }
 }
