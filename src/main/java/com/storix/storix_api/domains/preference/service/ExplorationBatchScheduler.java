@@ -32,7 +32,18 @@ public class ExplorationBatchScheduler {
             return;
         }
 
-        List<PreferenceExploration> entities = batch.stream()
+        long startTime = System.currentTimeMillis();
+        int totalCount = batch.size();
+
+        // 중복 제거 필터링
+        List<PreferenceExploration> entitiesToSave = batch.stream()
+                .filter(dto -> {
+                    boolean exists = explorationRepository.existsByUserIdAndWorksId(dto.userId(), dto.worksId());
+                    if (exists) {
+                        log.debug(">>> [Batch Skip] User {} - Works {} is already recorded.", dto.userId(), dto.worksId());
+                    }
+                    return !exists;
+                })
                 .map(dto -> PreferenceExploration.builder()
                         .userId(dto.userId())
                         .worksId(dto.worksId())
@@ -40,16 +51,23 @@ public class ExplorationBatchScheduler {
                         .build())
                 .toList();
 
-        try {
-            explorationRepository.saveAll(entities);
-            log.info("Flushed {} exploration records to DB.", entities.size());
-        } catch (Exception e) {
-            log.error("Failed to save exploration batch to DB", e);
+        int skippedCount = totalCount - entitiesToSave.size();
 
-            // 실패 시 데이터를 다시 글로벌 큐에 삽입 -> 다음 주기에 처리
-            for (PendingSwipeDto dto : batch) {
-                cacheHelper.rePushToGlobalQueue(dto);
-            }
+        // 저장 로직 실행
+        if (entitiesToSave.isEmpty()) {
+            log.info(">>> [ExplorationBatch] 새 데이터 없음 (Total: {}, Skipped: {})", totalCount, skippedCount);
+            return;
+        }
+
+
+        try {
+            explorationRepository.saveAll(entitiesToSave);
+
+            log.info(">>> [ExplorationBatch] synchronized 성 [Total: {}, Saved: {}, Skipped: {}] ({}ms)",
+                    totalCount, entitiesToSave.size(), skippedCount, System.currentTimeMillis() - startTime);
+
+        } catch (Exception e) {
+            log.error(">>> [ExplorationBatch] Critical save error: {}. Check DB constraints or entity mapping.", e.getMessage());
         }
     }
 }
