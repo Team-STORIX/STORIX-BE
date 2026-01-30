@@ -35,4 +35,7 @@ public interface ExplorationRepository extends JpaRepository<PreferenceExplorati
 
     @Query("SELECT pe.worksId FROM PreferenceExploration pe WHERE pe.userId = :userId")
     List<Long> findRespondedWorksIdsByUserId(@Param("userId") Long userId);
+
+    // 유저가 특정 작품에 대해 이미 응답했는지 여부 확인
+    boolean existsByUserIdAndWorksId(Long userId, Long worksId);
 }
