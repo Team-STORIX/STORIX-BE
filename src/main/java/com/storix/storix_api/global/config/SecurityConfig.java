@@ -67,15 +67,13 @@ public class SecurityConfig {
                     .anyRequest().permitAll()
             );
         } else {
-            DaoAuthenticationProvider swaggerAuthProvider = new DaoAuthenticationProvider();
-            swaggerAuthProvider.setUserDetailsService(
-                    new InMemoryUserDetailsManager(
-                            User.withUsername(swaggerUser)
-                                    .password(passwordEncoder().encode(swaggerPassword))
-                                    .roles("SWAGGER")
-                                    .build()
-                    )
+            InMemoryUserDetailsManager swaggerUserDetailsManager = new InMemoryUserDetailsManager(
+                    User.withUsername(swaggerUser)
+                            .password(passwordEncoder().encode(swaggerPassword))
+                            .roles("SWAGGER")
+                            .build()
             );
+            DaoAuthenticationProvider swaggerAuthProvider = new DaoAuthenticationProvider(swaggerUserDetailsManager);
             swaggerAuthProvider.setPasswordEncoder(passwordEncoder());
 
             http
@@ -215,14 +213,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    @ConditionalOnProperty(name = "swagger.user")
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user =
-                User.withUsername(swaggerUser)
-                        .password(passwordEncoder.encode(swaggerPassword))
-                        .roles("SWAGGER")
-                        .build();
-        return new InMemoryUserDetailsManager(user);
-    }
 }
