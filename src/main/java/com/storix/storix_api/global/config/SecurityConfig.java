@@ -2,19 +2,29 @@ package com.storix.storix_api.global.config;
 
 import com.storix.storix_api.global.security.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,8 +42,60 @@ public class SecurityConfig {
 
     private final SecurityEntryPoint securityEntryPoint;
     private final SecurityDeniedHandler securityDeniedHandler;
+    private final Environment environment;
+
+    @Value("${swagger.user:}")
+    private String swaggerUser;
+
+    @Value("${swagger.password:}")
+    private String swaggerPassword;
+
+    private boolean isLocal() {
+        return environment.acceptsProfiles(Profiles.of("local"));
+    }
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/swagger-ui/**", "/v3/api-docs/**")
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable);
+
+        if (isLocal()) {
+            http.authorizeHttpRequests(requests -> requests
+                    .anyRequest().permitAll()
+            );
+        } else {
+            DaoAuthenticationProvider swaggerAuthProvider = new DaoAuthenticationProvider();
+            swaggerAuthProvider.setUserDetailsService(
+                    new InMemoryUserDetailsManager(
+                            User.withUsername(swaggerUser)
+                                    .password(passwordEncoder().encode(swaggerPassword))
+                                    .roles("SWAGGER")
+                                    .build()
+                    )
+            );
+            swaggerAuthProvider.setPasswordEncoder(passwordEncoder());
+
+            http
+                    .authenticationProvider(swaggerAuthProvider)
+                    .httpBasic(basic -> basic
+                            .authenticationEntryPoint(new BasicAuthenticationEntryPoint() {{
+                                setRealmName("Swagger");
+                                afterPropertiesSet();
+                            }})
+                    )
+                    .authorizeHttpRequests(requests -> requests
+                            .anyRequest().hasRole("SWAGGER")
+                    );
+        }
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception {
 
         http
@@ -46,7 +108,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (requests) -> requests
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                                 // [Onboarding]
                                 .requestMatchers("/api/v1/onboarding/**").permitAll()
@@ -152,5 +213,16 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "swagger.user")
+    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
+        UserDetails user =
+                User.withUsername(swaggerUser)
+                        .password(passwordEncoder.encode(swaggerPassword))
+                        .roles("SWAGGER")
+                        .build();
+        return new InMemoryUserDetailsManager(user);
     }
 }
