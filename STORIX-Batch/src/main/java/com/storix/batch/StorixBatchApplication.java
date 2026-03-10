@@ -2,12 +2,15 @@ package com.storix.batch;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.TimeZone;
 
 @EnableScheduling
+@EnableJpaAuditing
 @SpringBootApplication(scanBasePackages = "com.storix")
 public class StorixBatchApplication {
 
@@ -17,6 +20,8 @@ public class StorixBatchApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(StorixBatchApplication.class, args);
+        SpringApplication app = new SpringApplication(StorixBatchApplication.class);
+        app.setWebApplicationType(WebApplicationType.NONE);
+        app.run(args);
     }
 }
