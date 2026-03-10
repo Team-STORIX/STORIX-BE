@@ -3,7 +3,6 @@ package com.storix.domain.domains.user.service;
 import com.storix.domain.domains.user.adaptor.AuthUserDetails;
 import com.storix.domain.domains.user.adaptor.UserAdaptor;
 import com.storix.domain.domains.user.domain.OAuthInfo;
-import com.storix.domain.domains.user.domain.OAuthProvider;
 import com.storix.domain.domains.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
