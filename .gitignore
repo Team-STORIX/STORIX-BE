@@ -1,7 +1,6 @@
 HELP.md
 .gradle
 build/
-!gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -35,3 +34,15 @@ out/
 
 ### VS Code ###
 .vscode/
+
+*.pem
+*.env
+
+### 추가가 필요한 파일은 예외로 추가하기 ###
+*.yml
+!ci.yml
+!cd.yml
+*.properties
+
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
